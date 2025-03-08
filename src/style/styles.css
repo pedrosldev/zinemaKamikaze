@@ -1,0 +1,296 @@
+/*
+  1. Use a more-intuitive box-sizing model.
+*/
+
+@font-face {
+  font-family: "Fright";
+  src: url(../fright_maiden/Fright\ Maiden\ Demo.ttf) format("truetype");
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+/*
+  2. Remove default margin
+*/
+* {
+  margin: 0;
+}
+/*
+  3. Allow percentage-based heights in the application
+*/
+html,
+body {
+  height: 100%;
+}
+/*
+  Typographic tweaks!
+  4. Add accessible line-height
+  5. Improve text rendering
+*/
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  cursor: url(../../img/HandXray.svg), auto;
+}
+/*
+  6. Improve media defaults
+*/
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+header {
+  text-align: center;
+  padding: 20px;
+  height: 10vh;
+  font-family: "Fright";
+  -webkit-text-stroke: 0.3px black;
+  color: transparent;
+  display: flex;
+  justify-content: space-evenly;
+  background-color: rgb(164, 168, 180,0.5);
+  background-image: url(../../img/scarey-bat.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+header:hover {
+  background-image: url(../../img/snakeman.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-color: rgb(164, 168, 180,0.5);
+}
+header h1 {
+  font-size: 3rem;
+  text-shadow: 2px 2px 0px #000000;
+  color: #ffffff;
+}
+
+.imgHeaderLeft {
+  width: 120px;
+  height: 70px;
+  filter: drop-shadow(6px 6px 6px rgb(0, 0, 255, 0.5));
+  z-index: 0;
+  transform: translateY(20px);
+  position: relative;
+  animation: upDown 6s infinite;
+  
+  /* filter: drop-shadow(6px 6px 0px blue); Very cool 3d effect*/
+}
+/* .headerCenter {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+} */
+
+/* .imgHeaderCenter {
+  width: 180px;
+  height: 120px;
+  filter: drop-shadow(6px 6px 6px rgb(0, 0, 255, 0.5));
+} */
+
+.imgHeaderRight {
+  width: 120px;
+  height: 70px;
+  filter: drop-shadow(6px 6px 6px rgb(0, 0, 255, 0.5));
+  z-index: 0;
+   transform: translateY(20px);
+  position: relative;
+}
+
+main {
+  background-color: #1b55fd;
+  background: linear-gradient(5deg, rgb(1, 14, 54) 0%, rgb(8, 172, 205) 100%);
+  height: 70vh;
+  display: grid;
+  grid-template-columns: 0.5fr 1fr 1.5fr 0.8fr;
+  grid-template-rows: 4fr 6fr;
+  z-index: 1;
+  position: relative;
+  
+   /* background-image: url(../../img/layout.PNG);
+  background-repeat: no-repeat;
+  background-size: cover;
+   height: 70vh; */
+
+}
+.item {
+  border: 5px solid rgba(104, 77, 74, 0.5);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+  border-radius: 5px;
+}
+.item-1{
+  background-image: url(../../img/deathwalker.svg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.item-1:hover{
+    animation: fadeIn 2s infinite;
+   
+}
+
+.item-2{
+ background-image: url(../../img/devilface.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.item-2:hover{
+   filter: brightness(90.5);
+     filter: drop-shadow(16px 16px 16px rgb(255, 0, 0));
+      transition: all 0.5s linear;
+
+}
+.item-3{
+  background-image: url(../../img/frankensteins-monster.svg);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.item-4{
+  /* background-image: url(../../img/vampirehead.svg); */
+  background-image: url(../../img/skeleton-rising.svg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+
+
+.item-5{
+  background-image: url(../../img/handsymonster.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.item-6{
+  background-image: url(../../img/witch.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.item-7{
+  background-image: url(../../img/skull.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.item-8{
+  background-image: url(../../img/ghost.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+footer{
+  background-color: rgb(164, 168, 180, 0.5);
+  display: flex;
+  /* justify-content: space-evenly; */
+  padding: 20px;
+  font-family: "Fright";
+  -webkit-text-stroke: 0.3px black;
+  color: transparent;
+  height: 20vh;
+  background-image: url(../../img/catWitch.svg);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  color: red;
+  text-align: center;
+}
+
+.movingLetters {
+  /* transform: translateX(40rem); */
+ margin-left: 55.5%;
+}
+/* footer p{
+    transform: translate(700px, 30%);
+} */
+
+.ondulation{
+  animation: ondulacion 2s infinite;
+  display: inline-block;
+}
+
+@keyframes ondulacion {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes upDown {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(35px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/*
+  7. Remove built-in form typography styles
+*/
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+/*
+  8. Avoid text overflows
+*/
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+/*
+  9. Create a root stacking context
+*/
+#root,
+#__next {
+  isolation: isolate;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translatex(0);
+  }
+}
