@@ -1,5 +1,6 @@
 ---
-
+const left = "ZINEMA";
+const right = "KAMIKAZE";
 ---
 
 <head>
@@ -12,18 +13,14 @@
 </head>
 <div class="container">
   <div class="left column">
-    <span>Z</span><span>I</span><span>N</span><span>E</span><span>M</span><span
-      >A</span
-    >
+    {left.split("").map((letter) => <span>{letter}</span>)}
   </div>
   <main>
     <h1>Y LA SORPRESA ES...</h1>
     <div class="surprise"></div>
   </main>
   <div class="right column">
-    <span>K</span><span>A</span><span>M</span><span>I</span><span>K</span><span
-      >A</span
-    ><span>Z</span><span>E</span>
+    {right.split("").map((letter) => <span>{letter}</span>)}
   </div>
 </div>
 <style>
@@ -46,17 +43,13 @@
     height: 100vh;
     font-size: 3.5rem;
   }
-  main{
-    display:flex;
-    flex-direction:column;
-    
- 
-  } 
+  main {
+    display: flex;
+    flex-direction: column;
+  }
   .surprise {
     width: 700px;
     height: 700px;
-    border:solid 1px black;
-   
- 
+    border: solid 1px black;
   }
 </style>
