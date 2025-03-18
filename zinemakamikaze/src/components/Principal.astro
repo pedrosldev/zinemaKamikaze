@@ -58,6 +58,9 @@ const right = "KAMIKAZE";
   }
 </style>
 <script>
+  const TMDB_API_KEY =
+    "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4MDdiOTAzODhhNmZkYzhmNjg1ZTQ3NDA3YTIxYWYwNiIsIm5iZiI6MTcwMzcwNTA3OS41NDcwMDAyLCJzdWIiOiI2NThjNzlmN2YzYjQ5YTI1M2U0MDNjNzIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.lfReehtY6PH2LHirD2oAquddfvs-eP8c4vp-WtqElQ0";
+  let filmSearch = "";
   document.addEventListener("DOMContentLoaded", function () {
     const btnLeer = document.getElementById("btnLeer");
     const contenidoDiv = document.getElementById("contenido");
@@ -68,6 +71,7 @@ const right = "KAMIKAZE";
     }
 
     btnLeer.addEventListener("click", function () {
+      console.log(TMDB_API_KEY);
       fetch("/titles.json")
         .then((response) => {
           if (!response.ok)
@@ -79,7 +83,30 @@ const right = "KAMIKAZE";
             throw new Error("El JSON no tiene el formato correcto.");
 
           const pelicula = data[Math.floor(Math.random() * data.length)];
+          filmSearch = pelicula.title;
           contenidoDiv.innerHTML = `<strong>${pelicula.title}</strong> (${pelicula.year ?? "Año desconocido"})`;
+        })
+        .catch((error) => {
+          contenidoDiv.textContent = "Error: " + error.message;
+        });
+
+      fetch(`https://api.themoviedb.org/3/search/movie?query=${filmSearch}`, {
+        headers: { Authorization: `Bearer ${TMDB_API_KEY}` },
+      })
+        .then((response) => {
+          if (!response.ok)
+            throw new Error("Error al cargar el archivo: " + response.status);
+          return response.json();
+        })
+        .then((data) => {
+          console.log("FIlm", filmSearch);
+          console.log(data);
+          console.log(data.results[0].poster_path);
+          // if (!Array.isArray(data))
+          //   throw new Error("El JSON no tiene el formato correcto.");
+
+          // const pelicula = data[Math.floor(Math.random() * data.length)];
+          // contenidoDiv.innerHTML = `<strong>${pelicula.title}</strong> (${pelicula.year ?? "Año desconocido"})`;
         })
         .catch((error) => {
           contenidoDiv.textContent = "Error: " + error.message;
