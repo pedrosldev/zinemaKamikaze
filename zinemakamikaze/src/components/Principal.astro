@@ -116,7 +116,7 @@ const right = "KAMIKAZE";
                 data.results.length === 0
               ) {
                 console.log("No hay poster");
-                posterUrl = "https://via.placeholder.com/500x750.png?text=No+poster+available";
+                posterUrl = "/images/noImg.jpg";
               } else {
                 posterUrl = `https://image.tmdb.org/t/p/w500${data.results[0].poster_path}`;
               }
