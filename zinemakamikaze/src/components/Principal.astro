@@ -58,51 +58,32 @@ const right = "KAMIKAZE";
   }
 </style>
 <script>
-  // document.getElementById("btnLeer").addEventListener("click", function () {
-  //   const contenidoDiv = document.getElementById("contenido");
-
-  //   // Ruta al archivo que deseas leer (debe estar en tu servidor)
-  //   const rutaArchivo = "/archivo.txt";
-
-  //   // Usar fetch para obtener el contenido del archivo
-  //   fetch(rutaArchivo)
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Error al cargar el archivo: " + response.status);
-  //       }
-  //       return response.text();
-  //     })
-  //     .then((texto) => {
-  //       // Mostrar el contenido en el DOM
-  //       contenidoDiv.textContent = texto;
-  //     })
-  //     .catch((error) => {
-  //       contenidoDiv.textContent = "Error: " + error.message;
-  //     });
-  // });
-  document.getElementById("btnLeer").addEventListener("click", function () {
+  document.addEventListener("DOMContentLoaded", function () {
+    const btnLeer = document.getElementById("btnLeer");
     const contenidoDiv = document.getElementById("contenido");
 
-    fetch("/titles.json")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error al cargar el archivo: " + response.status);
-        }
-        return response.json(); // Convertimos el JSON en un array
-      })
-      .then((data) => {
-        if (!Array.isArray(data)) {
-          throw new Error("El JSON no tiene el formato correcto.");
-        }
+    if (!btnLeer || !contenidoDiv) {
+      console.error("❌ Error: No se encontró el botón o el div 'contenido'.");
+      return;
+    }
 
-        // Elegir una película aleatoria
-        const pelicula = data[Math.floor(Math.random() * data.length)];
+    btnLeer.addEventListener("click", function () {
+      fetch("/titles.json")
+        .then((response) => {
+          if (!response.ok)
+            throw new Error("Error al cargar el archivo: " + response.status);
+          return response.json();
+        })
+        .then((data) => {
+          if (!Array.isArray(data))
+            throw new Error("El JSON no tiene el formato correcto.");
 
-        // Mostrar título y año en el DOM
-        contenidoDiv.innerHTML = `<strong>${pelicula.title}</strong> (${pelicula.year ?? "Año desconocido"})`;
-      })
-      .catch((error) => {
-        contenidoDiv.textContent = "Error: " + error.message;
-      });
+          const pelicula = data[Math.floor(Math.random() * data.length)];
+          contenidoDiv.innerHTML = `<strong>${pelicula.title}</strong> (${pelicula.year ?? "Año desconocido"})`;
+        })
+        .catch((error) => {
+          contenidoDiv.textContent = "Error: " + error.message;
+        });
+    });
   });
 </script>
