@@ -102,6 +102,8 @@ const right = "KAMIKAZE";
               return response.json();
             })
             .then((data) => {
+              if (!data.results)
+                throw new Error("El JSON no tiene el formato correcto.");
               console.log("FIlm", filmSearch);
               console.log(data);
               // console.log(data.results[0].poster_path);
