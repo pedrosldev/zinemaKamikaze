@@ -78,8 +78,7 @@ const right = "KAMIKAZE";
   }
 </style>
 <script>
-  const TMDB_API_KEY =
-    "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4MDdiOTAzODhhNmZkYzhmNjg1ZTQ3NDA3YTIxYWYwNiIsIm5iZiI6MTcwMzcwNTA3OS41NDcwMDAyLCJzdWIiOiI2NThjNzlmN2YzYjQ5YTI1M2U0MDNjNzIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.lfReehtY6PH2LHirD2oAquddfvs-eP8c4vp-WtqElQ0";
+  const TMDB_API_KEY = import.meta.env.PUBLIC_TMDB_API_KEY;
   let filmSearch = "";
   document.addEventListener("DOMContentLoaded", function () {
     const btnLeer = document.getElementById("btnLeer");
@@ -92,7 +91,7 @@ const right = "KAMIKAZE";
     }
 
     btnLeer.addEventListener("click", function () {
-      console.log(TMDB_API_KEY);
+      
       fetch("/titles.json")
         .then((response) => {
           if (!response.ok)
