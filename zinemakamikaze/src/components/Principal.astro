@@ -54,6 +54,10 @@ const right = "KAMIKAZE";
   .surprise {
     width: 700px;
     height: 700px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+    box-sizing: border-box; /* Asegura que padding no afecta el tamaño total */
     /*border: solid 1px black;*/
   }
 </style>
