@@ -134,6 +134,12 @@ const right = "KAMIKAZE";
               if (data.results.length > 1) {
                 surpriseDiv.innerHTML = "";
                 for (let i = 0; i < data.results.length; i++) {
+                  const container = document.createElement("div");
+                  container.style.position = "relative";
+                  container.style.display = "inline-block";
+                  container.style.width = "100%";
+                  container.style.height = "100%";
+
                   if (data.results[i].poster_path) {
                     const posterUrl = `https://image.tmdb.org/t/p/w500${data.results[i].poster_path}`;
                     const img = document.createElement("img");
@@ -141,16 +147,31 @@ const right = "KAMIKAZE";
                     img.alt = "Poster de la película";
                     img.style.width = "100%";
                     img.style.height = "100%";
-                    surpriseDiv.appendChild(img);
-                  }else{
+                    container.appendChild(img);
+                  } else {
                     const posterUrl = "/images/noImg.jpg";
                     const img = document.createElement("img");
                     img.src = posterUrl;
-                    img.alt = "Poster de la película";
+                    img.alt = "Sin póster disponible";
                     img.style.width = "100%";
                     img.style.height = "100%";
-                    surpriseDiv.appendChild(img);
+                    container.appendChild(img);
+
+                    const p = document.createElement("p");
+                    p.textContent = "Título: " + data.results[i].title;
+                    p.style.position = "absolute";
+                    p.style.top = "10px";
+                    p.style.left = "50%";
+                    p.style.transform = "translateX(-50%)";
+                    p.style.background = "rgba(0, 0, 0, 0.7)";
+                    p.style.color = "white";
+                    p.style.padding = "5px 10px";
+                    p.style.borderRadius = "5px";
+                    p.style.fontSize = "14px";
+                    container.appendChild(p);
                   }
+
+                  surpriseDiv.appendChild(container);
                 }
               }
 
