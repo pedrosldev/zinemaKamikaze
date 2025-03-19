@@ -102,21 +102,22 @@ const right = "KAMIKAZE";
               return response.json();
             })
             .then((data) => {
-              if (!data.results)
-                throw new Error("El JSON no tiene el formato correcto.");
+              let posterUrl = "";
+              if (!filmSearch) {
+                contenidoDiv.textContent =
+                  "Error: No se ha encontrado la película";
+                posterUrl = "/images/noImg.jpg";
+              }
+
               console.log("FIlm", filmSearch);
               console.log(data);
               // console.log(data.results[0].poster_path);
-              let posterUrl = "";
 
               if (data.results.length > 1) {
                 console.log("MÄS DE UNA PELÍCULA");
               }
               console.log("Tamaño", data.results.length);
-              if (
-               
-                data.results.length === 0
-              ) {
+              if (data.results.length === 0 || !data.results[0].poster_path) {
                 console.log("No hay poster");
                 posterUrl = "/images/noImg.jpg";
               } else {
