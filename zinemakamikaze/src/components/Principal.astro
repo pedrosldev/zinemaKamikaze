@@ -89,7 +89,7 @@ const right = "KAMIKAZE";
 
           const pelicula = data[Math.floor(Math.random() * data.length)];
           filmSearch = pelicula.title;
-          contenidoDiv.innerHTML = `<strong>${pelicula.title}</strong> (${pelicula.year ?? "Año desconocido"})`;
+          contenidoDiv.innerHTML = `<strong>${pelicula.title}</strong>`;
           return fetch(
             `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
               filmSearch
