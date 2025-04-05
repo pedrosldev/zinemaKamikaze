@@ -85,7 +85,7 @@ const right = "KAMIKAZE";
   document.addEventListener("DOMContentLoaded", function () {
     const btnLeer = document.getElementById("btnLeer");
     const contenidoDiv = document.getElementById("contenido");
-    const surpriseDiv = document.querySelector(".surprise");
+    const surpriseDiv = document.querySelector(".surprise")! as HTMLDivElement;
 
     if (!btnLeer || !contenidoDiv) {
       console.error("❌ Error: No se encontró el botón o el div 'contenido'.");
