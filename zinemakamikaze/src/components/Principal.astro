@@ -145,12 +145,22 @@ const right = "KAMIKAZE";
               }
 
               if (data.results.length === 1) {
+                surpriseDiv.innerHTML = "";
                 surpriseDiv.style.overflow = "hidden";
-                surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width:100%; height:100%;">`;
+                surpriseDiv.style.backgroundImage = `url(${posterUrl})`;
+                surpriseDiv.style.backgroundSize = "contain";
+                surpriseDiv.style.backgroundRepeat = "no-repeat";
+                surpriseDiv.style.backgroundPosition = "center";
+                surpriseDiv.style.borderRadius = "5px";
+                // surpriseDiv.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+                surpriseDiv.style.transition = "background-size 0.3s ease-in-out";
+                // surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width:100%; height:100%;">`;
               }
 
               if (data.results.length > 1) {
                 surpriseDiv.innerHTML = "";
+                surpriseDiv.style.backgroundImage = "none";
+                surpriseDiv.style.backgroundSize = "none";
                 surpriseDiv.style.overflowY = "scroll";
                 for (let i = 0; i < data.results.length; i++) {
                   const container = document.createElement("div");
@@ -161,14 +171,30 @@ const right = "KAMIKAZE";
 
                   if (data.results[i].poster_path) {
                     const posterUrl = `https://image.tmdb.org/t/p/w500${data.results[i].poster_path}`;
-                    const img = document.createElement("img");
-                    img.src = posterUrl;
-                    img.alt = "Poster de la película";
-                    img.style.width = "100%";
-                    img.style.height = "100%";
-                    img.style.objectFit = "cover";
-                    img.style.borderRadius = "5px";
-                    container.appendChild(img);
+                    const divBackground = document.createElement("div");
+                    divBackground.style.backgroundImage = `url(${posterUrl})`;
+                    divBackground.style.backgroundSize = "contain";
+                    divBackground.style.backgroundPosition = "center";
+                    divBackground.style.backgroundRepeat = "no-repeat";
+                    divBackground.style.width = "300px";
+                    divBackground.style.height = "300px";
+                    divBackground.style.borderRadius = "5px";
+                    // divBackground.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+                    divBackground.style.transition = "background-size 0.3s ease-in-out";
+                    // divBackground.style.position = "absolute";
+                    // divBackground.style.top = "0";
+                    // divBackground.style.left = "0";
+                    // divBackground.style.zIndex = "-1";
+                    container.appendChild(divBackground);
+          
+                    // const img = document.createElement("img");
+                    // img.src = posterUrl;
+                    // img.alt = "Poster de la película";
+                    // img.style.width = "100%";
+                    // img.style.height = "100%";
+                    // img.style.objectFit = "cover";
+                    // img.style.borderRadius = "5px";
+                    // container.appendChild(img);
                   } else {
                     const posterUrl = "/images/noImg.jpg";
                     const img = document.createElement("img");
