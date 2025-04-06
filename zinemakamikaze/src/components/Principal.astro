@@ -105,6 +105,12 @@ const right = "KAMIKAZE";
 
           const pelicula = data[Math.floor(Math.random() * data.length)];
           filmSearch = pelicula.title;
+          function puntosPorEspacios(texto:string) {
+            return texto.replace(/\./g, " ");
+          }
+          filmSearch = puntosPorEspacios(filmSearch);
+          console.log("Original title", pelicula.title);
+          console.log("Título formateado", filmSearch);
           contenidoDiv.innerHTML = `<strong>${pelicula.title}</strong>`;
           return fetch(
             `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
@@ -153,7 +159,8 @@ const right = "KAMIKAZE";
                 surpriseDiv.style.backgroundPosition = "center";
                 surpriseDiv.style.borderRadius = "5px";
                 // surpriseDiv.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
-                surpriseDiv.style.transition = "background-size 0.3s ease-in-out";
+                surpriseDiv.style.transition =
+                  "background-size 0.3s ease-in-out";
                 // surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width:100%; height:100%;">`;
               }
 
@@ -180,13 +187,14 @@ const right = "KAMIKAZE";
                     divBackground.style.height = "300px";
                     divBackground.style.borderRadius = "5px";
                     // divBackground.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
-                    divBackground.style.transition = "background-size 0.3s ease-in-out";
+                    divBackground.style.transition =
+                      "background-size 0.3s ease-in-out";
                     // divBackground.style.position = "absolute";
                     // divBackground.style.top = "0";
                     // divBackground.style.left = "0";
                     // divBackground.style.zIndex = "-1";
                     container.appendChild(divBackground);
-          
+
                     // const img = document.createElement("img");
                     // img.src = posterUrl;
                     // img.alt = "Poster de la película";
