@@ -111,7 +111,7 @@ const right = "KAMIKAZE";
           filmSearch = puntosPorEspacios(filmSearch);
           console.log("Original title", pelicula.title);
           console.log("Título formateado", filmSearch);
-          contenidoDiv.innerHTML = `<strong>${pelicula.title}</strong>`;
+          contenidoDiv.innerHTML = `<strong>${filmSearch}</strong>`;
           return fetch(
             `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
               filmSearch
