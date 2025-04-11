@@ -68,16 +68,14 @@ const right = "KAMIKAZE";
   }
   .surprise {
     margin-top: 10px;
-    width: 700px;
-    height: 700px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 32px;
+    /* width: 700px;
+    height: 700px; */
+
     box-sizing: border-box; /* Asegura que padding no afecta el tamaño total */
 
     /* overflow-y: scroll; */
-    /*border: solid 1px black;*/
   }
+
 </style>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -111,14 +109,14 @@ const right = "KAMIKAZE";
           if (!poster) {
             // console.log("No hay poster");
 
-            surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" >`;
+            surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; ">`;
             // surpriseDiv.style.backgroundImage = `url(/images/noImg.jpg)`;
             // surpriseDiv.style.backgroundSize = "cover";
             // surpriseDiv.style.backgroundRepeat = "no-repeat";
             // surpriseDiv.style.backgroundPosition = "center";
           } else {
             const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
-            surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película">`;
+            surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out;">`;
             // surpriseDiv.style.backgroundImage = `url(${posterUrl})`;
             // surpriseDiv.style.backgroundSize = "contain";
             // surpriseDiv.style.backgroundRepeat = "no-repeat";
