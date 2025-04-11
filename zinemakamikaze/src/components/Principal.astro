@@ -80,8 +80,6 @@ const right = "KAMIKAZE";
   }
 </style>
 <script>
-  const TMDB_API_KEY = import.meta.env.PUBLIC_TMDB_API_KEY;
-  let filmSearch = "";
   document.addEventListener("DOMContentLoaded", function () {
     const btnLeer = document.getElementById("btnLeer");
     const contenidoDiv = document.getElementById("contenido");
@@ -93,7 +91,7 @@ const right = "KAMIKAZE";
     }
 
     btnLeer.addEventListener("click", function () {
-      fetch("/titles.json")
+      fetch("/all_titles.json")
         .then((response) => {
           if (!response.ok)
             throw new Error("Error al cargar el archivo: " + response.status);
@@ -103,143 +101,23 @@ const right = "KAMIKAZE";
           if (!Array.isArray(data))
             throw new Error("El JSON no tiene el formato correcto.");
 
-          const pelicula = data[Math.floor(Math.random() * data.length)];
-          filmSearch = pelicula.title;
-          function puntosPorEspacios(texto:string) {
-            return texto.replace(/\./g, " ");
+          const randomIndex = Math.floor(Math.random() * data.length);
+          const pelicula = data[randomIndex];
+          const film = Math.floor(Math.random() * pelicula.films.length);
+          const poster = pelicula.films[film].poster_path;
+          const year = pelicula.films[film].year;
+          const title = pelicula.films[film].title;
+
+          if (!poster) {
+            console.log("No hay poster");
+
+            surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" style="width:100%; height:100%;">`;
+          } else {
+            const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
+            surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width:100%; height:100%;">`;
           }
-          filmSearch = puntosPorEspacios(filmSearch);
-          console.log("Original title", pelicula.title);
-          console.log("Título formateado", filmSearch);
-          contenidoDiv.innerHTML = `<strong>${filmSearch}</strong>`;
-          return fetch(
-            `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
-              filmSearch
-            )}`,
-            {
-              headers: { Authorization: `Bearer ${TMDB_API_KEY}` },
-            }
-          )
-            .then((response) => {
-              if (!response.ok)
-                throw new Error(
-                  "Error al cargar el archivo: " + response.status
-                );
-              return response.json();
-            })
-            .then((data) => {
-              let posterUrl = "";
-              if (!filmSearch) {
-                contenidoDiv.textContent =
-                  "Error: No se ha encontrado la película";
-                surpriseDiv.innerHTML = "";
-                // posterUrl = "/images/noImg.jpg";
-                return;
-              }
 
-              console.log("FIlm", filmSearch);
-              console.log(data);
-              // console.log(data.results[0].poster_path);
-
-              console.log("Tamaño", data.results.length);
-              if (data.results.length === 0 || !data.results[0].poster_path) {
-                console.log("No hay poster");
-                posterUrl = "/images/noImg.jpg";
-                surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width:100%; height:100%;">`;
-              } else {
-                posterUrl = `https://image.tmdb.org/t/p/w500${data.results[0].poster_path}`;
-              }
-
-              if (data.results.length === 1) {
-                surpriseDiv.innerHTML = "";
-                surpriseDiv.style.overflow = "hidden";
-                surpriseDiv.style.backgroundImage = `url(${posterUrl})`;
-                surpriseDiv.style.backgroundSize = "contain";
-                surpriseDiv.style.backgroundRepeat = "no-repeat";
-                surpriseDiv.style.backgroundPosition = "center";
-                surpriseDiv.style.borderRadius = "5px";
-                // surpriseDiv.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
-                surpriseDiv.style.transition =
-                  "background-size 0.3s ease-in-out";
-                // surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width:100%; height:100%;">`;
-              }
-
-              if (data.results.length > 1) {
-                surpriseDiv.innerHTML = "";
-                surpriseDiv.style.backgroundImage = "none";
-                surpriseDiv.style.backgroundSize = "none";
-                surpriseDiv.style.overflowY = "scroll";
-                for (let i = 0; i < data.results.length; i++) {
-                  const container = document.createElement("div");
-                  container.style.position = "relative";
-                  container.style.display = "inline-block";
-                  container.style.width = "80%";
-                  container.style.height = "80%";
-
-                  if (data.results[i].poster_path) {
-                    const posterUrl = `https://image.tmdb.org/t/p/w500${data.results[i].poster_path}`;
-                    const divBackground = document.createElement("div");
-                    divBackground.style.backgroundImage = `url(${posterUrl})`;
-                    divBackground.style.backgroundSize = "contain";
-                    divBackground.style.backgroundPosition = "center";
-                    divBackground.style.backgroundRepeat = "no-repeat";
-                    divBackground.style.width = "300px";
-                    divBackground.style.height = "300px";
-                    divBackground.style.borderRadius = "5px";
-                    // divBackground.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
-                    divBackground.style.transition =
-                      "background-size 0.3s ease-in-out";
-                    // divBackground.style.position = "absolute";
-                    // divBackground.style.top = "0";
-                    // divBackground.style.left = "0";
-                    // divBackground.style.zIndex = "-1";
-                    container.appendChild(divBackground);
-
-                    // const img = document.createElement("img");
-                    // img.src = posterUrl;
-                    // img.alt = "Poster de la película";
-                    // img.style.width = "100%";
-                    // img.style.height = "100%";
-                    // img.style.objectFit = "cover";
-                    // img.style.borderRadius = "5px";
-                    // container.appendChild(img);
-                  } else {
-                    const posterUrl = "/images/noImg.jpg";
-                    const img = document.createElement("img");
-                    img.src = posterUrl;
-                    img.alt = "Sin póster disponible";
-                    img.style.width = "100%";
-                    img.style.height = "100%";
-                    container.appendChild(img);
-
-                    const p = document.createElement("p");
-                    p.textContent = data.results[i].title;
-                    p.style.position = "absolute";
-                    p.style.top = "10px";
-                    p.style.left = "50%";
-                    p.style.transform = "translateX(-50%)";
-                    p.style.background = "rgba(0, 0, 0, 0.7)";
-                    p.style.color = "white";
-                    p.style.padding = "5px 10px";
-                    p.style.borderRadius = "5px";
-                    p.style.fontSize = "14px";
-                    container.appendChild(p);
-                  }
-
-                  surpriseDiv.appendChild(container);
-                }
-              }
-
-              // if (!Array.isArray(data))
-              //   throw new Error("El JSON no tiene el formato correcto.");
-
-              // const pelicula = data[Math.floor(Math.random() * data.length)];
-              // contenidoDiv.innerHTML = `<strong>${pelicula.title}</strong> (${pelicula.year ?? "Año desconocido"})`;
-            })
-            .catch((error) => {
-              // contenidoDiv.textContent = "Error: " + error.message;
-              console.error("Error: " + error.message);
-            });
+          contenidoDiv.innerHTML = `<strong>${title} (${year})</strong>`;
         })
         .catch((error) => {
           contenidoDiv.textContent = "Error: " + error.message;
