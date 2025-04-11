@@ -116,7 +116,6 @@ const right = "KAMIKAZE";
             surpriseDiv.style.backgroundSize = "cover";
             surpriseDiv.style.backgroundRepeat = "no-repeat";
             surpriseDiv.style.backgroundPosition = "center";
-            
           } else {
             const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
             // surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película">`;
@@ -124,12 +123,15 @@ const right = "KAMIKAZE";
             surpriseDiv.style.backgroundSize = "contain";
             surpriseDiv.style.backgroundRepeat = "no-repeat";
             surpriseDiv.style.backgroundPosition = "center";
+            // surpriseDiv.style.borderRadius = "20px";
+            // surpriseDiv.style.overflow = "hidden"; // si fuera necesario
+            // surpriseDiv.style.width = "300px"; // o lo que necesites
+            // surpriseDiv.style.height = "450px"; // para mantener proporción
             // surpriseDiv.style.width = "100%";
             // surpriseDiv.style.height = "100%";
             // surpriseDiv.style.borderRadius = "10px";
             // surpriseDiv.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
             // surpriseDiv.style.transition = "transform 0.3s ease-in-out";
-           
           }
 
           contenidoDiv.innerHTML = `<strong>${title} (${year})</strong>`;
