@@ -111,18 +111,18 @@ const right = "KAMIKAZE";
           if (!poster) {
             // console.log("No hay poster");
 
-            // surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" >`;
-            surpriseDiv.style.backgroundImage = `url(/images/noImg.jpg)`;
-            surpriseDiv.style.backgroundSize = "cover";
-            surpriseDiv.style.backgroundRepeat = "no-repeat";
-            surpriseDiv.style.backgroundPosition = "center";
+            surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" >`;
+            // surpriseDiv.style.backgroundImage = `url(/images/noImg.jpg)`;
+            // surpriseDiv.style.backgroundSize = "cover";
+            // surpriseDiv.style.backgroundRepeat = "no-repeat";
+            // surpriseDiv.style.backgroundPosition = "center";
           } else {
             const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
-            // surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película">`;
-            surpriseDiv.style.backgroundImage = `url(${posterUrl})`;
-            surpriseDiv.style.backgroundSize = "contain";
-            surpriseDiv.style.backgroundRepeat = "no-repeat";
-            surpriseDiv.style.backgroundPosition = "center";
+            surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película">`;
+            // surpriseDiv.style.backgroundImage = `url(${posterUrl})`;
+            // surpriseDiv.style.backgroundSize = "contain";
+            // surpriseDiv.style.backgroundRepeat = "no-repeat";
+            // surpriseDiv.style.backgroundPosition = "center";
             // surpriseDiv.style.borderRadius = "20px";
             // surpriseDiv.style.overflow = "hidden"; // si fuera necesario
             // surpriseDiv.style.width = "300px"; // o lo que necesites
