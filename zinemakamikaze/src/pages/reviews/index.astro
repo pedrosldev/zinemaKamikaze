@@ -4,7 +4,7 @@ import Layout from "../../layouts/Layout.astro";
 const reviews = await getCollection("review");
 ---
 
-
+<Layout>
   <h1>Críticas de Cine</h1>
   <ul>
     {
@@ -15,4 +15,4 @@ const reviews = await getCollection("review");
       ))
     }
   </ul>
-
+</Layout>

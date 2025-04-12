@@ -5,13 +5,13 @@ import Layout from "../../layouts/Layout.astro";
 export async function getStaticPaths() {
   const reviews = await getCollection("review");
   return reviews.map((review) => ({
-    params: { slug: review.id },
+    params: { slug: review.data.slug },
     props:  review ,
   }));
 }
 type Props = CollectionEntry<"review">;
 
-const review = Astro.props;
+const review = Astro.props as Props;
 
 const { Content } = await render(review);
 ---

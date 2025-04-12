@@ -10,6 +10,7 @@ const review = defineCollection({
         date: z.date(),
         tags: z.array(z.string()),
         image: z.string().optional(),
+        slug: z.string()
     }),
 });
 
