@@ -2,7 +2,7 @@
 title: 'Test2'
 description: 'Test'
 date: 2025-04-12
-tags: ["test"]
+tags: ["other"]
 slug: test-review2
 ---
 
