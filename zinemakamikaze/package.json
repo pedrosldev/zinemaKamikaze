@@ -9,7 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^5.5.0",
+    "astro": "^5.7.2",
     "openai": "^4.87.3"
   }
 }
