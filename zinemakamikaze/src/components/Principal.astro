@@ -22,34 +22,37 @@ const right = "";
     <div id="contenido"></div>
     <div class="surprise"></div>
   </main>
-  <div class="right column">
+  <!-- <div class="right column">
     <!-- <a href="/reviews" class="btn-enlace">Ver todas las críticas</a>
     <a href="/reviews/tags">Buscar por etiquetas</a> -->
-  </div>
+  </div> -->
 </div>
 <style>
   .container {
     font-family: "Sigmar", sans-serif;
     text-align: center;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+
+    /* align-items: center; */
   }
   .column {
     background-color: grey;
   }
   .left,
   .right {
-    display: flex;
+    /* display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    width: 15%;
-    height: 100vh;
+    align-items: center; */
+    /* width: 15%; */
+    height: 10vh;
     font-size: 2rem;
   }
   main {
     display: flex;
     flex-direction: column;
+    align-items: center;
   }
 
   .findSurprise {
@@ -58,6 +61,9 @@ const right = "";
     padding: 5px;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 1.5rem;
+    font-weight:lighter;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 
   .findSurprise:hover {
@@ -104,10 +110,10 @@ const right = "";
           const title = pelicula.films[film].title;
           console.log(pelicula.films[film].id);
           if (!poster) {
-            surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; ">`;
+            surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" style="width: 30%; height: 20%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; ">`;
           } else {
             const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
-            surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; opacity: 0;" loading="lazy" onload="this.style.opacity=1">`;
+            surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width: 80%; height: 80%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; opacity: 0;" loading="lazy" onload="this.style.opacity=1">`;
           }
 
           contenidoDiv.innerHTML = `<strong>${title} (${year})</strong>`;
