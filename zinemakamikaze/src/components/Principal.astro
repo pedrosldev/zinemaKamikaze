@@ -24,7 +24,10 @@ const right = "";
     <div id="contenido"></div>
     <div class="surprise"></div>
   </main>
-  <div class="right column"></div>
+  <div class="right column">
+    <a href="/reviews" class="btn-enlace">Ver todas las críticas</a>
+    <a href="/reviews/tags">Buscar por etiquetas</a>
+  </div>
 </div>
 <style>
   .container {
@@ -87,7 +90,12 @@ const right = "";
     }
 
     btnLeer.addEventListener("click", function () {
-      fetch("/all_titles.json")
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+      fetch("/api/titles.json")
         .then((response) => {
           if (!response.ok)
             throw new Error("Error al cargar el archivo: " + response.status);
@@ -103,7 +111,7 @@ const right = "";
           const poster = pelicula.films[film].poster_path;
           const year = pelicula.films[film].year;
           const title = pelicula.films[film].title;
-
+          console.log(pelicula.films[film].id);
           if (!poster) {
             // console.log("No hay poster");
 

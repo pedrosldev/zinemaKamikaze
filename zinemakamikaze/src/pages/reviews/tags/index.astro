@@ -1,0 +1,24 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../../layouts/Layout.astro";
+
+const reviews = await getCollection("review");
+
+// Obtener todos los tags únicos
+const allTags = Array.from(
+  new Set(reviews.flatMap((review) => review.data.tags))
+);
+---
+
+<Layout>
+  <h1>Explora por Tags</h1>
+  <ul>
+    {
+      allTags.map((tag) => (
+        <li>
+          <a href={`/reviews/tags/${tag}`}>{tag}</a>
+        </li>
+      ))
+    }
+  </ul>
+</Layout>
