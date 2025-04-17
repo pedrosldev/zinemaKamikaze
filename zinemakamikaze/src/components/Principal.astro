@@ -95,7 +95,7 @@ const right = "";
         spread: 70,
         origin: { y: 0.6 },
       });
-      fetch("/all_titles_with_id.json")
+      fetch("/api/titles.json")
         .then((response) => {
           if (!response.ok)
             throw new Error("Error al cargar el archivo: " + response.status);
