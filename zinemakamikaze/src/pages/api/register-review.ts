@@ -1,13 +1,22 @@
 import type { APIRoute } from 'astro';
 import mysql from 'mysql2/promise';
+export const prerender = false;
 
 // Uso variables de entorno para la conexión a la base de datos
-const db_host = import.meta.env.DB_HOST || 'localhost'; 
-const db_user = import.meta.env.DB_USER; 
-const db_password = import.meta.env.DB_PASSWORD; 
-const db_database = import.meta.env.DB_DATABASE; 
-const db_port = import.meta.env.DB_PORT;
-
+const db_host = import.meta.env.DB_HOST || 'localhost';
+const db_user = import.meta.env.DB_USER || 'root';
+const db_password = import.meta.env.DB_PASSWORD || '';
+const db_database = import.meta.env.DB_NAME || 'zinemakamikaze';
+const db_port = Number(import.meta.env.DB_PORT);
+// const db_host =  'localhost';
+// const db_user =  'root';
+// const db_password = '';
+// const db_database = 'zinemakamikaze';
+// const db_port = 3306;
+console.log('DB_HOST:', db_host);
+console.log('DB_USER:', db_user);
+console.log('DB_PASSWORD:', db_password);
+console.log('DB_NAME:', db_database);
 const connection = await mysql.createConnection({
     host: db_host,
     user: db_user,
@@ -31,9 +40,9 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const connection = await mysql.createConnection({
-        host: '200.234.227.110',
+        host: 'localhost',
         user: 'root',
-        password: 'root',
+        password: '',
         database: 'zinemakamikaze',
         port: 3306,
     });
