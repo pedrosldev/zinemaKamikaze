@@ -18,51 +18,52 @@ const right = "";
   </div>
   <main>
     <h1 class="findSurprise" id="btnLeer">Y LA ELEGIDA ES...</h1>
-    <!-- <button id="btnLeer">Cargar archivo.txt</button> -->
 
-    <!-- <h2>Contenido del fichero:</h2> -->
     <div id="contenido"></div>
     <div class="surprise"></div>
   </main>
-  <div class="right column">
+  <!-- <div class="right column">
     <!-- <a href="/reviews" class="btn-enlace">Ver todas las críticas</a>
     <a href="/reviews/tags">Buscar por etiquetas</a> -->
-  </div>
-</div>
+</div> 
+
 <style>
   .container {
     font-family: "Sigmar", sans-serif;
     text-align: center;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+
+    /* align-items: center; */
   }
   .column {
     background-color: grey;
   }
   .left,
   .right {
-    display: flex;
+    /* display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    width: 15%;
-    height: 100vh;
+    align-items: center; */
+    /* width: 15%; */
+    height: 10vh;
     font-size: 2rem;
   }
   main {
     display: flex;
     flex-direction: column;
+    align-items: center;
   }
 
   .findSurprise {
-    /* font-size: 2rem;
-    margin: 0;
-    padding: 0; */
     color: white;
     background-color: rgb(0, 0, 0, 0.8);
     padding: 5px;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 1.5rem;
+    font-weight: lighter;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 
   .findSurprise:hover {
@@ -70,12 +71,8 @@ const right = "";
   }
   .surprise {
     margin-top: 10px;
-    /* width: 700px;
-    height: 700px; */
 
-    box-sizing: border-box; /* Asegura que padding no afecta el tamaño total */
-
-    /* overflow-y: scroll; */
+    box-sizing: border-box;
   }
 </style>
 <script>
@@ -112,30 +109,32 @@ const right = "";
           const year = pelicula.films[film].year;
           const title = pelicula.films[film].title;
           console.log(pelicula.films[film].id);
+           fetch("/api/register-review", {
+             method: "POST",
+             headers: {
+               "Content-Type": "application/json",
+             },
+             body: JSON.stringify({ film_id: pelicula.films[film].id }),
+           })
+             .then((response) => {
+               if (!response.ok) {
+                 throw new Error(
+                   "Error al guardar la review en la base de datos."
+                 );
+               }
+               return response.json();
+             })
+             .then((data) => {
+               console.log("✅ Review guardada:", data.message);
+             })
+             .catch((error) => {
+               console.error("❌ Error al guardar la review:", error.message);
+             });
           if (!poster) {
-            // console.log("No hay poster");
-
-            surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; ">`;
-            // surpriseDiv.style.backgroundImage = `url(/images/noImg.jpg)`;
-            // surpriseDiv.style.backgroundSize = "cover";
-            // surpriseDiv.style.backgroundRepeat = "no-repeat";
-            // surpriseDiv.style.backgroundPosition = "center";
+            surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" style="width: 30%; height: 20%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; ">`;
           } else {
             const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
-            surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; opacity: 0;" loading="lazy" onload="this.style.opacity=1">`;
-            // surpriseDiv.style.backgroundImage = `url(${posterUrl})`;
-            // surpriseDiv.style.backgroundSize = "contain";
-            // surpriseDiv.style.backgroundRepeat = "no-repeat";
-            // surpriseDiv.style.backgroundPosition = "center";
-            // surpriseDiv.style.borderRadius = "20px";
-            // surpriseDiv.style.overflow = "hidden"; // si fuera necesario
-            // surpriseDiv.style.width = "300px"; // o lo que necesites
-            // surpriseDiv.style.height = "450px"; // para mantener proporción
-            // surpriseDiv.style.width = "100%";
-            // surpriseDiv.style.height = "100%";
-            // surpriseDiv.style.borderRadius = "10px";
-            // surpriseDiv.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
-            // surpriseDiv.style.transition = "transform 0.3s ease-in-out";
+            surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width: 80%; height: 80%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; opacity: 0;" loading="lazy" onload="this.style.opacity=1">`;
           }
 
           contenidoDiv.innerHTML = `<strong>${title} (${year})</strong>`;
