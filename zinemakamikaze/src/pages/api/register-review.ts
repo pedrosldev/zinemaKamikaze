@@ -3,9 +3,9 @@ import mysql from 'mysql2/promise';
 export const prerender = false;
 
 // Uso variables de entorno para la conexión a la base de datos
-const db_host = import.meta.env.DB_HOST || 'localhost';
+const db_host = import.meta.env.DB_HOST || '127.0.0.1';
 const db_user = import.meta.env.DB_USER || 'root';
-const db_password = import.meta.env.DB_PASSWORD || '';
+const db_password = import.meta.env.DB_PASSWORD || 'root';
 const db_database = import.meta.env.DB_NAME || 'zinemakamikaze';
 const db_port = Number(import.meta.env.DB_PORT);
 // const db_host =  'localhost';
