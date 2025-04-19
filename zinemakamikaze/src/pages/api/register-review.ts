@@ -17,13 +17,13 @@ console.log('DB_HOST:', db_host);
 console.log('DB_USER:', db_user);
 console.log('DB_PASSWORD:', db_password);
 console.log('DB_NAME:', db_database);
-const connection = await mysql.createConnection({
-    host: db_host,
-    user: db_user,
-    password: db_password,
-    database: db_database,
-    port: db_port,
-});
+// const connection = await mysql.createConnection({
+//     host: db_host,
+//     user: db_user,
+//     password: db_password,
+//     database: db_database,
+//     port: db_port,
+// });
 
 
 export const POST: APIRoute = async ({ request }) => {
@@ -40,10 +40,10 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const connection = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'zinemakamikaze',
+        host: db_host,
+        user: db_user,
+        password: db_password,
+        database: db_database,
         port: 3306,
     });
 
