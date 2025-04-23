@@ -105,6 +105,7 @@ const right = "";
           const randomIndex = Math.floor(Math.random() * data.length);
           const pelicula = data[randomIndex];
           const film = Math.floor(Math.random() * pelicula.films.length);
+          const filmId = pelicula.films[film].id;
           const poster = pelicula.films[film].poster_path;
           const year = pelicula.films[film].year;
           const title = pelicula.films[film].title;
@@ -114,7 +115,7 @@ const right = "";
              headers: {
                "Content-Type": "application/json",
              },
-             body: JSON.stringify({ film_id: pelicula.films[film].id }),
+             body: JSON.stringify({ film_id: filmId, title: title, year: year }),
            })
              .then((response) => {
                if (!response.ok) {
