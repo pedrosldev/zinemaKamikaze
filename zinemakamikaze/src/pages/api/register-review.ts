@@ -5,7 +5,7 @@ export const prerender = false;
 // Uso variables de entorno para la conexión a la base de datos
 const db_host = import.meta.env.DB_HOST || '127.0.0.1';
 const db_user = import.meta.env.DB_USER || 'root';
-const db_password = import.meta.env.DB_PASSWORD || 'root';
+const db_password = import.meta.env.DB_PASSWORD || '';
 const db_database = import.meta.env.DB_NAME || 'zinemakamikaze';
 const db_port = Number(import.meta.env.DB_PORT);
 // const db_host =  'localhost';
@@ -49,8 +49,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     try {
         await connection.execute(
-            'INSERT INTO test_reviews (film_id) VALUES (?)',
-            [body.film_id]
+            'INSERT INTO test_reviews (film_id, title, year) VALUES (?,?,?)',
+            [body.film_id, body.title, body.year], 
         );
 
         return new Response(
