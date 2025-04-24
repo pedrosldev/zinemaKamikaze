@@ -1,0 +1,20 @@
+---
+import { getReviewsByVibe } from '../../lib/db';
+import { Astro } from 'astro';
+export const prerender = false; // Consultar
+
+const { params } = Astro;
+const reviews = await getReviewsByVibe(params.vibe);
+---
+
+<h1>Películas con vibe: {params.vibe}</h1>
+
+<ul>
+  {reviews.map(review => (
+    <li>
+      <a href={`/reviews/${review.id}`}>{review.title} ({review.year})</a>
+    </li>
+  ))}
+</ul>
+
+<a href="/">← Volver al listado de vibes</a>

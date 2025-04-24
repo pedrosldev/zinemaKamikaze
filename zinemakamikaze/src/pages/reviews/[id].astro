@@ -1,0 +1,18 @@
+---
+import { getReviewById } from '../../lib/db';
+import { Astro } from 'astro';
+export const prerender = false // Consultar
+const { params } = Astro;
+const review = await getReviewById(Number(params.id));
+---
+
+{review ? (
+  <>
+    <h1>{review.title} ({review.year})</h1>
+    <p><strong>Vibe:</strong> {review.vibe}</p>
+    
+    <a href={`/vibe/${review.vibe}`}>← Volver a {review.vibe}</a>
+  </>
+) : (
+  <p>Review no encontrada</p>
+)}
