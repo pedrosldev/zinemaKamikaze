@@ -1,13 +1,13 @@
 ---
 import { getReviewsByVibe } from '../../lib/db';
-import { Astro } from 'astro';
+
 export const prerender = false; // Consultar
 
-const { params } = Astro;
-const reviews = await getReviewsByVibe(params.vibe);
+const vibe = Astro.params.vibe;
+const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 ---
 
-<h1>Películas con vibe: {params.vibe}</h1>
+<h1>Películas con vibe: {Astro.params.vibe}</h1>
 
 <ul>
   {reviews.map(review => (
