@@ -6,7 +6,10 @@ export const prerender = false; // Consultar
 const vibe = Astro.params.vibe;
 const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 ---
-
+<head>
+  <meta charset="utf-8" />
+  
+</head>
 <h1>Películas con vibe: {Astro.params.vibe}</h1>
 
 <ul>

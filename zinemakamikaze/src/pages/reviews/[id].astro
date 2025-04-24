@@ -8,6 +8,10 @@ const review = await getReviewById(Number(Astro.params.id));
 {
   review ? (
     <>
+      <head>
+    <meta charset="utf-8" />
+    
+  </head>
       <h1>
         {review.title} ({review.year})
       </h1>
