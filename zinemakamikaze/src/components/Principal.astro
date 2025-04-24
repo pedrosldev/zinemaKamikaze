@@ -107,7 +107,7 @@ const right = "";
           const film = Math.floor(Math.random() * pelicula.films.length);
           const filmId = pelicula.films[film].id;
           const poster = pelicula.films[film].poster_path;
-          const year = pelicula.films[film].year;
+          const year = pelicula.films[film].year || "Unknown";
           const title = pelicula.films[film].title;
           console.log(pelicula.films[film].id);
            fetch("/api/register-review", {
