@@ -1,6 +1,9 @@
 ---
 const left = "ZINEMA KAMIKAZE";
 const right = "";
+import { getAllVibes } from '../lib/db';
+
+const vibes = await getAllVibes();
 ---
 
 <head>
@@ -16,6 +19,11 @@ const right = "";
   <div class="left column">
     {left.split("").map((letter) => <span>{letter}</span>)}
   </div>
+  <ul>
+    {vibes.map(vibe => (
+      <li><a href={`/vibe/${vibe}`}>{vibe}</a></li>
+    ))}
+  </ul>
   <main>
     <h1 class="findSurprise" id="btnLeer">Y LA ELEGIDA ES...</h1>
 
@@ -107,7 +115,7 @@ const right = "";
           const film = Math.floor(Math.random() * pelicula.films.length);
           const filmId = pelicula.films[film].id;
           const poster = pelicula.films[film].poster_path;
-          const year = pelicula.films[film].year;
+          const year = pelicula.films[film].year || "Unknown";
           const title = pelicula.films[film].title;
           console.log(pelicula.films[film].id);
            fetch("/api/register-review", {
