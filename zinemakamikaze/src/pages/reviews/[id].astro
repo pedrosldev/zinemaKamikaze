@@ -10,7 +10,13 @@ const review = await getReviewById(Number(Astro.params.id));
     <>
       <head>
     <meta charset="utf-8" />
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
+    rel="stylesheet"
+  />
   </head>
       <h1>
         {review.title} ({review.year})
@@ -26,3 +32,19 @@ const review = await getReviewById(Number(Astro.params.id));
     <p>Review no encontrada</p>
   )
 }
+
+<style>
+  h1 {
+    font-family: "Sigmar", sans-serif;
+    text-align: center;
+  }
+  p {
+    font-family: "Sigmar", sans-serif;
+    text-align: center;
+  }
+  a {
+    font-family: "Sigmar", sans-serif;
+    text-decoration: none;
+    color: blue;
+  }
+</style>

@@ -8,6 +8,13 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 ---
 <head>
   <meta charset="utf-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
+    rel="stylesheet"
+  />
   
 </head>
 <h1>Películas con vibe: {Astro.params.vibe}</h1>
@@ -21,3 +28,24 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 </ul>
 
 <a href="/">← Volver al listado de vibes</a>
+
+
+<style>
+  h1 {
+    font-family: "Sigmar", sans-serif;
+    text-align: center;
+  }
+  ul {
+    font-family: "Sigmar", sans-serif;
+    list-style-type: none;
+    padding: 0;
+  }
+  li {
+    margin: 10px 0;
+  }
+  a {
+    font-family: "Sigmar", sans-serif;
+    text-decoration: none;
+    color: blue;
+  }
+</style>
