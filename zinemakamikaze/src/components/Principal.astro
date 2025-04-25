@@ -20,7 +20,7 @@ const vibes = await getAllVibes();
     {left.split("").map((letter) => <span>{letter}</span>)}
   </div>
   <ul>
-    {vibes.map(vibe => (
+    {vibes.filter(vibe => vibe !== null).map(vibe => (
       <li><a href={`/vibe/${vibe}`}>{vibe}</a></li>
     ))}
   </ul>
