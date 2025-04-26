@@ -1,5 +1,5 @@
 ---
-const left = "ZINEMA KAMIKAZE";
+const left = "ZINEMA KAMIKAZE!";
 const right = "";
 import { getAllVibes } from "../lib/db";
 import Vibrarcodion from "./Vibrarcodion.astro";
@@ -18,7 +18,8 @@ const vibes = await getAllVibes();
 </head>
 <div class="container">
   <div class="left column">
-    {left.split("").map((letter) => <span>{letter}</span>)}
+    <h1>ZINEMA KAMIKAZE!!!</h1>
+    <!-- {left.split("").map((letter) => <span>{letter}</span>)} -->
     <!-- <ul>
       {
         vibes
@@ -57,6 +58,7 @@ const vibes = await getAllVibes();
   .left,
   .right {
     display: flex;
+    justify-content: space-around;
     /* align-items: center;
     justify-content: center; */
     /* display: flex;
