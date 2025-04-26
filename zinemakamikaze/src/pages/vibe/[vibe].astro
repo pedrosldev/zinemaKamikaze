@@ -20,22 +20,22 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 <Layout>
   <header>
     <h1>Películas con vibe: {Astro.params.vibe}</h1>
-    <a href="/"
-      > Volver al
-      listado de vibes</a>
+    <a href="/"> Volver al listado de vibes</a>
   </header>
 
-  <ul>
-    {
-      reviews.map((review) => (
-        <li>
-          <a href={`/reviews/${review.id}`}>
-            {review.title} ({review.year})
-          </a>
-        </li>
-      ))
-    }
-  </ul>
+  <main>
+    <ul>
+      {
+        reviews.map((review) => (
+          <li>
+            <a href={`/reviews/${review.id}`}>
+              {review.title} ({review.year})
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
 </Layout>
 
 <style>
@@ -67,6 +67,12 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
   }
 
   a:hover {
-   filter: brightness(0.8);
+    filter: brightness(0.8);
+  }
+
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 </style>
