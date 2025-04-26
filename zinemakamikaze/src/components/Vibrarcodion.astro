@@ -1,0 +1,123 @@
+---
+// Import any necessary modules for database access
+// Replace this with your actual database access function
+import { getAllVibes } from "../lib/db";
+
+const vibes = await getAllVibes();
+
+// Props interface
+interface Props {
+  titulo?: string;
+  vibes: string[];
+}
+
+const { titulo = "Reviews por vibra" } = Astro.props;
+---
+
+<div class="acordeon">
+  <button class="acordeon-titulo-principal" aria-expanded="false">
+    <span class="titulo-texto">{titulo}</span>
+    <span class="icono">v</span>
+  </button>
+
+  <div class="acordeon-contenido" hidden>
+    <div class="acordeon-contenido-interior">
+      {
+        vibes.map((vibe) => (
+          <div class="acordeon-item">
+            <a href={`/vibe/${vibe}`} class="vibe-enlace">
+              {vibe}
+            </a>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .acordeon {
+    width:15%;
+    /* margin: 0 auto; */
+  }
+
+  .acordeon-titulo-principal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem;
+    background: none;
+    border: none;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 0;
+    position: relative; /* Para posicionamiento del icono */
+  }
+
+  .titulo-texto {
+    display: inline-block;
+  }
+
+  .icono {
+    position: absolute;
+    right: 5px;
+    transition: transform 0.3s;
+    font-size: 0.8em;
+  }
+
+  .acordeon-contenido {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease-out;
+  }
+
+  .acordeon-contenido-interior {
+    padding: 0.5rem 0.5rem;
+  }
+
+  .acordeon-titulo-principal[aria-expanded="true"] + .acordeon-contenido {
+    max-height: 1000px;
+  }
+
+  .acordeon-item {
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .vibe-enlace {
+    text-decoration: none;
+    color: #333;
+    transition: color 0.2s;
+    display: block;
+    font-size: 0.9rem;
+  }
+
+  .vibe-enlace:hover {
+    color: #0066cc;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const botonPrincipal = document.querySelector(".acordeon-titulo-principal");
+
+    botonPrincipal.addEventListener("click", () => {
+      const estaExpandido =
+        botonPrincipal.getAttribute("aria-expanded") === "true";
+
+      if (estaExpandido) {
+        botonPrincipal.setAttribute("aria-expanded", "false");
+        const contenido = botonPrincipal.nextElementSibling;
+        contenido.setAttribute("hidden", "");
+      } else {
+        botonPrincipal.setAttribute("aria-expanded", "true");
+        const contenido = botonPrincipal.nextElementSibling;
+        contenido.removeAttribute("hidden");
+      }
+    });
+  });
+</script>

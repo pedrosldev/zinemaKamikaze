@@ -1,7 +1,8 @@
 ---
-const left = "ZINEMA KAMIKAZE";
+const left = "ZINEMA KAMIKAZE!";
 const right = "";
-import { getAllVibes } from '../lib/db';
+import { getAllVibes } from "../lib/db";
+import Vibrarcodion from "./Vibrarcodion.astro";
 
 const vibes = await getAllVibes();
 ---
@@ -17,23 +18,30 @@ const vibes = await getAllVibes();
 </head>
 <div class="container">
   <div class="left column">
-    {left.split("").map((letter) => <span>{letter}</span>)}
+    <h1>ZINEMA KAMIKAZE!!!</h1>
+    <!-- {left.split("").map((letter) => <span>{letter}</span>)} -->
+    <!-- <ul>
+      {
+        vibes
+          .filter((vibe) => vibe !== null)
+          .map((vibe) => (
+            <li>
+              <a href={`/vibe/${vibe}`}>{vibe}</a>
+            </li>
+          ))
+      }
+    </ul> -->
+    <Vibrarcodion vibes={vibes} />
   </div>
-  <ul>
-    {vibes.filter(vibe => vibe !== null).map(vibe => (
-      <li><a href={`/vibe/${vibe}`}>{vibe}</a></li>
-    ))}
-  </ul>
+
   <main>
     <h1 class="findSurprise" id="btnLeer">Y LA ELEGIDA ES...</h1>
 
     <div id="contenido"></div>
     <div class="surprise"></div>
   </main>
-  <!-- <div class="right column">
-    <!-- <a href="/reviews" class="btn-enlace">Ver todas las críticas</a>
-    <a href="/reviews/tags">Buscar por etiquetas</a> -->
-</div> 
+
+</div>
 
 <style>
   .container {
@@ -49,12 +57,16 @@ const vibes = await getAllVibes();
   }
   .left,
   .right {
+    display: flex;
+    justify-content: space-around;
+    /* align-items: center;
+    justify-content: center; */
     /* display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center; */
     /* width: 15%; */
-    height: 10vh;
+    height: 15vh;
     font-size: 2rem;
   }
   main {
@@ -83,7 +95,7 @@ const vibes = await getAllVibes();
     box-sizing: border-box;
   }
 
-  ul{
+  ul {
     list-style-type: none;
     padding: 0;
     margin: 10px;
@@ -96,13 +108,13 @@ const vibes = await getAllVibes();
   ul li a {
     text-decoration: none;
     color: white;
-    background-color: rgb(0, 0, 0, 0.8);
-    padding: 3px;
-    border-radius: 5px;
+    /* background-color: rgb(0, 0, 0, 0.8);
+    padding: 3px; */
+    /* border-radius: 5px; */
     font-size: 1.2rem;
     font-weight: lighter;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s ease-in-out;
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease-in-out; */
   }
 </style>
 <script>
@@ -140,27 +152,27 @@ const vibes = await getAllVibes();
           const year = pelicula.films[film].year || "Unknown";
           const title = pelicula.films[film].title;
           console.log(pelicula.films[film].id);
-           fetch("/api/register-review", {
-             method: "POST",
-             headers: {
-               "Content-Type": "application/json",
-             },
-             body: JSON.stringify({ film_id: filmId, title: title, year: year }),
-           })
-             .then((response) => {
-               if (!response.ok) {
-                 throw new Error(
-                   "Error al guardar la review en la base de datos."
-                 );
-               }
-               return response.json();
-             })
-             .then((data) => {
-               console.log("✅ Review guardada:", data.message);
-             })
-             .catch((error) => {
-               console.error("❌ Error al guardar la review:", error.message);
-             });
+          fetch("/api/register-review", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ film_id: filmId, title: title, year: year }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  "Error al guardar la review en la base de datos."
+                );
+              }
+              return response.json();
+            })
+            .then((data) => {
+              console.log("✅ Review guardada:", data.message);
+            })
+            .catch((error) => {
+              console.error("❌ Error al guardar la review:", error.message);
+            });
           if (!poster) {
             surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" style="width: 30%; height: 20%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; ">`;
           } else {
