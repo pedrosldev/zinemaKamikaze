@@ -17,22 +17,11 @@ const vibes = await getAllVibes();
   />
 </head>
 <div class="container">
-  <div class="left column">
+  <header>
     <h1>ZINEMA KAMIKAZE!!!</h1>
-    <!-- {left.split("").map((letter) => <span>{letter}</span>)} -->
-    <!-- <ul>
-      {
-        vibes
-          .filter((vibe) => vibe !== null)
-          .map((vibe) => (
-            <li>
-              <a href={`/vibe/${vibe}`}>{vibe}</a>
-            </li>
-          ))
-      }
-    </ul> -->
+
     <Vibrarcodion vibes={vibes} />
-  </div>
+  </header>
 
   <main>
     <h1 class="findSurprise" id="btnLeer">Y LA ELEGIDA ES...</h1>
@@ -40,7 +29,6 @@ const vibes = await getAllVibes();
     <div id="contenido"></div>
     <div class="surprise"></div>
   </main>
-
 </div>
 
 <style>
@@ -52,22 +40,12 @@ const vibes = await getAllVibes();
 
     /* align-items: center; */
   }
-  .column {
-    background-color: grey;
-  }
-  .left,
-  .right {
+
+  header {
     display: flex;
-    justify-content: space-around;
-    /* align-items: center;
-    justify-content: center; */
-    /* display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center; */
-    /* width: 15%; */
-    height: 15vh;
-    font-size: 2rem;
+    justify-content:space-evenly;
+    background-color: grey;
+    height: 10vh;
   }
   main {
     display: flex;
