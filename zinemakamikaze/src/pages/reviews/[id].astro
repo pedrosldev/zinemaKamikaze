@@ -9,15 +9,15 @@ const review = await getReviewById(Number(Astro.params.id));
   review ? (
     <>
       <head>
-    <meta charset="utf-8" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
-    rel="stylesheet"
-  />
-  </head>
+        <meta charset="utf-8" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <h1>
         {review.title} ({review.year})
       </h1>
@@ -26,7 +26,10 @@ const review = await getReviewById(Number(Astro.params.id));
         <strong>Vibe:</strong> {review.vibe}
       </p>
 
-      <a href={`/vibe/${review.vibe}`}>← Volver a {review.vibe}</a>
+      <a href={`/vibe/${review.vibe}`}>
+        <img src="/images/left-arrow-backup-2-svgrepo-com.svg" alt="" /> Volver
+        a {review.vibe}
+      </a>
     </>
   ) : (
     <p>Review no encontrada</p>
@@ -46,5 +49,10 @@ const review = await getReviewById(Number(Astro.params.id));
     font-family: "Sigmar", sans-serif;
     text-decoration: none;
     color: blue;
+  }
+  img {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
   }
 </style>

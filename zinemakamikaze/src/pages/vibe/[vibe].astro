@@ -1,34 +1,40 @@
 ---
-import { getReviewsByVibe } from '../../lib/db';
+import { getReviewsByVibe } from "../../lib/db";
 
 export const prerender = false; // Consultar
 
 const vibe = Astro.params.vibe;
 const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 ---
+
 <head>
   <meta charset="utf-8" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
     rel="stylesheet"
   />
-  
 </head>
 <h1>Películas con vibe: {Astro.params.vibe}</h1>
 
 <ul>
-  {reviews.map(review => (
-    <li>
-      <a href={`/reviews/${review.id}`}>{review.title} ({review.year})</a>
-    </li>
-  ))}
+  {
+    reviews.map((review) => (
+      <li>
+        <a href={`/reviews/${review.id}`}>
+          {review.title} ({review.year})
+        </a>
+      </li>
+    ))
+  }
 </ul>
 
-<a href="/">← Volver al listado de vibes</a>
-
+<a href="/"
+  ><img src="/images/left-arrow-backup-2-svgrepo-com.svg" alt="" /> Volver al listado
+  de vibes</a
+>
 
 <style>
   h1 {
@@ -47,5 +53,11 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     font-family: "Sigmar", sans-serif;
     text-decoration: none;
     color: blue;
+  }
+
+  img {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
   }
 </style>
