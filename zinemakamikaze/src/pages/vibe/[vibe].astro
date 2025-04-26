@@ -1,36 +1,52 @@
 ---
-import { getReviewsByVibe } from '../../lib/db';
-
+import { getReviewsByVibe } from "../../lib/db";
+import Layout from "../../layouts/Layout.astro";
 export const prerender = false; // Consultar
 
 const vibe = Astro.params.vibe;
 const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 ---
+
 <head>
   <meta charset="utf-8" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
     rel="stylesheet"
   />
-  
 </head>
-<h1>Películas con vibe: {Astro.params.vibe}</h1>
+<Layout>
+  <header>
+    <h1>Películas con vibe: {Astro.params.vibe}</h1>
+    <a href="/"> Volver al listado de vibes</a>
+  </header>
 
-<ul>
-  {reviews.map(review => (
-    <li>
-      <a href={`/reviews/${review.id}`}>{review.title} ({review.year})</a>
-    </li>
-  ))}
-</ul>
-
-<a href="/">← Volver al listado de vibes</a>
-
+  <main>
+    <ul>
+      {
+        reviews.map((review) => (
+          <li>
+            <a href={`/reviews/${review.id}`}>
+              {review.title} ({review.year})
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+</Layout>
 
 <style>
+  header {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    background-color: grey;
+    height: 12vh;
+  }
   h1 {
     font-family: "Sigmar", sans-serif;
     text-align: center;
@@ -38,14 +54,25 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
   ul {
     font-family: "Sigmar", sans-serif;
     list-style-type: none;
-    padding: 0;
+    /* padding: 0; */
   }
-  li {
+  /* li {
     margin: 10px 0;
-  }
+  } */
   a {
     font-family: "Sigmar", sans-serif;
     text-decoration: none;
-    color: blue;
+    margin: 10px;
+    /* color: blue; */
+  }
+
+  a:hover {
+    filter: brightness(0.8);
+  }
+
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 </style>

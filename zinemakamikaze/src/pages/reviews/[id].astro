@@ -1,39 +1,51 @@
 ---
 import { getReviewById } from "../../lib/db";
+import Layout from "../../layouts/Layout.astro";
 export const prerender = false; // Consultar
 // const { params } = Astro;
 const review = await getReviewById(Number(Astro.params.id));
 ---
 
-{
-  review ? (
-    <>
-      <head>
-    <meta charset="utf-8" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
-    rel="stylesheet"
-  />
-  </head>
-      <h1>
-        {review.title} ({review.year})
-      </h1>
-      <p>{review.review}</p>
-      <p>
-        <strong>Vibe:</strong> {review.vibe}
-      </p>
-
-      <a href={`/vibe/${review.vibe}`}>← Volver a {review.vibe}</a>
-    </>
-  ) : (
-    <p>Review no encontrada</p>
-  )
-}
+<Layout>
+  {
+    review ? (
+      <>
+        <head>
+          <meta charset="utf-8" />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+          <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
+            rel="stylesheet"
+          />
+        </head>
+        <header>
+          <h1>
+            {review.title} ({review.year})
+          </h1>
+          <a href={`/vibe/${review.vibe}`}>Volver a {review.vibe}</a>
+        </header>
+        <p>{review.review}</p>
+        <p>
+          <strong>Vibe:</strong> {review.vibe}
+        </p>
+      </>
+    ) : (
+      <p>Review no encontrada</p>
+    )
+  }
+</Layout>
 
 <style>
+  header {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    background-color: grey;
+    height: 12vh;
+  }
   h1 {
     font-family: "Sigmar", sans-serif;
     text-align: center;
@@ -45,6 +57,8 @@ const review = await getReviewById(Number(Astro.params.id));
   a {
     font-family: "Sigmar", sans-serif;
     text-decoration: none;
-    color: blue;
+  }
+  a:hover {
+    filter: brightness(0.8);
   }
 </style>

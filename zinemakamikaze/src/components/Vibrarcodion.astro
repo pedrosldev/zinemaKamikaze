@@ -17,7 +17,9 @@ const { titulo = "Vibreviews" } = Astro.props;
 <div class="acordeon">
   <button class="acordeon-titulo-principal" aria-expanded="false">
     <span class="titulo-texto">{titulo}</span>
-    <span class="icono">v</span>
+    <span class="icono"
+      ><img src="/images/down-arrow-svgrepo-com.svg" alt="" /></span
+    >
   </button>
 
   <div class="acordeon-contenido">
@@ -37,7 +39,7 @@ const { titulo = "Vibreviews" } = Astro.props;
 
 <style>
   .acordeon {
-    width:10%;
+    width: 10%;
     margin-right: 15px;
     /* margin: 0 auto; */
   }
@@ -69,7 +71,10 @@ const { titulo = "Vibreviews" } = Astro.props;
     transition: transform 0.3s ease-in-out;
     font-size: 0.8em;
   }
-
+img {
+    width: 20px;
+    height: 20px;
+  }
   .acordeon-titulo-principal[aria-expanded="true"] .icono {
     transform: rotate(180deg);
   }
