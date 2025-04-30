@@ -14,6 +14,15 @@ interface Props {
 const { titulo = "Vibreviews" } = Astro.props;
 ---
 
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
+    rel="stylesheet"
+  />
+</head>
 <div class="acordeon">
   <button class="acordeon-titulo-principal" aria-expanded="false">
     <span class="titulo-texto">{titulo}</span>
@@ -63,6 +72,7 @@ const { titulo = "Vibreviews" } = Astro.props;
 
   .titulo-texto {
     display: inline-block;
+    font-family: "Sigmar", sans-serif;
   }
 
   .icono {
@@ -71,7 +81,7 @@ const { titulo = "Vibreviews" } = Astro.props;
     transition: transform 0.3s ease-in-out;
     font-size: 0.8em;
   }
-img {
+  img {
     width: 20px;
     height: 20px;
   }
