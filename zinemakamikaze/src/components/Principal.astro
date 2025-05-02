@@ -330,7 +330,12 @@ const vibes = await getAllVibes();
             surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" style="width: 30%; height: 20%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; ">`;
           } else {
             const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
-            surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width: 300px; height: 400px; object-fit: contain; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; opacity: 0;" loading="lazy" onload="this.style.opacity=1">`;
+            // surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width: 300px; height: 400px; object-fit: contain; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; opacity: 0;" loading="lazy" onload="this.style.opacity=1">`;
+            surpriseDiv.style.backgroundImage = `url(${posterUrl})`;
+            surpriseDiv.style.backgroundSize = "100% 100%";
+            surpriseDiv.style.backgroundPosition = "center";
+            surpriseDiv.style.backgroundRepeat = "no-repeat";
+            
           }
 
           contenidoDiv.innerHTML = `<strong>${title} (${year})</strong>`;
