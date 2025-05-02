@@ -16,7 +16,7 @@ const vibes = await getAllVibes();
     rel="stylesheet"
   />
 </head>
-<div class="container">
+<!-- <div class="container">
   <header>
     <h1>ZINEMA KAMIKAZE!!!</h1>
 
@@ -29,31 +29,48 @@ const vibes = await getAllVibes();
     <div id="contenido"></div>
     <div class="surprise"></div>
   </main>
-</div>
+</div> -->
+<main>
+  <div class="a">
+    <h1>ZINEMA KAMIKAZE!!!</h1><div class="film-grain"></div>
+    <div class="old-film-scratches"></div>
+  </div>
+  <div class="b">Actor 2</div>
+  <div class="c">Escena 1</div>
+  <div class="d">
+    <h1 class="findSurprise" id="btnLeer">Y LA ELEGIDA ES...</h1>
+    <div id="contenido"></div>
+  </div>
+  <div class="e surprise">Título</div>
+  <div class="f">
+    Actor 3
+    <div class="film-grain"></div>
+    <div class="old-film-scratches"></div>
+  </div>
+</main>
 
 <style>
-  .container {
+  /* .container {
     font-family: "Sigmar", sans-serif;
     text-align: center;
     display: flex;
     flex-direction: column;
 
-    /* align-items: center; */
-  }
+  } */
 
-  header {
+  /* header {
     display: flex;
-    justify-content:space-evenly;
+    justify-content: space-evenly;
     background-color: grey;
     height: 12vh;
-  }
-  main {
+  } */
+  /* main {
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
+  } */
 
-  .findSurprise {
+  /* .findSurprise {
     color: white;
     background-color: rgb(0, 0, 0, 0.8);
     padding: 5px;
@@ -62,37 +79,195 @@ const vibes = await getAllVibes();
     font-size: 1.5rem;
     font-weight: lighter;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-
+  } */
+  /* 
   .findSurprise:hover {
     background-color: rgb(0, 0, 0, 0.9);
-  }
-  .surprise {
+  } */
+  /* .surprise {
     margin-top: 10px;
 
     box-sizing: border-box;
-  }
+  } */
 
-  ul {
+  /* ul {
     list-style-type: none;
     padding: 0;
     margin: 10px;
     display: flex;
-    /* flex-direction: column; */
+   
     align-items: center;
     justify-content: space-around;
-  }
+  } */
 
-  ul li a {
+  /* ul li a {
     text-decoration: none;
     color: white;
-    /* background-color: rgb(0, 0, 0, 0.8);
-    padding: 3px; */
-    /* border-radius: 5px; */
+
     font-size: 1.2rem;
     font-weight: lighter;
-    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s ease-in-out; */
+
+  } */
+  /****** */
+  main {
+    margin: 0;
+    background-color: #1c3b70;
+    display: grid;
+    grid-template-areas:
+      "a a b b c"
+      "d e e e f"
+      "d e e e f";
+    height: 100vh;
+    font-family: "Sigmar", sans-serif;
+  }
+
+  main > div:not(.film-grain):not(.old-film-scratches) {
+    background-color: #1a54fa;
+    filter: brightness(0.8) contrast(0.9);
+    border: 7px solid rgba(107, 63, 47, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: flicker 3s infinite;
+    position: relative;
+    /* Añadido para contener los efectos */
+    overflow: hidden;
+    /* Añadido para contener los efectos */
+  }
+
+  .a {
+    grid-area: a;
+  }
+
+  .b {
+    grid-area: b;
+  }
+
+  .c {
+    grid-area: c;
+  }
+
+  .d {
+    grid-area: d;
+  }
+
+  .e {
+    grid-area: e;
+  }
+
+  .f {
+    grid-area: f;
+  }
+
+  /* .surprise {
+
+
+    box-sizing: border-box;
+  } */
+
+  @keyframes flicker {
+    0%,
+    100% {
+      filter: brightness(0.8) contrast(0.9);
+    }
+
+    50% {
+      filter: brightness(0.9) contrast(1);
+    }
+
+    75% {
+      filter: brightness(0.85) contrast(1.05);
+    }
+  }
+
+  /* Efectos solo para .b y .f */
+  .b > .film-grain,
+  .f > .film-grain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: url("/images/old_celluloid.png");
+    background-size: cover;
+    opacity: 0.15;
+    z-index: 100;
+    animation: flickerGrain 10s infinite steps(60);
+  }
+
+  .a > .old-film-scratches,
+  .f > .old-film-scratches {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("/images/old_celluloid.png") repeat;
+    background-size: cover;
+    pointer-events: none;
+    mix-blend-mode: lighten;
+    z-index: 101;
+    animation: scratchesFlicker 7s infinite steps(60);
+    opacity: 0.12;
+  }
+  .d {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  @keyframes flickerGrain {
+    0% {
+      opacity: 0.1;
+      transform: translate(0px, 0px);
+    }
+
+    25% {
+      opacity: 0.2;
+      transform: translate(1px, -1px);
+    }
+
+    50% {
+      opacity: 0.05;
+      transform: translate(-1px, 1px);
+    }
+
+    75% {
+      opacity: 0.15;
+      transform: translate(2px, -2px);
+    }
+
+    100% {
+      opacity: 0.1;
+      transform: translate(0px, 0px);
+    }
+  }
+
+  @keyframes scratchesFlicker {
+    0% {
+      opacity: 0.1;
+      transform: translate(0, 0) scale(1);
+    }
+
+    25% {
+      opacity: 0.2;
+      transform: translateY(-2px) scale(1.01);
+    }
+
+    50% {
+      opacity: 0.05;
+      transform: translateX(1px) scale(0.99);
+    }
+
+    75% {
+      opacity: 0.15;
+      transform: translate(-2px, 1px) scale(1.02);
+    }
+
+    100% {
+      opacity: 0.1;
+      transform: translate(0, 0) scale(1);
+    }
   }
 </style>
 <script>
@@ -155,7 +330,7 @@ const vibes = await getAllVibes();
             surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" style="width: 30%; height: 20%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; ">`;
           } else {
             const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
-            surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width: 80%; height: 80%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; opacity: 0;" loading="lazy" onload="this.style.opacity=1">`;
+            surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width: 300px; height: 400px; object-fit: contain; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; opacity: 0;" loading="lazy" onload="this.style.opacity=1">`;
           }
 
           contenidoDiv.innerHTML = `<strong>${title} (${year})</strong>`;
