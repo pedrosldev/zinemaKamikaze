@@ -1,7 +1,7 @@
 ---
 import { getReviewsByVibe } from "../../lib/db";
 import Layout from "../../layouts/Layout.astro";
-export const prerender = false; // Consultar
+export const prerender = false;
 
 const vibe = Astro.params.vibe;
 const reviews = vibe ? await getReviewsByVibe(vibe) : [];
@@ -16,63 +16,294 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
     rel="stylesheet"
   />
+  <!-- Añadimos animate.css para animaciones -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
 </head>
-<Layout>
-  <header>
-    <h1>Películas con vibe: {Astro.params.vibe}</h1>
-    <a href="/"> Volver al listado de vibes</a>
-  </header>
 
-  <main>
-    <ul>
-      {
-        reviews.map((review) => (
-          <li>
-            <a href={`/reviews/${review.id}`}>
-              {review.title} ({review.year})
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+<Layout>
+  <main class="reviews-layout">
+    <!-- Sidebar izquierdo (antiguo footer) -->
+    <div class="grid-sidebar">
+      <div class="film-grain"></div>
+      <div class="old-film-scratches"></div>
+      <div class="sidebar-content">
+        <!-- Aquí puedes añadir contenido adicional para la barra lateral si lo deseas -->
+      </div>
+    </div>
+
+    <div class="main-content">
+      <!-- Header animado que aparece desde la derecha -->
+      <div class="grid-header">
+        <h1 class="animate__animated animate__slideInRight animate__slow">
+          ZINEMA KAMIKAZE: {vibe}
+        </h1>
+        <div class="film-grain"></div>
+        <div class="old-film-scratches"></div>
+        <a href="/" class="back-link">Volver al listado</a>
+      </div>
+
+      <!-- Contenido principal con las reviews -->
+      <div class="grid-content">
+        <ul class="reviews-list">
+          {
+            reviews.map((review) => (
+              <li class="review-item">
+                <a href={`/reviews/${review.id}`}>
+                  {review.title}{" "}
+                  <span class="review-year">({review.year})</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
   </main>
 </Layout>
 
 <style>
-  header {
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    justify-content: center;
-    background-color: grey;
-    height: 12vh;
-  }
-  h1 {
+  /* Nueva estructura de layout con sidebar */
+  .reviews-layout {
+    margin: 0;
+    background-color: #1c3b70;
+    display: grid;
+    grid-template-columns: 80px 1fr; /* 80px para la barra lateral, el resto para el contenido principal */
+    height: 100vh;
+    overflow: hidden;
     font-family: "Sigmar", sans-serif;
-    text-align: center;
-  }
-  ul {
-    font-family: "Sigmar", sans-serif;
-    list-style-type: none;
-    /* padding: 0; */
-  }
-  /* li {
-    margin: 10px 0;
-  } */
-  a {
-    font-family: "Sigmar", sans-serif;
-    text-decoration: none;
-    margin: 10px;
-    /* color: blue; */
   }
 
-  a:hover {
-    filter: brightness(0.8);
+  /* Contenedor principal para el header y el contenido */
+  .main-content {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
   }
 
-  main {
+  /* Estilos para la barra lateral (antiguo footer) */
+  .grid-sidebar {
+    background-color: #1a54fa;
+    filter: brightness(0.8) contrast(0.9);
+    position: relative;
+    overflow: hidden;
+    background-image: linear-gradient(
+        to right,
+        rgba(107, 63, 47, 0.8) 6px,
+        transparent 6px
+      ),
+      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
+    background-position:
+      0 0,
+      0 0,
+      100% 0,
+      0 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    padding: 10px;
+    animation: flicker 3s infinite;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    position: relative;
+  }
+
+  /* Estilos compartidos para el header y content */
+  .grid-header,
+  .grid-content {
+    background-color: #1a54fa;
+    filter: brightness(0.8) contrast(0.9);
+    position: relative;
+    overflow: hidden;
+    background-image: linear-gradient(
+        to right,
+        rgba(107, 63, 47, 0.8) 6px,
+        transparent 6px
+      ),
+      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
+    background-position:
+      0 0,
+      0 0,
+      100% 0,
+      0 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    padding: 20px;
+  }
+
+  /* Estilos específicos para el header */
+  .grid-header {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    min-height: 150px;
+    align-items: center;
+    justify-content: center;
+    animation: flicker 3s infinite;
+  }
+
+  /* Estilos para el contenido principal */
+  .grid-content {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow-y: auto;
+    animation: flicker 3s infinite;
+  }
+
+  /* Estilos específicos para el contenido */
+  .reviews-list {
+    list-style-type: none;
+    padding: 0;
+    width: 80%;
+    max-width: 800px;
+  }
+
+  .review-item {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-left: 4px solid rgba(107, 63, 47, 0.8);
+    transition: transform 0.3s ease;
+  }
+
+  .review-item:hover {
+    transform: translateX(10px);
+    filter: brightness(1.1);
+  }
+
+  .review-item a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+    display: block;
+  }
+
+  .review-year {
+    color: #f5d742;
+    font-size: 0.9rem;
+  }
+
+  .back-link {
+    color: #f5d742;
+    text-decoration: none;
+    margin-top: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+    filter: brightness(1.2);
+  }
+
+  /* Efectos de película */
+  .film-grain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: url("/images/old_celluloid.png");
+    background-size: cover;
+    opacity: 0.15;
+    z-index: 100;
+    animation: flickerGrain 10s infinite steps(60);
+  }
+
+  .old-film-scratches {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("/images/old_celluloid.png") repeat;
+    background-size: cover;
+    pointer-events: none;
+    mix-blend-mode: lighten;
+    z-index: 101;
+    animation: scratchesFlicker 7s infinite steps(60);
+    opacity: 0.12;
+  }
+
+  /* Animaciones */
+  @keyframes flicker {
+    0%,
+    100% {
+      filter: brightness(0.8) contrast(0.9);
+    }
+    50% {
+      filter: brightness(0.9) contrast(1);
+    }
+    75% {
+      filter: brightness(0.85) contrast(1.05);
+    }
+  }
+
+  /* La animación slideInRight está proporcionada por animate.css */
+
+  @keyframes flickerGrain {
+    0% {
+      opacity: 0.1;
+      transform: translate(0px, 0px);
+    }
+    25% {
+      opacity: 0.2;
+      transform: translate(1px, -1px);
+    }
+    50% {
+      opacity: 0.05;
+      transform: translate(-1px, 1px);
+    }
+    75% {
+      opacity: 0.15;
+      transform: translate(2px, -2px);
+    }
+    100% {
+      opacity: 0.1;
+      transform: translate(0px, 0px);
+    }
+  }
+
+  @keyframes scratchesFlicker {
+    0% {
+      opacity: 0.1;
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      opacity: 0.2;
+      transform: translateY(-2px) scale(1.01);
+    }
+    50% {
+      opacity: 0.05;
+      transform: translateX(1px) scale(0.99);
+    }
+    75% {
+      opacity: 0.15;
+      transform: translate(-2px, 1px) scale(1.02);
+    }
+    100% {
+      opacity: 0.1;
+      transform: translate(0, 0) scale(1);
+    }
   }
 </style>
