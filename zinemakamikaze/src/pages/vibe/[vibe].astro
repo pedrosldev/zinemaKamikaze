@@ -12,45 +12,37 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
-    rel="stylesheet"
-  />
-  <!-- Ya no necesitamos animate.css -->
+  <link href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap" rel="stylesheet" />
 </head>
 
 <Layout>
   <main class="reviews-layout">
-    <!-- Sidebar izquierdo (antiguo footer) -->
+    <!-- Sidebar izquierdo -->
     <div class="grid-sidebar">
       <div class="film-grain"></div>
       <div class="old-film-scratches"></div>
-      <div class="sidebar-content">
-        <!-- Aquí puedes añadir contenido adicional para la barra lateral si lo deseas -->
-      </div>
     </div>
 
+    <!-- Contenido principal -->
     <div class="main-content">
-      <!-- Header animado que aparece desde la derecha -->
-      <div class="grid-header slide-in-right">
+      <!-- Header con animación -->
+      <div class="grid-header">
         <h1>ZINEMA KAMIKAZE: {vibe}</h1>
         <div class="film-grain"></div>
         <div class="old-film-scratches"></div>
         <a href="/" class="back-link">Volver al listado</a>
       </div>
 
-      <!-- Contenido principal con las reviews -->
+      <!-- Listado de reviews con items alternados -->
       <div class="grid-content">
         <ul class="reviews-list">
-          {
-            reviews.map((review) => (
-              <li class="review-item">
-                <a href={`/reviews/${review.id}`}>
-                  {review.title} <span class="review-year">({review.year})</span>
-                </a>
-              </li>
-            ))
-          }
+          {reviews.map((review, index) => (
+            <li class={`review-item ${index % 2 === 0 ? 'even' : 'odd'}`}>
+              <a href={`/reviews/${review.id}`}>
+                {review.title} <span class="review-year">({review.year})</span>
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
     </div>
@@ -58,76 +50,46 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 </Layout>
 
 <style>
-  /* Nueva estructura de layout con sidebar */
+  /* Estructura principal */
   .reviews-layout {
     margin: 0;
     background-color: #1c3b70;
     display: grid;
-    grid-template-columns: 80px 1fr; /* 80px para la barra lateral, el resto para el contenido principal */
+    grid-template-columns: 80px 1fr;
     height: 100vh;
     overflow: hidden;
     font-family: "Sigmar", sans-serif;
   }
 
-  /* Contenedor principal para el header y el contenido */
+  /* Contenedor principal */
   .main-content {
     display: grid;
     grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "header"
+      "content";
     height: 100vh;
   }
 
-  /* Estilos para la barra lateral (antiguo footer) */
-  .grid-sidebar {
-    background-color: #1a54fa;
-    filter: brightness(0.8) contrast(0.9);
-    position: relative;
-    overflow: hidden;
-    background-image: linear-gradient(
-        to right,
-        rgba(107, 63, 47, 0.8) 6px,
-        transparent 6px
-      ),
-      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
-      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
-      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
-    background-position:
-      0 0,
-      0 0,
-      100% 0,
-      0 100%;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    box-sizing: border-box;
-    padding: 10px;
-    animation: flicker 3s infinite;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  /* Asignación de áreas */
+  .grid-header {
+    grid-area: header;
   }
 
-  .sidebar-content {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-    position: relative;
+  .grid-content {
+    grid-area: content;
   }
 
-  /* Estilos compartidos para el header y content */
+  /* Estilos compartidos */
+  .grid-sidebar,
   .grid-header,
   .grid-content {
     background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
     position: relative;
     overflow: hidden;
-    background-image: linear-gradient(
-        to right,
-        rgba(107, 63, 47, 0.8) 6px,
-        transparent 6px
-      ),
+    background-image:
+      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
@@ -140,44 +102,60 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     background-repeat: no-repeat;
     box-sizing: border-box;
     padding: 20px;
+    animation: flicker 3s infinite;
   }
 
   /* Estilos específicos para el header */
   .grid-header {
     display: flex;
     flex-direction: column;
-    text-align: center;
-    min-height: 150px;
     align-items: center;
     justify-content: center;
-    animation: flicker 3s infinite;
+    text-align: center;
+    min-height: 150px;
+    animation: 
+      slideInRight 1.5s ease-out,
+      flicker 3s infinite 1.5s;
   }
 
-  /* Estilos para el contenido principal */
+  /* Estilos para el contenido */
   .grid-content {
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
     overflow-y: auto;
-    animation: flicker 3s infinite;
   }
 
-  /* Estilos específicos para el contenido */
   .reviews-list {
     list-style-type: none;
     padding: 0;
-    width: 80%;
-    max-width: 800px;
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto;
   }
 
+  /* Items pares e impares */
   .review-item {
     margin: 15px 0;
-    padding: 10px;
+    padding: 15px;
     background-color: rgba(0, 0, 0, 0.2);
     border-left: 4px solid rgba(107, 63, 47, 0.8);
-    transition: transform 0.3s ease;
-    filter: brightness(0.9) contrast(1);
-    text-align: center;
+    transition: all 0.3s ease;
+    width: 80%;
+    position: relative;
+  }
+
+  .review-item.even {
+    margin-right: auto;
+    margin-left: 0;
+    text-align: left;
+    border-left-color: rgba(107, 63, 47, 0.8);
+    border-right: none;
+  }
+
+  .review-item.odd {
+    margin-left: auto;
+    margin-right: 0;
+    text-align: right;
+    border-right: 4px solid #f5d742;
+    border-left: none;
   }
 
   .review-item:hover {
@@ -203,6 +181,8 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     margin-top: 10px;
     font-size: 1rem;
     transition: all 0.3s ease;
+    position: relative;
+    z-index: 10;
   }
 
   .back-link:hover {
@@ -242,78 +222,41 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 
   /* Animaciones */
   @keyframes flicker {
-    0%,
-    100% {
-      filter: brightness(0.8) contrast(0.9);
-    }
-    50% {
-      filter: brightness(0.9) contrast(1);
-    }
-    75% {
-      filter: brightness(0.85) contrast(1.05);
-    }
+    0%, 100% { filter: brightness(0.8) contrast(0.9); }
+    50% { filter: brightness(0.9) contrast(1); }
+    75% { filter: brightness(0.85) contrast(1.05); }
   }
 
-  /* Animación personalizada para el desplazamiento desde la derecha */
   @keyframes slideInRight {
-    0% {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    100% {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-
-  /* Clase para aplicar la animación */
-  .slide-in-right {
-    animation: slideInRight 1.5s ease both;
+    0% { transform: translateX(100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
   }
 
   @keyframes flickerGrain {
-    0% {
-      opacity: 0.1;
-      transform: translate(0px, 0px);
-    }
-    25% {
-      opacity: 0.2;
-      transform: translate(1px, -1px);
-    }
-    50% {
-      opacity: 0.05;
-      transform: translate(-1px, 1px);
-    }
-    75% {
-      opacity: 0.15;
-      transform: translate(2px, -2px);
-    }
-    100% {
-      opacity: 0.1;
-      transform: translate(0px, 0px);
-    }
+    0% { opacity: 0.1; transform: translate(0px, 0px); }
+    25% { opacity: 0.2; transform: translate(1px, -1px); }
+    50% { opacity: 0.05; transform: translate(-1px, 1px); }
+    75% { opacity: 0.15; transform: translate(2px, -2px); }
+    100% { opacity: 0.1; transform: translate(0px, 0px); }
   }
 
   @keyframes scratchesFlicker {
-    0% {
-      opacity: 0.1;
-      transform: translate(0, 0) scale(1);
-    }
-    25% {
-      opacity: 0.2;
-      transform: translateY(-2px) scale(1.01);
-    }
-    50% {
-      opacity: 0.05;
-      transform: translateX(1px) scale(0.99);
-    }
-    75% {
-      opacity: 0.15;
-      transform: translate(-2px, 1px) scale(1.02);
-    }
-    100% {
-      opacity: 0.1;
-      transform: translate(0, 0) scale(1);
-    }
+    0% { opacity: 0.1; transform: translate(0, 0) scale(1); }
+    25% { opacity: 0.2; transform: translateY(-2px) scale(1.01); }
+    50% { opacity: 0.05; transform: translateX(1px) scale(0.99); }
+    75% { opacity: 0.15; transform: translate(-2px, 1px) scale(1.02); }
+    100% { opacity: 0.1; transform: translate(0, 0) scale(1); }
   }
 </style>
+
+<script is:inline>
+  // Asegurar que la animación se ejecute correctamente
+  document.addEventListener('DOMContentLoaded', () => {
+    const header = document.querySelector('.grid-header');
+    if (header) {
+      header.style.animation = 'none';
+      header.offsetHeight; // Trigger reflow
+      header.style.animation = '';
+    }
+  });
+</script>
