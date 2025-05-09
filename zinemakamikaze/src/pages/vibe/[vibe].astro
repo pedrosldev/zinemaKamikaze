@@ -1,7 +1,7 @@
 ---
 import { getReviewsByVibe } from "../../lib/db";
 import Layout from "../../layouts/Layout.astro";
-export const prerender = false; // Consultar
+export const prerender = false;
 
 const vibe = Astro.params.vibe;
 const reviews = vibe ? await getReviewsByVibe(vibe) : [];
@@ -12,67 +12,292 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap" rel="stylesheet" />
 </head>
-<Layout>
-  <header>
-    <h1>Películas con vibe: {Astro.params.vibe}</h1>
-    <a href="/"> Volver al listado de vibes</a>
-  </header>
 
-  <main>
-    <ul>
-      {
-        reviews.map((review) => (
-          <li>
-            <a href={`/reviews/${review.id}`}>
-              {review.title} ({review.year})
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+<Layout>
+  <main class="reviews-layout">
+    <!-- Sidebar izquierdo (200px) -->
+    <div class="grid-sidebar">
+      <div class="film-grain"></div>
+      <div class="old-film-scratches"></div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+      <!-- Header fijo -->
+      <div class="grid-header">
+        <h1>ZINEMA KAMIKAZE: {vibe}</h1>
+        <div class="film-grain"></div>
+        <div class="old-film-scratches"></div>
+        <a href="/" class="back-link">Volver al listado</a>
+      </div>
+
+      <!-- Área de contenido con scroll invisible -->
+      <div class="content-scrollable">
+        <div class="scroll-content">
+          <ul class="reviews-list">
+            {reviews.map((review, index) => (
+              <li class={`review-item ${index % 2 === 0 ? 'even' : 'odd'}`}>
+                <a href={`/reviews/${review.id}`}>
+                  {review.title} <span class="review-year">({review.year})</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
   </main>
 </Layout>
 
 <style>
-  header {
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    justify-content: center;
-    background-color: grey;
-    height: 12vh;
-  }
-  h1 {
+  /* Estructura principal */
+  .reviews-layout {
+    margin: 0;
+    background-color: #1c3b70;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    height: 100vh;
+    overflow: hidden;
     font-family: "Sigmar", sans-serif;
-    text-align: center;
-  }
-  ul {
-    font-family: "Sigmar", sans-serif;
-    list-style-type: none;
-    /* padding: 0; */
-  }
-  /* li {
-    margin: 10px 0;
-  } */
-  a {
-    font-family: "Sigmar", sans-serif;
-    text-decoration: none;
-    margin: 10px;
-    /* color: blue; */
   }
 
-  a:hover {
-    filter: brightness(0.8);
+  /* Sidebar estilo cine */
+  .grid-sidebar {
+    background-color: #1a54fa;
+    filter: brightness(0.8) contrast(0.9);
+    position: relative;
+    overflow: hidden;
+    background-image:
+      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
+    background-position:
+      0 0,
+      0 0,
+      100% 0,
+      0 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    padding: 20px;
+    animation: flicker 3s infinite;
   }
 
-  main {
+  /* Contenedor principal */
+  .main-content {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Header fijo */
+  .grid-header {
+    background-color: #1a54fa;
+    filter: brightness(0.8) contrast(0.9);
+    position: relative;
+    overflow: hidden;
+    background-image:
+      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
+    background-position:
+      0 0,
+      0 0,
+      100% 0,
+      0 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    padding: 20px;
+    animation: 
+      slideInRight 1.5s ease-out,
+      flicker 3s infinite 1.5s;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 180px;
+    z-index: 10;
+  }
+
+  /* Área de contenido con scroll invisible */
+  .content-scrollable {
+    overflow-y: scroll;
+    height: calc(100vh - 180px);
+    scrollbar-width: none; /* Para Firefox */
+    -ms-overflow-style: none; /* Para IE/Edge */
+  }
+
+  /* Ocultar scrollbar en Chrome/Safari */
+  .content-scrollable::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scroll-content {
+    padding: 20px;
+    background-color: #1a54fa;
+    filter: brightness(0.8) contrast(0.9);
+    position: relative;
+    background-image:
+      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
+    background-position:
+      0 0,
+      0 0,
+      100% 0,
+      0 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    min-height: 100%;
+    animation: flicker 3s infinite;
+  }
+
+  /* Lista de reviews */
+  .reviews-list {
+    list-style-type: none;
+    padding: 0;
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  /* Items alternados */
+  .review-item {
+    margin: 15px 0;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    width: 80%;
+    position: relative;
+  }
+
+  .review-item.even {
+    margin-right: auto;
+    margin-left: 0;
+    text-align: left;
+    border-left: 4px solid rgba(107, 63, 47, 0.8);
+    border-right: none;
+  }
+
+  .review-item.odd {
+    margin-left: auto;
+    margin-right: 0;
+    text-align: right;
+    border-right: 4px solid #f5d742;
+    border-left: none;
+  }
+
+  .review-item:hover {
+    transform: translateX(10px);
+    filter: brightness(1.1);
+  }
+
+  /* Resto de estilos... */
+  .review-item a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+    display: block;
+  }
+
+  .review-year {
+    color: #f5d742;
+    font-size: 0.9rem;
+  }
+
+  .back-link {
+    color: #f5d742;
+    text-decoration: none;
+    margin-top: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Efectos de película y animaciones */
+  .film-grain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: url("/images/old_celluloid.png");
+    background-size: cover;
+    opacity: 0.15;
+    z-index: 100;
+    animation: flickerGrain 10s infinite steps(60);
+  }
+
+  .old-film-scratches {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("/images/old_celluloid.png") repeat;
+    background-size: cover;
+    pointer-events: none;
+    mix-blend-mode: lighten;
+    z-index: 101;
+    animation: scratchesFlicker 7s infinite steps(60);
+    opacity: 0.12;
+  }
+
+  @keyframes flicker {
+    0%, 100% { filter: brightness(0.8) contrast(0.9); }
+    50% { filter: brightness(0.9) contrast(1); }
+    75% { filter: brightness(0.85) contrast(1.05); }
+  }
+
+  @keyframes slideInRight {
+    0% { transform: translateX(100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes flickerGrain {
+    0% { opacity: 0.1; transform: translate(0px, 0px); }
+    25% { opacity: 0.2; transform: translate(1px, -1px); }
+    50% { opacity: 0.05; transform: translate(-1px, 1px); }
+    75% { opacity: 0.15; transform: translate(2px, -2px); }
+    100% { opacity: 0.1; transform: translate(0px, 0px); }
+  }
+
+  @keyframes scratchesFlicker {
+    0% { opacity: 0.1; transform: translate(0, 0) scale(1); }
+    25% { opacity: 0.2; transform: translateY(-2px) scale(1.01); }
+    50% { opacity: 0.05; transform: translateX(1px) scale(0.99); }
+    75% { opacity: 0.15; transform: translate(-2px, 1px) scale(1.02); }
+    100% { opacity: 0.1; transform: translate(0, 0) scale(1); }
   }
 </style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const header = document.querySelector('.grid-header');
+    if (header) {
+      header.style.animation = 'none';
+      header.offsetHeight; // Trigger reflow
+      header.style.animation = '';
+    }
+
+    // Habilitar scroll con rueda del mouse
+    const scrollContainer = document.querySelector('.content-scrollable');
+    if (scrollContainer) {
+      scrollContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        scrollContainer.scrollTop += e.deltaY;
+      });
+    }
+  });
+</script>
