@@ -17,10 +17,11 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 
 <Layout>
   <main class="reviews-layout">
-    <!-- Sidebar izquierdo -->
+    <!-- Sidebar izquierdo más ancho -->
     <div class="grid-sidebar">
       <div class="film-grain"></div>
       <div class="old-film-scratches"></div>
+      <!-- Contenido adicional del sidebar si lo deseas -->
     </div>
 
     <!-- Contenido principal -->
@@ -50,15 +51,42 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 </Layout>
 
 <style>
-  /* Estructura principal */
+  /* Estructura principal con sidebar más ancho */
   .reviews-layout {
     margin: 0;
     background-color: #1c3b70;
     display: grid;
-    grid-template-columns: 80px 1fr;
+    grid-template-columns: 200px 1fr; /* Sidebar de 200px */
     height: 100vh;
     overflow: hidden;
     font-family: "Sigmar", sans-serif;
+  }
+
+  /* Sidebar más ancho con estilos mejorados */
+  .grid-sidebar {
+    background-color: #1a54fa;
+    filter: brightness(0.8) contrast(0.9);
+    position: relative;
+    overflow: hidden;
+    background-image:
+      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
+    background-position:
+      0 0,
+      0 0,
+      100% 0,
+      0 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    padding: 20px;
+    animation: flicker 3s infinite;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
   }
 
   /* Contenedor principal */
@@ -71,19 +99,41 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     height: 100vh;
   }
 
-  /* Asignación de áreas */
+  /* Resto de estilos se mantienen igual que en la versión anterior */
   .grid-header {
     grid-area: header;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 150px;
+    animation: 
+      slideInRight 1.5s ease-out,
+      flicker 3s infinite 1.5s;
+    background-color: #1a54fa;
+    filter: brightness(0.8) contrast(0.9);
+    position: relative;
+    overflow: hidden;
+    background-image:
+      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
+    background-position:
+      0 0,
+      0 0,
+      100% 0,
+      0 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    padding: 20px;
   }
 
   .grid-content {
     grid-area: content;
-  }
-
-  /* Estilos compartidos */
-  .grid-sidebar,
-  .grid-header,
-  .grid-content {
+    overflow-y: auto;
     background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
     position: relative;
@@ -105,24 +155,6 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     animation: flicker 3s infinite;
   }
 
-  /* Estilos específicos para el header */
-  .grid-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    min-height: 150px;
-    animation: 
-      slideInRight 1.5s ease-out,
-      flicker 3s infinite 1.5s;
-  }
-
-  /* Estilos para el contenido */
-  .grid-content {
-    overflow-y: auto;
-  }
-
   .reviews-list {
     list-style-type: none;
     padding: 0;
@@ -131,12 +163,10 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     margin: 0 auto;
   }
 
-  /* Items pares e impares */
   .review-item {
     margin: 15px 0;
     padding: 15px;
     background-color: rgba(0, 0, 0, 0.2);
-    border-left: 4px solid rgba(107, 63, 47, 0.8);
     transition: all 0.3s ease;
     width: 80%;
     position: relative;
@@ -146,7 +176,7 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     margin-right: auto;
     margin-left: 0;
     text-align: left;
-    border-left-color: rgba(107, 63, 47, 0.8);
+    border-left: 4px solid rgba(107, 63, 47, 0.8);
     border-right: none;
   }
 
@@ -250,7 +280,6 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 </style>
 
 <script is:inline>
-  // Asegurar que la animación se ejecute correctamente
   document.addEventListener('DOMContentLoaded', () => {
     const header = document.querySelector('.grid-header');
     if (header) {
