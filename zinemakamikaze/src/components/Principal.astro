@@ -344,7 +344,12 @@ const vibes = await getAllVibes();
               console.error("❌ Error al guardar la review:", error.message);
             });
           if (!poster) {
-            surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" style="width: 30%; height: 20%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; ">`;
+            //surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" style="width: 30%; height: 20%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; ">`;
+            surpriseDiv.style.backgroundImage = `url(/images/noImg.jpg)`;
+            surpriseDiv.style.backgroundSize = "100% 100%";
+            surpriseDiv.style.backgroundPosition = "center";
+            surpriseDiv.style.backgroundRepeat = "no-repeat";
+            surpriseDiv.style.filter = "blur(0px)";
           } else {
             const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
             // surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width: 300px; height: 400px; object-fit: contain; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; opacity: 0;" loading="lazy" onload="this.style.opacity=1">`;
