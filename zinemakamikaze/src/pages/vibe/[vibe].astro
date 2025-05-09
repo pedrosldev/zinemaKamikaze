@@ -17,16 +17,15 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 
 <Layout>
   <main class="reviews-layout">
-    <!-- Sidebar izquierdo más ancho -->
+    <!-- Sidebar izquierdo (200px) -->
     <div class="grid-sidebar">
       <div class="film-grain"></div>
       <div class="old-film-scratches"></div>
-      <!-- Contenido adicional del sidebar si lo deseas -->
     </div>
 
     <!-- Contenido principal -->
     <div class="main-content">
-      <!-- Header con animación -->
+      <!-- Header fijo -->
       <div class="grid-header">
         <h1>ZINEMA KAMIKAZE: {vibe}</h1>
         <div class="film-grain"></div>
@@ -34,35 +33,37 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
         <a href="/" class="back-link">Volver al listado</a>
       </div>
 
-      <!-- Listado de reviews con items alternados -->
-      <div class="grid-content">
-        <ul class="reviews-list">
-          {reviews.map((review, index) => (
-            <li class={`review-item ${index % 2 === 0 ? 'even' : 'odd'}`}>
-              <a href={`/reviews/${review.id}`}>
-                {review.title} <span class="review-year">({review.year})</span>
-              </a>
-            </li>
-          ))}
-        </ul>
+      <!-- Área de contenido con scroll invisible -->
+      <div class="content-scrollable">
+        <div class="scroll-content">
+          <ul class="reviews-list">
+            {reviews.map((review, index) => (
+              <li class={`review-item ${index % 2 === 0 ? 'even' : 'odd'}`}>
+                <a href={`/reviews/${review.id}`}>
+                  {review.title} <span class="review-year">({review.year})</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   </main>
 </Layout>
 
 <style>
-  /* Estructura principal con sidebar más ancho */
+  /* Estructura principal */
   .reviews-layout {
     margin: 0;
     background-color: #1c3b70;
     display: grid;
-    grid-template-columns: 200px 1fr; /* Sidebar de 200px */
+    grid-template-columns: 200px 1fr;
     height: 100vh;
     overflow: hidden;
     font-family: "Sigmar", sans-serif;
   }
 
-  /* Sidebar más ancho con estilos mejorados */
+  /* Sidebar estilo cine */
   .grid-sidebar {
     background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
@@ -83,61 +84,66 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     box-sizing: border-box;
     padding: 20px;
     animation: flicker 3s infinite;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
   }
 
   /* Contenedor principal */
   .main-content {
     display: grid;
     grid-template-rows: auto 1fr;
-    grid-template-areas:
-      "header"
-      "content";
     height: 100vh;
+    overflow: hidden;
   }
 
-  /* Resto de estilos se mantienen igual que en la versión anterior */
+  /* Header fijo */
   .grid-header {
-    grid-area: header;
+    background-color: #1a54fa;
+    filter: brightness(0.8) contrast(0.9);
+    position: relative;
+    overflow: hidden;
+    background-image:
+      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
+    background-position:
+      0 0,
+      0 0,
+      100% 0,
+      0 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    padding: 20px;
+    animation: 
+      slideInRight 1.5s ease-out,
+      flicker 3s infinite 1.5s;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    min-height: 150px;
-    animation: 
-      slideInRight 1.5s ease-out,
-      flicker 3s infinite 1.5s;
-    background-color: #1a54fa;
-    filter: brightness(0.8) contrast(0.9);
-    position: relative;
-    overflow: hidden;
-    background-image:
-      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
-      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
-      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
-      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
-    background-position:
-      0 0,
-      0 0,
-      100% 0,
-      0 100%;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    box-sizing: border-box;
-    padding: 20px;
+    min-height: 180px;
+    z-index: 10;
   }
 
-  .grid-content {
-    grid-area: content;
-    overflow-y: auto;
+  /* Área de contenido con scroll invisible */
+  .content-scrollable {
+    overflow-y: scroll;
+    height: calc(100vh - 180px);
+    scrollbar-width: none; /* Para Firefox */
+    -ms-overflow-style: none; /* Para IE/Edge */
+  }
+
+  /* Ocultar scrollbar en Chrome/Safari */
+  .content-scrollable::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scroll-content {
+    padding: 20px;
     background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
     position: relative;
-    overflow: hidden;
     background-image:
       linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
@@ -151,10 +157,11 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     background-size: 100% 100%;
     background-repeat: no-repeat;
     box-sizing: border-box;
-    padding: 20px;
+    min-height: 100%;
     animation: flicker 3s infinite;
   }
 
+  /* Lista de reviews */
   .reviews-list {
     list-style-type: none;
     padding: 0;
@@ -163,6 +170,7 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     margin: 0 auto;
   }
 
+  /* Items alternados */
   .review-item {
     margin: 15px 0;
     padding: 15px;
@@ -193,6 +201,7 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     filter: brightness(1.1);
   }
 
+  /* Resto de estilos... */
   .review-item a {
     color: white;
     text-decoration: none;
@@ -215,12 +224,7 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     z-index: 10;
   }
 
-  .back-link:hover {
-    text-decoration: underline;
-    filter: brightness(1.2);
-  }
-
-  /* Efectos de película */
+  /* Efectos de película y animaciones */
   .film-grain {
     position: absolute;
     top: 0;
@@ -250,7 +254,6 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     opacity: 0.12;
   }
 
-  /* Animaciones */
   @keyframes flicker {
     0%, 100% { filter: brightness(0.8) contrast(0.9); }
     50% { filter: brightness(0.9) contrast(1); }
@@ -286,6 +289,15 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
       header.style.animation = 'none';
       header.offsetHeight; // Trigger reflow
       header.style.animation = '';
+    }
+
+    // Habilitar scroll con rueda del mouse
+    const scrollContainer = document.querySelector('.content-scrollable');
+    if (scrollContainer) {
+      scrollContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        scrollContainer.scrollTop += e.deltaY;
+      });
     }
   });
 </script>
