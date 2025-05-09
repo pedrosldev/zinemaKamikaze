@@ -16,11 +16,7 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
     rel="stylesheet"
   />
-  <!-- Añadimos animate.css para animaciones -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-  />
+  <!-- Ya no necesitamos animate.css -->
 </head>
 
 <Layout>
@@ -36,10 +32,8 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 
     <div class="main-content">
       <!-- Header animado que aparece desde la derecha -->
-      <div class="grid-header">
-        <h1 class="animate__animated animate__slideInRight animate__slow">
-          ZINEMA KAMIKAZE: {vibe}
-        </h1>
+      <div class="grid-header slide-in-right">
+        <h1>ZINEMA KAMIKAZE: {vibe}</h1>
         <div class="film-grain"></div>
         <div class="old-film-scratches"></div>
         <a href="/" class="back-link">Volver al listado</a>
@@ -52,8 +46,7 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
             reviews.map((review) => (
               <li class="review-item">
                 <a href={`/reviews/${review.id}`}>
-                  {review.title}{" "}
-                  <span class="review-year">({review.year})</span>
+                  {review.title} <span class="review-year">({review.year})</span>
                 </a>
               </li>
             ))
@@ -259,7 +252,22 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     }
   }
 
-  /* La animación slideInRight está proporcionada por animate.css */
+  /* Animación personalizada para el desplazamiento desde la derecha */
+  @keyframes slideInRight {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Clase para aplicar la animación */
+  .slide-in-right {
+    animation: slideInRight 1.5s ease both;
+  }
 
   @keyframes flickerGrain {
     0% {
