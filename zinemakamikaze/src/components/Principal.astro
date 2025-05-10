@@ -245,16 +245,17 @@ const vibes = await getAllVibes();
           const pelicula = data[randomIndex];
           const film = Math.floor(Math.random() * pelicula.films.length);
           const filmId = pelicula.films[film].id;
-          const poster = pelicula.films[film].poster_path;
+          const poster = pelicula.films[film].poster_path || "";
           const year = pelicula.films[film].year || "Unknown";
           const title = pelicula.films[film].title;
           console.log(pelicula.films[film].id);
+          
           fetch("/api/register-review", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ film_id: filmId, title: title, year: year }),
+            body: JSON.stringify({ film_id: filmId, title: title, year: year, poster: poster }),
           })
             .then((response) => {
               if (!response.ok) {

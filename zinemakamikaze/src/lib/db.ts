@@ -16,15 +16,17 @@ interface ReviewRow extends RowDataPacket {
     title: string;
     year: number;
     vibe: string;
+    film_id: number;
+    poster: string;
     description: string;
   }
   interface VibeRow extends RowDataPacket {
     vibe: string;
   }
-  export async function insertReview(film_id: number, title: string, year: number) {
+  export async function insertReview(film_id: number, title: string, year: number, poster: string) {
     const [result] = await pool.execute(
-      'INSERT INTO test_reviews (film_id, title, year) VALUES (?, ?, ?)',
-      [film_id, title, year]
+      'INSERT INTO test_reviews (film_id, title, year, poster_url) VALUES (?, ?, ?, ?)',
+      [film_id, title, year, poster]
     );
     return result;
   }
@@ -34,9 +36,9 @@ export async function getAllVibes():Promise<string[]>{
   return rows.map((row: any) => row.vibe);
 }
 
-export async function getReviewsByVibe(vibe: string): Promise<Pick<ReviewRow, 'id' |'title' | 'year'>[]> {
-  const [rows] = await pool.query<Array<Pick<ReviewRow, 'id' | 'title' | 'year'> & RowDataPacket>>(
-    "SELECT id, title,year FROM test_reviews WHERE vibe = ?",
+export async function getReviewsByVibe(vibe: string): Promise<Pick<ReviewRow, 'id' |'title' | 'year' | 'film_id'>[]> {
+  const [rows] = await pool.query<Array<Pick<ReviewRow, 'id' | 'title' | 'year' | 'film_id'> & RowDataPacket>>(
+    "SELECT id, title, year, film_id FROM test_reviews WHERE vibe = ?",
     [vibe]
   );
   return rows;
