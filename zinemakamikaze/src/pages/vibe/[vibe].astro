@@ -142,8 +142,6 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     padding: 20px;
     opacity: 0;
     /* animation: flicker 3s infinite; */
-   
-   
   }
 
   /* Área de contenido con scroll */
@@ -250,7 +248,7 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     width: 100%;
     height: 100%;
     pointer-events: none;
-    background: url("/images/old_celluloid.png");
+    background: url("/images/old_photo_texture_bw_by_firesign24_7_d1ni173-414w-2x.jpg");
     background-size: cover;
     opacity: 0.15;
     z-index: 100;
@@ -263,7 +261,8 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     left: 0;
     width: 100%;
     height: 100%;
-    background: url("/images/old_celluloid.png") repeat;
+    background: url("/images/old_photo_texture_bw_by_firesign24_7_d1ni173-414w-2x.jpg")
+      repeat;
     background-size: cover;
     pointer-events: none;
     mix-blend-mode: lighten;
@@ -360,7 +359,7 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("ul").addEventListener("mouseover", (e) => {
       const li = e.target.closest(".review-item");
-      const poster = li ? li.dataset.posterUrl : '';
+      const poster = li ? li.dataset.posterUrl : "";
       const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
       const sidebar = document.querySelector(".wide-sidebar");
       sidebar.style.backgroundImage = `url(${posterUrl})`;
@@ -370,24 +369,22 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
       sidebar.style.animation = "none";
       sidebar.offsetHeight; // Trigger reflow
       sidebar.style.animation = "flicker 3s infinite";
-      
     });
     // Animación del header
     const header = document.querySelector(".full-width-header");
-    const sidebar = document.querySelector('.wide-sidebar');
+    const sidebar = document.querySelector(".wide-sidebar");
     if (header) {
       header.style.animation = "none";
       header.offsetHeight; // Trigger reflow
       header.style.animation = "";
     }
 
-    if (sidebar){
-      sidebar.style.animation = 'none';
+    if (sidebar) {
+      sidebar.style.animation = "none";
       sidebar.offsetWidth; // Trigger reflow
-      sidebar.style.animation = 'slideInFromTop 1.5s';
+      sidebar.style.animation = "slideInFromTop 1.5s";
       // sidebar.style.animationDelay = '1.5s';
-      sidebar.style.opacity = '1';
-      
+      sidebar.style.opacity = "1";
     }
 
     // Scroll con rueda del mouse
