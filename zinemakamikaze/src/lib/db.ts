@@ -16,6 +16,7 @@ interface ReviewRow extends RowDataPacket {
     title: string;
     year: number;
     vibe: string;
+    film_id: number;
     description: string;
   }
   interface VibeRow extends RowDataPacket {
@@ -34,9 +35,9 @@ export async function getAllVibes():Promise<string[]>{
   return rows.map((row: any) => row.vibe);
 }
 
-export async function getReviewsByVibe(vibe: string): Promise<Pick<ReviewRow, 'id' |'title' | 'year'>[]> {
-  const [rows] = await pool.query<Array<Pick<ReviewRow, 'id' | 'title' | 'year'> & RowDataPacket>>(
-    "SELECT id, title,year FROM test_reviews WHERE vibe = ?",
+export async function getReviewsByVibe(vibe: string): Promise<Pick<ReviewRow, 'id' |'title' | 'year' | 'film_id'>[]> {
+  const [rows] = await pool.query<Array<Pick<ReviewRow, 'id' | 'title' | 'year' | 'film_id'> & RowDataPacket>>(
+    "SELECT id, title, year, film_id FROM test_reviews WHERE vibe = ?",
     [vibe]
   );
   return rows;
