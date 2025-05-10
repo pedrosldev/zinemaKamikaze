@@ -344,7 +344,17 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("ul").addEventListener("mouseover", (e) => {
       const li = e.target.closest(".review-item");
-      if (li) console.log(li.dataset.posterUrl);
+      const poster = li ? li.dataset.posterUrl : '';
+      const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
+      const sidebar = document.querySelector(".wide-sidebar");
+      sidebar.style.backgroundImage = `url(${posterUrl})`;
+      sidebar.style.backgroundSize = "cover";
+      sidebar.style.backgroundPosition = "center";
+      sidebar.style.filter = "brightness(0.8) contrast(0.9)";
+      sidebar.style.animation = "none";
+      sidebar.offsetHeight; // Trigger reflow
+      sidebar.style.animation = "flicker 3s infinite";
+      
     });
     // Animación del header
     const header = document.querySelector(".full-width-header");
