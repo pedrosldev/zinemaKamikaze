@@ -12,7 +12,10 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
+    rel="stylesheet"
+  />
 </head>
 
 <Layout>
@@ -36,13 +39,19 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
       <!-- Área de contenido con scroll -->
       <div class="content-scrollable">
         <ul class="reviews-list">
-          {reviews.map((review, index) => (
-            <li class={`review-item ${index % 2 === 0 ? 'even' : 'odd'}`}>
-              <a href={`/reviews/${review.id}`}>
-                {review.title} <span class="review-year">({review.year})</span>
-              </a>
-            </li>
-          ))}
+          {
+            reviews.map((review, index) => (
+              <li
+                class={`review-item ${index % 2 === 0 ? "even" : "odd"}`}
+                data-poster-url={review.poster}
+              >
+                <a href={`/reviews/${review.id}`}>
+                  {review.title}{" "}
+                  <span class="review-year">({review.year})</span>
+                </a>
+              </li>
+            ))
+          }
         </ul>
       </div>
     </div>
@@ -67,8 +76,11 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     filter: brightness(0.8) contrast(0.9);
     position: relative;
     overflow: hidden;
-    background-image:
-      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+    background-image: linear-gradient(
+        to right,
+        rgba(107, 63, 47, 0.8) 6px,
+        transparent 6px
+      ),
       linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
@@ -81,7 +93,7 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     background-repeat: no-repeat;
     box-sizing: border-box;
     padding: 30px;
-    animation: 
+    animation:
       slideInRight 1.5s ease-out,
       flicker 3s infinite 1.5s;
     display: flex;
@@ -111,8 +123,11 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     overflow: hidden;
     width: 400px; /* Más ancho que antes */
     min-width: 400px;
-    background-image:
-      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+    background-image: linear-gradient(
+        to right,
+        rgba(107, 63, 47, 0.8) 6px,
+        transparent 6px
+      ),
       linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
@@ -137,8 +152,11 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
     position: relative;
-    background-image:
-      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+    background-image: linear-gradient(
+        to right,
+        rgba(107, 63, 47, 0.8) 6px,
+        transparent 6px
+      ),
       linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
@@ -252,47 +270,94 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
   }
 
   @keyframes flicker {
-    0%, 100% { filter: brightness(0.8) contrast(0.9); }
-    50% { filter: brightness(0.9) contrast(1); }
-    75% { filter: brightness(0.85) contrast(1.05); }
+    0%,
+    100% {
+      filter: brightness(0.8) contrast(0.9);
+    }
+    50% {
+      filter: brightness(0.9) contrast(1);
+    }
+    75% {
+      filter: brightness(0.85) contrast(1.05);
+    }
   }
 
   @keyframes slideInRight {
-    0% { transform: translateX(100%); opacity: 0; }
-    100% { transform: translateX(0); opacity: 1; }
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
   }
 
   @keyframes flickerGrain {
-    0% { opacity: 0.1; transform: translate(0px, 0px); }
-    25% { opacity: 0.2; transform: translate(1px, -1px); }
-    50% { opacity: 0.05; transform: translate(-1px, 1px); }
-    75% { opacity: 0.15; transform: translate(2px, -2px); }
-    100% { opacity: 0.1; transform: translate(0px, 0px); }
+    0% {
+      opacity: 0.1;
+      transform: translate(0px, 0px);
+    }
+    25% {
+      opacity: 0.2;
+      transform: translate(1px, -1px);
+    }
+    50% {
+      opacity: 0.05;
+      transform: translate(-1px, 1px);
+    }
+    75% {
+      opacity: 0.15;
+      transform: translate(2px, -2px);
+    }
+    100% {
+      opacity: 0.1;
+      transform: translate(0px, 0px);
+    }
   }
 
   @keyframes scratchesFlicker {
-    0% { opacity: 0.1; transform: translate(0, 0) scale(1); }
-    25% { opacity: 0.2; transform: translateY(-2px) scale(1.01); }
-    50% { opacity: 0.05; transform: translateX(1px) scale(0.99); }
-    75% { opacity: 0.15; transform: translate(-2px, 1px) scale(1.02); }
-    100% { opacity: 0.1; transform: translate(0, 0) scale(1); }
+    0% {
+      opacity: 0.1;
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      opacity: 0.2;
+      transform: translateY(-2px) scale(1.01);
+    }
+    50% {
+      opacity: 0.05;
+      transform: translateX(1px) scale(0.99);
+    }
+    75% {
+      opacity: 0.15;
+      transform: translate(-2px, 1px) scale(1.02);
+    }
+    100% {
+      opacity: 0.1;
+      transform: translate(0, 0) scale(1);
+    }
   }
 </style>
 
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelector("ul").addEventListener("mouseover", (e) => {
+      const li = e.target.closest(".review-item");
+      if (li) console.log(li.dataset.posterUrl);
+    });
     // Animación del header
-    const header = document.querySelector('.full-width-header');
+    const header = document.querySelector(".full-width-header");
     if (header) {
-      header.style.animation = 'none';
+      header.style.animation = "none";
       header.offsetHeight; // Trigger reflow
-      header.style.animation = '';
+      header.style.animation = "";
     }
 
     // Scroll con rueda del mouse
-    const scrollContainer = document.querySelector('.content-scrollable');
+    const scrollContainer = document.querySelector(".content-scrollable");
     if (scrollContainer) {
-      scrollContainer.addEventListener('wheel', (e) => {
+      scrollContainer.addEventListener("wheel", (e) => {
         e.preventDefault();
         scrollContainer.scrollTop += e.deltaY;
       });

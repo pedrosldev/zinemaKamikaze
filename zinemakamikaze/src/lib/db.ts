@@ -36,9 +36,9 @@ export async function getAllVibes():Promise<string[]>{
   return rows.map((row: any) => row.vibe);
 }
 
-export async function getReviewsByVibe(vibe: string): Promise<Pick<ReviewRow, 'id' |'title' | 'year' | 'film_id'>[]> {
-  const [rows] = await pool.query<Array<Pick<ReviewRow, 'id' | 'title' | 'year' | 'film_id'> & RowDataPacket>>(
-    "SELECT id, title, year, film_id FROM test_reviews WHERE vibe = ?",
+export async function getReviewsByVibe(vibe: string): Promise<Pick<ReviewRow, 'id' |'title' | 'year' | 'film_id' | 'poster'>[]> {
+  const [rows] = await pool.query<Array<Pick<ReviewRow, 'id' | 'title' | 'year' | 'film_id' | 'poster'> & RowDataPacket>>(
+    "SELECT id, title, year, film_id, poster_url AS poster FROM test_reviews WHERE vibe = ?",
     [vibe]
   );
   return rows;
