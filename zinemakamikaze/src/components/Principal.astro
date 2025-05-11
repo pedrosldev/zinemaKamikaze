@@ -25,7 +25,7 @@ const vibes = await getAllVibes();
   <div class="b">Actor 2</div>
   <div class="c">Escena 1</div>
   <div class="d">
-    <h1 class="findSurprise" id="btnLeer">Y LA ELEGIDA ES...</h1>
+    <h1 class="findSurprise findSurprise-perforations findSurprise-sepia findSurprise-wide" id="btnLeer">Y LA ELEGIDA ES...</h1>
     <div id="contenido"></div>
   </div>
   <div class="e surprise"></div>
@@ -84,9 +84,140 @@ const vibes = await getAllVibes();
     box-sizing: border-box;
     /* Asegurar que el padding y border no aumenten el tamaño */
   }
-  .findSurprise {
-    cursor: pointer;
-  }
+    .findSurprise {
+      cursor: pointer;
+      padding: 14px 24px;
+      position: relative;
+      background-color: #1a1a18;
+      color: #c9be9c;
+      /* font-family: 'Courier New', monospace; */
+      border-radius: 2px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-weight: bold;
+      overflow: hidden;
+      border: none;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease-out;
+      display: inline-block;
+      margin: 15px 0;
+    }
+    
+    .findSurprise::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 6px,
+        rgba(201, 190, 156, 0.2) 6px,
+        rgba(201, 190, 156, 0.2) 12px
+      );
+      animation: stripedBorder 8s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .findSurprise::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(transparent 0%, transparent 45%, rgba(201, 190, 156, 0.2) 45%, rgba(201, 190, 156, 0.2) 55%, transparent 55%, transparent 100%);
+      animation: horizontalStripedBorder 3s linear infinite;
+      pointer-events: none;
+      z-index: 2;
+    }
+    
+    @keyframes stripedBorder {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+    
+    @keyframes horizontalStripedBorder {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 0 100px;
+      }
+    }
+    
+    .findSurprise-perforations::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 8px 50%, rgba(0,0,0,0.2) 3px, transparent 4px),
+        radial-gradient(circle at calc(100% - 8px) 50%, rgba(0,0,0,0.2) 3px, transparent 4px);
+      background-size: 16px 16px;
+      background-repeat: repeat-y;
+      pointer-events: none;
+      z-index: 3;
+    }
+    
+    .findSurprise:hover {
+      transform: scale(1.02);
+      box-shadow: 
+        inset 0 0 15px rgba(0, 0, 0, 0.7),
+        0 0 15px rgba(201, 190, 156, 0.4);
+      text-shadow: 0 0 5px rgba(201, 190, 156, 0.5);
+      letter-spacing: 4px;
+    }
+    
+    .findSurprise:hover::after {
+      animation: stripedBorder 4s linear infinite;
+    }
+    
+    .findSurprise:hover::before {
+      animation: horizontalStripedBorder 1.5s linear infinite;
+    }
+    
+    .findSurprise-grain {
+      position: relative;
+    }
+    
+    .findSurprise-grain::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
+      pointer-events: none;
+      opacity: 0.12;
+      mix-blend-mode: overlay;
+      z-index: 4;
+    }
+        .findSurprise-brown {
+      background-color: #261e16;
+      color: #d8c9a7;
+    }
+    
+    .findSurprise-sepia {
+      background-color: #2b2317;
+      color: #e0d4a4;
+    }
+    
+    /* Variaciones de anchura */
+    .findSurprise-wide {
+      padding: 14px 45px;
+    }
   .a {
     grid-area: a;
   }
