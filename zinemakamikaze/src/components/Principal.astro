@@ -84,7 +84,9 @@ const vibes = await getAllVibes();
     box-sizing: border-box;
     /* Asegurar que el padding y border no aumenten el tamaño */
   }
-
+  .findSurprise {
+    cursor: pointer;
+  }
   .a {
     grid-area: a;
   }
@@ -249,13 +251,18 @@ const vibes = await getAllVibes();
           const year = pelicula.films[film].year || "Unknown";
           const title = pelicula.films[film].title;
           console.log(pelicula.films[film].id);
-          
+
           fetch("/api/register-review", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ film_id: filmId, title: title, year: year, poster: poster }),
+            body: JSON.stringify({
+              film_id: filmId,
+              title: title,
+              year: year,
+              poster: poster,
+            }),
           })
             .then((response) => {
               if (!response.ok) {
