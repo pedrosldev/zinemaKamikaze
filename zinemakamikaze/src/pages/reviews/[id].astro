@@ -22,7 +22,7 @@ const review = await getReviewById(Number(Astro.params.id));
         </head>
         <header>
           <h1>
-            {review.title} ({review.year})
+            {review.title} {review.year && review.year !== 0 ? `(${review.year})` : ''}
           </h1>
           <a href={`/vibe/${review.vibe}`}>Volver a {review.vibe}</a>
         </header>

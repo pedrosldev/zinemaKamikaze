@@ -47,7 +47,11 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
               >
                 <a href={`/reviews/${review.id}`}>
                   {review.title}{" "}
-                  <span class="review-year">({review.year})</span>
+                  <span class="review-year">
+                    
+                    {review.year && review.year !== 0 ? `(${review.year})` : ""}
+                    
+                  </span>
                 </a>
               </li>
             ))
