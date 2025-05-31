@@ -32,10 +32,27 @@ const review = await getReviewById(Number(Astro.params.id));
             </a>
           </div>
         </header>
-        <p>{review.review}</p>
+
+        <!-- Contenedor de créditos -->
+        <div class="credits-container" onclick="toggleAnimation()">
+          <div id="credits-text" class="credits-text">
+            {review.review.split('\n').map(line => <p>{line}</p>)}
+          </div>
+        </div>
+
         <p>
           <strong>Vibe:</strong> {review.vibe}
         </p>
+
+        <script is:inline>
+          let isPaused = false;
+          function toggleAnimation() {
+            const el = document.getElementById('credits-text');
+            if (!el) return;
+            isPaused = !isPaused;
+            el.style.animationPlayState = isPaused ? 'paused' : 'running';
+          }
+        </script>
       </>
     ) : (
       <p>Review no encontrada</p>
@@ -52,19 +69,42 @@ const review = await getReviewById(Number(Astro.params.id));
     background-color: grey;
     height: 12vh;
   }
-  h1 {
-    font-family: "Sigmar", sans-serif;
-    text-align: center;
-  }
-  p {
+  h1, p, a {
     font-family: "Sigmar", sans-serif;
     text-align: center;
   }
   a {
-    font-family: "Sigmar", sans-serif;
     text-decoration: none;
   }
   a:hover {
     filter: brightness(0.8);
   }
+
+  .credits-container {
+    height: 300px;
+    overflow: hidden;
+    position: relative;
+    background-color: black;
+    color: white;
+    margin-top: 2rem;
+    cursor: pointer; /* indica que se puede hacer clic */
+  }
+
+  .credits-text {
+    display: flex;
+    flex-direction: column;
+    animation: scroll-up 20s linear infinite;
+    animation-play-state: running;
+  }
+
+  @keyframes scroll-up {
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(-100%);
+    }
+  }
 </style>
+
+
