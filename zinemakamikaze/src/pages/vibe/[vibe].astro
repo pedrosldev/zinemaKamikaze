@@ -38,7 +38,12 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 
       <!-- Área de contenido con scroll -->
       <div class="content-scrollable">
-        <button class="scroll-arrow scroll-up"> ⬆ </button>
+        <!-- <button class="scroll-arrow scroll-up"> ⬆ </button> -->
+        <img
+          src="/images/caret-circle-up-svgrepo-com.svg"
+          alt="Scroll Up"
+          class="scroll-arrow scroll-up"
+        />
         <ul class="reviews-list">
           {
             reviews.map((review, index) => (
@@ -56,7 +61,12 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
             ))
           }
         </ul>
-        <button class="scroll-arrow scroll-down"> ⬇ </button>
+        <!-- <button class="scroll-arrow scroll-down"> ⬇ </button> -->
+        <img
+          src="/images/down-move-pointer-direction-svgrepo-com.svg"
+          alt="Scroll Down"
+          class="scroll-arrow scroll-down"
+        />
       </div>
     </div>
   </main>
@@ -74,7 +84,11 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     font-family: "Sigmar", sans-serif;
   }
 
-  /* Header pantalla completa */
+  /* img {
+    width: 30px;
+    height: 30px;
+    
+  } */
   .full-width-header {
     background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
@@ -150,6 +164,7 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 
   /* Área de contenido con scroll */
   .content-scrollable {
+    position: relative;
     overflow-y: scroll;
     flex: 1;
     scrollbar-width: none;
@@ -276,29 +291,32 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
   }
   .scroll-arrow {
     position: sticky;
-    background: rgba(0, 0, 0, 0.6);
+    /* background: rgba(0, 0, 0, 0.6);
     color: white;
-    border: none;
-    font-size: 1.5rem;
+    border: none; */
+    /* font-size: 1.5rem;
     padding: 8px 12px;
-    border-radius: 50%;
+    border-radius: 50%; */
     z-index: 100;
     cursor: pointer;
     margin: auto;
     display: block;
     transition: background 0.3s;
+    width: 30px;
+    height: 30px;
   }
 
-  .scroll-arrow:hover {
+  /* .scroll-arrow:hover {
     background: rgba(255, 255, 255, 0.8);
     color: black;
-  }
+  } */
 
   /* Flecha arriba: fija en la parte superior */
   .scroll-up {
     top: 0;
     margin-top: 5px;
   }
+  
 
   /* Flecha abajo: fija en la parte inferior */
   .scroll-down {
