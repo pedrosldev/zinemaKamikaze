@@ -22,14 +22,47 @@ const review = await getReviewById(Number(Astro.params.id));
         </head>
         <header>
           <h1>
-            {review.title} ({review.year})
+            {review.title}{" "}
+            {review.year && review.year !== 0 ? `(${review.year})` : ""}
           </h1>
-          <a href={`/vibe/${review.vibe}`}>Volver a {review.vibe}</a>
+          <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href={`/vibe/${review.vibe}`}>Volver a {review.vibe}</a>
+            <a href="/" class="back-link">
+              Volver al listado
+            </a>
+          </div>
         </header>
-        <p>{review.review}</p>
-        <p>
-          <strong>Vibe:</strong> {review.vibe}
-        </p>
+
+        <!-- Contenedor de créditos -->
+        <div class="credits-container">
+  <div id="credits-text" class="credits-text">
+    {review.review.split('\n').map(line => <p>{line}</p>)}
+  </div>
+</div>
+
+<div style="display: flex; gap: 1rem; justify-content: center;">
+  <img
+    id="toggle-btn"
+    src="/images/pause-square-svgrepo-com.svg"
+    alt="Play/Pause"
+    onclick="toggleAnimation()"
+  />
+</div>
+
+<script is:inline>
+  let isPaused = false;
+  const toggleBtn = document.getElementById('toggle-btn');
+  const creditsText = document.getElementById('credits-text');
+
+  function toggleAnimation() {
+    if (!creditsText || !toggleBtn) return;
+    isPaused = !isPaused;
+    creditsText.style.animationPlayState = isPaused ? 'paused' : 'running';
+    toggleBtn.src = isPaused
+      ? '/images/play-square-svgrepo-com.svg'
+      : '/images/pause-square-svgrepo-com.svg';
+  }
+</script>
       </>
     ) : (
       <p>Review no encontrada</p>
@@ -44,21 +77,50 @@ const review = await getReviewById(Number(Astro.params.id));
     align-content: center;
     justify-content: center;
     background-color: grey;
-    height: 12vh;
+    height: 20dvh;
   }
-  h1 {
-    font-family: "Sigmar", sans-serif;
-    text-align: center;
-  }
-  p {
+  h1, p, a {
     font-family: "Sigmar", sans-serif;
     text-align: center;
   }
   a {
-    font-family: "Sigmar", sans-serif;
     text-decoration: none;
   }
   a:hover {
     filter: brightness(0.8);
   }
+
+  img {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+  }
+
+  .credits-container {
+    height: 70dvh;
+    overflow: hidden;
+    position: relative;
+    background-color: black;
+    color: white;
+    /* margin-top: 2rem; */
+    cursor: pointer; /* indica que se puede hacer clic */
+  }
+
+  .credits-text {
+    display: flex;
+    flex-direction: column;
+    animation: scroll-up 20s linear infinite;
+    animation-play-state: running;
+  }
+
+  @keyframes scroll-up {
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(-100%);
+    }
+  }
 </style>
+
+
