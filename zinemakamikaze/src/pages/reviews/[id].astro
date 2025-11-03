@@ -76,8 +76,28 @@ const review = await getReviewById(Number(Astro.params.id));
     flex-direction: column;
     align-content: center;
     justify-content: center;
-    background-color: grey;
+    background-color: #1a54fa;
+    filter: brightness(0.8) contrast(0.9);
+    animation: flicker 3s infinite;
     height: 20dvh;
+        background-image:
+                /* Borde izquierdo */
+      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      /* Borde superior */
+        linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      /* Borde derecho - posicionado en el lado derecho */
+        linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      /* Borde inferior - posicionado en la parte inferior */
+        linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
+    background-position:
+      0 0,
+      /* Borde izquierdo */ 0 0,
+      /* Borde superior */ 100% 0,
+      /* Borde derecho */ 0 100%;
+    /* Borde inferior */
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
   }
   h1, p, a {
     font-family: "Sigmar", sans-serif;
@@ -119,6 +139,21 @@ const review = await getReviewById(Number(Astro.params.id));
     }
     100% {
       transform: translateY(-100%);
+    }
+  }
+
+    @keyframes flicker {
+    0%,
+    100% {
+      filter: brightness(0.8) contrast(0.9);
+    }
+
+    50% {
+      filter: brightness(0.9) contrast(1);
+    }
+
+    75% {
+      filter: brightness(0.85) contrast(1.05);
     }
   }
 </style>
