@@ -117,13 +117,24 @@ const review = await getReviewById(Number(Astro.params.id));
   }
 
   .credits-container {
-    height: 70dvh;
+    /* height: 70dvh;
     overflow: hidden;
     position: relative;
     background-color: black;
     color: white;
-    /* margin-top: 2rem; */
-    cursor: pointer; /* indica que se puede hacer clic */
+    cursor: pointer;  */
+    height: 70dvh;
+    overflow: hidden;
+    position: relative;
+    background-color: black;
+    color: black;
+    cursor: pointer; 
+    background: url("/images/old_celluloid.png") repeat;
+    background-size: cover;
+    pointer-events: none;
+    mix-blend-mode: lighten;
+    opacity: 0.9; 
+ 
   }
 
   .credits-text {
