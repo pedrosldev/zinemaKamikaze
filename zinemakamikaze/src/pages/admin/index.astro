@@ -1,0 +1,121 @@
+---
+// src/pages/admin/index.astro
+import Layout from "../../layouts/Layout.astro";
+import { getActiveTokens, createTriggerToken } from "../../lib/db";
+
+const activeTokens = await getActiveTokens();
+---
+
+<Layout>
+  <div class="admin-container">
+    <h1>Zona de Administración - Tokens</h1>
+
+    <div class="tokens-section">
+      <h2>Generar Nuevo Código</h2>
+      <button id="generateToken" class="generate-btn"
+        >Generar Nuevo Código</button
+      >
+
+      <div class="active-tokens">
+        <h3>Códigos Activos:</h3>
+        {
+          activeTokens.length > 0 ? (
+            <div class="tokens-list">
+              {activeTokens.map((token) => (
+                <div class="token-item">
+                  <div class="token-code">
+                    <strong>Código:</strong>
+                    <code>{token.token}</code>
+                  </div>
+                  <div class="token-info">
+                    Creado: {new Date(token.created_at).toLocaleString()}
+                  </div>
+                  <div class="token-instructions">
+                    <em>
+                      Comparte este código con el ganador para que pueda generar
+                      una crítica
+                    </em>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No hay códigos activos</p>
+          )
+        }
+      </div>
+    </div>
+
+    <!-- Tu formulario para nuevas críticas aquí -->
+    <div class="review-form">
+      <h2>Nueva Crítica Manual</h2>
+      <form id="reviewForm">
+        <!-- Tus campos del formulario -->
+      </form>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .admin-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: "Sigmar", sans-serif;
+  }
+
+  .generate-btn {
+    background: #f5d742;
+    color: #000;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+
+  .token-item {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    border: 2px solid rgba(107, 63, 47, 0.8);
+  }
+
+  .token-code code {
+    background: #f1f1f1;
+    color: #000;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 1.1rem;
+  }
+</style>
+
+<script>
+  document
+    .getElementById("generateToken")
+    .addEventListener("click", async () => {
+      try {
+        const response = await fetch("/api/generate-token", {
+          method: "POST",
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert(
+            `Nuevo código generado:\n\n${result.token}\n\nCopia este código y compártelo con el ganador.`
+          );
+          location.reload();
+        } else {
+          alert("Error al generar el código");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Error al generar el código");
+      }
+    });
+</script>
