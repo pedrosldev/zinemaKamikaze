@@ -10,7 +10,6 @@ const vibes = await getAllVibes();
 <head>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
   <link
     href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
     rel="stylesheet"
@@ -19,15 +18,31 @@ const vibes = await getAllVibes();
 
 <main>
   <div class="a">
-    <h1>ZINEMA KAMIKAZE!!!</h1><div class="film-grain"></div>
+    <h1>ZINEMA KAMIKAZE!!!</h1>
+    <div class="film-grain"></div>
     <div class="old-film-scratches"></div>
   </div>
   <div class="b">Actor 2</div>
   <div class="c">Escena 1</div>
   <div class="d">
+    <!-- Input para el token -->
+    <div class="token-input-container" id="tokenContainer">
+      <h3>INTRODUCE TU CÓDIGO DE ACCESO:</h3>
+      <input
+        type="text"
+        id="tokenInput"
+        placeholder="Ingresa el código aquí..."
+        class="token-input"
+      />
+      <button id="validateToken" class="token-btn">VALIDAR CÓDIGO</button>
+      <p id="tokenMessage" class="token-message"></p>
+    </div>
+
+    <!-- Botón original (oculto inicialmente) -->
     <h1
       class="findSurprise findSurprise-perforations findSurprise-sepia findSurprise-wide"
       id="btnLeer"
+      style="display: none;"
     >
       Y LA ELEGIDA ES...
     </h1>
@@ -52,9 +67,7 @@ const vibes = await getAllVibes();
       "d e e e f";
     height: 100vh;
     overflow: hidden;
-    /* Evitar scroll en el body */
     grid-gap: 0px;
-    /* Eliminar espacio entre celdas de la grid */
     font-family: "Sigmar", sans-serif;
   }
 
@@ -67,35 +80,115 @@ const vibes = await getAllVibes();
     animation: flicker 3s infinite;
     position: relative;
     overflow: hidden;
-
-    /* Aplicamos el efecto de cuadrícula marrón translúcido en los cuatro lados con bordes más finos */
-    background-image:
-                /* Borde izquierdo */
-      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
-      /* Borde superior */
-        linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
-      /* Borde derecho - posicionado en el lado derecho */
-        linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
-      /* Borde inferior - posicionado en la parte inferior */
-        linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
+    background-image: linear-gradient(
+        to right,
+        rgba(107, 63, 47, 0.8) 6px,
+        transparent 6px
+      ),
+      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
     background-position:
       0 0,
-      /* Borde izquierdo */ 0 0,
-      /* Borde superior */ 100% 0,
-      /* Borde derecho */ 0 100%;
-    /* Borde inferior */
+      0 0,
+      100% 0,
+      0 100%;
     background-size: 100% 100%;
     background-repeat: no-repeat;
     box-sizing: border-box;
-    /* Asegurar que el padding y border no aumenten el tamaño */
   }
+
+  /* Estilos para el sistema de tokens */
+  .token-input-container {
+    text-align: center;
+    padding: 1rem;
+    width: 100%;
+  }
+
+  .token-input-container h3 {
+    color: #c9be9c;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .token-input {
+    width: 80%;
+    max-width: 300px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    border: 2px solid rgba(107, 63, 47, 0.8);
+    border-radius: 4px;
+    background: rgba(26, 26, 24, 0.9);
+    color: #c9be9c;
+    font-family: "Sigmar", sans-serif;
+    font-size: 1rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .token-input::placeholder {
+    color: #666;
+    text-transform: none;
+  }
+
+  .token-input:focus {
+    outline: none;
+    border-color: #f5d742;
+    box-shadow: 0 0 10px rgba(245, 215, 66, 0.3);
+  }
+
+  .token-btn {
+    background: #f5d742;
+    color: #000;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: "Sigmar", sans-serif;
+    font-size: 1rem;
+    margin: 10px 0;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+
+  .token-btn:hover {
+    background: #d4b82a;
+    transform: scale(1.05);
+  }
+
+  .token-btn:disabled {
+    background: #666;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .token-message {
+    margin: 10px 0;
+    font-size: 0.9rem;
+    min-height: 20px;
+    font-weight: bold;
+  }
+
+  .token-success {
+    color: #4caf50;
+  }
+
+  .token-error {
+    color: #f44336;
+  }
+
+  /* Estilos existentes para .findSurprise */
   .findSurprise {
     cursor: pointer;
     padding: 14px 24px;
     position: relative;
     background-color: #1a1a18;
     color: #c9be9c;
-    /* font-family: 'Courier New', monospace; */
     border-radius: 2px;
     text-transform: uppercase;
     letter-spacing: 3px;
@@ -222,6 +315,7 @@ const vibes = await getAllVibes();
     mix-blend-mode: overlay;
     z-index: 4;
   }
+
   .findSurprise-brown {
     background-color: #261e16;
     color: #d9e1e9;
@@ -232,10 +326,10 @@ const vibes = await getAllVibes();
     color: #d4dce8;
   }
 
-  /* Variaciones de anchura */
   .findSurprise-wide {
     padding: 14px 45px;
   }
+
   .a {
     grid-area: a;
   }
@@ -250,6 +344,10 @@ const vibes = await getAllVibes();
 
   .d {
     grid-area: d;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
   .e {
@@ -265,11 +363,9 @@ const vibes = await getAllVibes();
     100% {
       filter: brightness(0.8) contrast(0.9);
     }
-
     50% {
       filter: brightness(0.9) contrast(1);
     }
-
     75% {
       filter: brightness(0.85) contrast(1.05);
     }
@@ -305,33 +401,24 @@ const vibes = await getAllVibes();
     animation: scratchesFlicker 7s infinite steps(60);
     opacity: 0.12;
   }
-  .d {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
 
   @keyframes flickerGrain {
     0% {
       opacity: 0.1;
       transform: translate(0px, 0px);
     }
-
     25% {
       opacity: 0.2;
       transform: translate(1px, -1px);
     }
-
     50% {
       opacity: 0.05;
       transform: translate(-1px, 1px);
     }
-
     75% {
       opacity: 0.15;
       transform: translate(2px, -2px);
     }
-
     100% {
       opacity: 0.1;
       transform: translate(0px, 0px);
@@ -343,111 +430,176 @@ const vibes = await getAllVibes();
       opacity: 0.1;
       transform: translate(0, 0) scale(1);
     }
-
     25% {
       opacity: 0.2;
       transform: translateY(-2px) scale(1.01);
     }
-
     50% {
       opacity: 0.05;
       transform: translateX(1px) scale(0.99);
     }
-
     75% {
       opacity: 0.15;
       transform: translate(-2px, 1px) scale(1.02);
     }
-
     100% {
       opacity: 0.1;
       transform: translate(0, 0) scale(1);
     }
   }
 </style>
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    const tokenInput = document.getElementById("tokenInput");
+    const validateTokenBtn = document.getElementById("validateToken");
+    const tokenMessage = document.getElementById("tokenMessage");
+    const tokenContainer = document.getElementById("tokenContainer");
     const btnLeer = document.getElementById("btnLeer");
     const contenidoDiv = document.getElementById("contenido");
-    const surpriseDiv = document.querySelector(".surprise")! as HTMLDivElement;
+    const surpriseDiv = document.querySelector(".surprise");
 
-    if (!btnLeer || !contenidoDiv) {
-      console.error("❌ Error: No se encontró el botón o el div 'contenido'.");
-      return;
+    // Función para validar el token
+    async function validateToken(token) {
+      try {
+        validateTokenBtn.disabled = true;
+        validateTokenBtn.textContent = "VALIDANDO...";
+        tokenMessage.textContent = "";
+        tokenMessage.className = "token-message";
+
+        const response = await fetch("/api/validate-token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: token.trim() }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.valid) {
+          // Token válido - mostrar el botón de evento
+          tokenMessage.textContent =
+            "¡CÓDIGO VÁLIDO! Ahora puedes generar la crítica.";
+          tokenMessage.className = "token-message token-success";
+          tokenContainer.style.display = "none";
+          btnLeer.style.display = "block";
+
+          // Efecto de confeti para validación exitosa
+          confetti({
+            particleCount: 50,
+            spread: 70,
+            origin: { y: 0.6 },
+          });
+        } else {
+          // Token inválido
+          tokenMessage.textContent =
+            result.message || "CÓDIGO INVÁLIDO. Inténtalo de nuevo.";
+          tokenMessage.className = "token-message token-error";
+        }
+      } catch (error) {
+        console.error("Error al validar el token:", error);
+        tokenMessage.textContent = "ERROR DE CONEXIÓN. Inténtalo más tarde.";
+        tokenMessage.className = "token-message token-error";
+      } finally {
+        validateTokenBtn.disabled = false;
+        validateTokenBtn.textContent = "VALIDAR CÓDIGO";
+      }
     }
 
-    btnLeer.addEventListener("click", function () {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-      });
-      fetch("/api/titles.json")
-        .then((response) => {
-          if (!response.ok)
-            throw new Error("Error al cargar el archivo: " + response.status);
-          return response.json();
-        })
-        .then((data) => {
-          if (!Array.isArray(data))
-            throw new Error("El JSON no tiene el formato correcto.");
-
-          const randomIndex = Math.floor(Math.random() * data.length);
-          const pelicula = data[randomIndex];
-          const film = Math.floor(Math.random() * pelicula.films.length);
-          const filmId = pelicula.films[film].id;
-          const poster = pelicula.films[film].poster_path || "";
-          const year = pelicula.films[film].year || "Unknown";
-          const title = pelicula.films[film].title;
-          console.log(pelicula.films[film].id);
-
-          fetch("/api/register-review", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              film_id: filmId,
-              title: title,
-              year: year,
-              poster: poster,
-            }),
-          })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error(
-                  "Error al guardar la review en la base de datos."
-                );
-              }
-              return response.json();
-            })
-            .then((data) => {
-              console.log("✅ Review guardada:", data.message);
-            })
-            .catch((error) => {
-              console.error("❌ Error al guardar la review:", error.message);
-            });
-          if (!poster) {
-            //surpriseDiv.innerHTML = `<img src="/images/noImg.jpg" alt="Sin póster disponible" style="width: 30%; height: 20%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; ">`;
-            surpriseDiv.style.backgroundImage = `url(/images/noImg.jpg)`;
-            surpriseDiv.style.backgroundSize = "100% 100%";
-            surpriseDiv.style.backgroundPosition = "center";
-            surpriseDiv.style.backgroundRepeat = "no-repeat";
-            surpriseDiv.style.filter = "blur(0px)";
-          } else {
-            const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
-            // surpriseDiv.innerHTML = `<img src="${posterUrl}" alt="Poster de la película" style="width: 300px; height: 400px; object-fit: contain; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; opacity: 0;" loading="lazy" onload="this.style.opacity=1">`;
-            surpriseDiv.style.backgroundImage = `url(${posterUrl})`;
-            surpriseDiv.style.backgroundSize = "100% 100%";
-            surpriseDiv.style.backgroundPosition = "center";
-            surpriseDiv.style.backgroundRepeat = "no-repeat";
-          }
-
-          contenidoDiv.innerHTML = `<strong>${title} (${year})</strong>`;
-        })
-        .catch((error) => {
-          contenidoDiv.textContent = "Error: " + error.message;
-        });
+    // Event listener para el botón de validar
+    validateTokenBtn.addEventListener("click", function () {
+      const token = tokenInput.value.trim();
+      if (!token) {
+        tokenMessage.textContent = "POR FAVOR, INTRODUCE UN CÓDIGO.";
+        tokenMessage.className = "token-message token-error";
+        return;
+      }
+      validateToken(token);
     });
+
+    // También validar al presionar Enter
+    tokenInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        validateToken(tokenInput.value.trim());
+      }
+    });
+
+    // Tu función existente para generar la crítica (sin cambios)
+    if (btnLeer && contenidoDiv) {
+      btnLeer.addEventListener("click", function () {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+
+        fetch("/api/titles.json")
+          .then((response) => {
+            if (!response.ok)
+              throw new Error("Error al cargar el archivo: " + response.status);
+            return response.json();
+          })
+          .then((data) => {
+            if (!Array.isArray(data))
+              throw new Error("El JSON no tiene el formato correcto.");
+
+            const randomIndex = Math.floor(Math.random() * data.length);
+            const pelicula = data[randomIndex];
+            const film = Math.floor(Math.random() * pelicula.films.length);
+            const filmId = pelicula.films[film].id;
+            const poster = pelicula.films[film].poster_path || "";
+            const year = pelicula.films[film].year || "Unknown";
+            const title = pelicula.films[film].title;
+            console.log(pelicula.films[film].id);
+
+            fetch("/api/register-review", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                film_id: filmId,
+                title: title,
+                year: year,
+                poster: poster,
+              }),
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error(
+                    "Error al guardar la review en la base de datos."
+                  );
+                }
+                return response.json();
+              })
+              .then((data) => {
+                console.log("✅ Review guardada:", data.message);
+              })
+              .catch((error) => {
+                console.error("❌ Error al guardar la review:", error.message);
+              });
+
+            if (!poster) {
+              surpriseDiv.style.backgroundImage = `url(/images/noImg.jpg)`;
+              surpriseDiv.style.backgroundSize = "100% 100%";
+              surpriseDiv.style.backgroundPosition = "center";
+              surpriseDiv.style.backgroundRepeat = "no-repeat";
+              surpriseDiv.style.filter = "blur(0px)";
+            } else {
+              const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
+              surpriseDiv.style.backgroundImage = `url(${posterUrl})`;
+              surpriseDiv.style.backgroundSize = "100% 100%";
+              surpriseDiv.style.backgroundPosition = "center";
+              surpriseDiv.style.backgroundRepeat = "no-repeat";
+            }
+
+            contenidoDiv.innerHTML = `<strong>${title} (${year})</strong>`;
+          })
+          .catch((error) => {
+            contenidoDiv.textContent = "Error: " + error.message;
+          });
+      });
+    }
   });
 </script>
