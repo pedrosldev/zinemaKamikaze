@@ -51,3 +51,45 @@ export async function getReviewById(id: number): Promise<ReviewRow | null> {
   );
   return rows.length > 0 ? rows[0] : null;
 }
+
+// Añade esta interface con las otras interfaces
+interface TokenRow extends RowDataPacket {
+  token: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+// Añade estas funciones al final del archivo db.ts
+export async function createTriggerToken(): Promise<string> {
+  const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
+
+  await pool.execute(
+    "INSERT INTO trigger_tokens (token, is_active) VALUES (?, true)",
+    [token]
+  );
+
+  return token;
+}
+
+export async function validateToken(token: string): Promise<boolean> {
+  const [rows] = await pool.query<(TokenRow & RowDataPacket)[]>(
+    "SELECT is_active FROM trigger_tokens WHERE token = ? AND is_active = true",
+    [token]
+  );
+
+  return rows.length > 0;
+}
+
+export async function deactivateToken(token: string): Promise<void> {
+  await pool.execute(
+    "UPDATE trigger_tokens SET is_active = false WHERE token = ?",
+    [token]
+  );
+}
+
+export async function getActiveTokens(): Promise<TokenRow[]> {
+  const [rows] = await pool.query<(TokenRow & RowDataPacket)[]>(
+    "SELECT * FROM trigger_tokens WHERE is_active = true ORDER BY created_at DESC"
+  );
+  return rows;
+}
