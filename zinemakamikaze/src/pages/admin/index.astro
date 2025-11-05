@@ -243,71 +243,103 @@ const activeTokens = await getActiveTokens();
 </style>
 
 <script>
-  const generateTokenBtn = document.getElementById(
-    "generateToken"
-  ) as HTMLButtonElement;
-  const reviewForm = document.getElementById("reviewForm") as HTMLFormElement;
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("🔄 DOM cargado - Configurando event listeners...");
 
-  // Verificar que los elementos existen
-  if (!generateTokenBtn || !reviewForm) {
-    console.error(
-      "❌ Error: No se encontraron algunos elementos del DOM en admin"
-    );
-    return;
-  }
+    const generateTokenBtn = document.getElementById("generateToken");
+    const reviewForm = document.getElementById("reviewForm");
 
-  generateTokenBtn.addEventListener("click", async () => {
-    try {
-      const button = generateTokenBtn;
-      button.disabled = true;
-      button.textContent = "GENERANDO...";
+    console.log("🔍 Buscando elementos:", {
+      generateTokenBtn: !!generateTokenBtn,
+      reviewForm: !!reviewForm,
+    });
 
-      const response = await fetch("/api/generate-token", {
-        method: "POST",
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(
-          `NUEVO CÓDIGO GENERADO:\n\n${result.token}\n\nCopia este código y compártelo con el ganador.`
-        );
-        location.reload();
-      } else {
-        alert("ERROR AL GENERAR EL CÓDIGO");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("ERROR AL GENERAR EL CÓDIGO");
-    } finally {
-      const button = generateTokenBtn;
-      button.disabled = false;
-      button.textContent = "GENERAR NUEVO CÓDIGO";
+    if (!generateTokenBtn) {
+      console.error("❌ No se encontró el botón generateTokenBtn");
+      return;
     }
-  });
 
-  reviewForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+    if (!reviewForm) {
+      console.error("❌ No se encontró el formulario reviewForm");
+    }
 
-    const formData = new FormData(e.target as HTMLFormElement);
-    const reviewData = Object.fromEntries(formData);
+    // Event listener para el botón de generar token
+    generateTokenBtn.addEventListener("click", async function () {
+      console.log("🎯 CLICK RECIBIDO en generar token");
 
-    try {
-      const response = await fetch("/api/register-review", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(reviewData),
-      });
+      try {
+        const button = this;
+        button.disabled = true;
+        button.textContent = "GENERANDO...";
 
-      if (response.ok) {
-        alert("CRÍTICA GUARDADA EXITOSAMENTE");
-        reviewForm.reset();
-      } else {
-        alert("ERROR AL GUARDAR LA CRÍTICA");
+        console.log("📡 Haciendo fetch a /api/generate-tokens...");
+        const response = await fetch("/api/generate-tokens", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log(
+          "📨 Respuesta recibida:",
+          response.status,
+          response.statusText
+        );
+
+        const result = await response.json();
+        console.log("🎉 Resultado:", result);
+
+        if (response.ok && result.token) {
+          alert(
+            `NUEVO CÓDIGO GENERADO:\n\n${result.token}\n\nCopia este código y compártelo con el ganador.`
+          );
+          console.log("🔄 Recargando página...");
+          location.reload();
+        } else {
+          alert(
+            "ERROR AL GENERAR EL CÓDIGO: " +
+              (result.message || "Error desconocido")
+          );
+        }
+      } catch (error) {
+        console.error("❌ Error completo:", error);
+        alert("ERROR DE CONEXIÓN: " + error.message);
+      } finally {
+        const button = document.getElementById("generateToken");
+        if (button) {
+          button.disabled = false;
+          button.textContent = "GENERAR NUEVO CÓDIGO";
+        }
       }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("ERROR AL GUARDAR LA CRÍTICA");
+    });
+
+    // Event listener para el formulario
+    if (reviewForm) {
+      reviewForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        console.log("📝 Formulario enviado");
+
+        const formData = new FormData(this);
+        const reviewData = Object.fromEntries(formData);
+
+        try {
+          const response = await fetch("/api/register-review", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(reviewData),
+          });
+
+          if (response.ok) {
+            alert("CRÍTICA GUARDADA EXITOSAMENTE");
+            this.reset();
+          } else {
+            alert("ERROR AL GUARDAR LA CRÍTICA");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("ERROR AL GUARDAR LA CRÍTICA");
+        }
+      });
     }
   });
 </script>
