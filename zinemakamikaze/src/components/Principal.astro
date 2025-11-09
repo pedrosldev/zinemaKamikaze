@@ -489,7 +489,7 @@ const vibes = await getAllVibes();
         tokenMessage!.textContent = "";
         tokenMessage!.className = "token-message";
 
-        const response = await fetch("/api/validate-token", {
+        const response = await fetch("/api/validate-tokens", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
