@@ -23,10 +23,10 @@ interface ReviewRow extends RowDataPacket {
   interface VibeRow extends RowDataPacket {
     vibe: string;
   }
-  export async function insertReview(film_id: number, title: string, year: number, poster: string) {
+  export async function insertReview(film_id: number, title: string, year: number, review: string, vibe: string, poster: string) {
     const [result] = await pool.execute(
-      'INSERT INTO test_reviews (film_id, title, year, poster_url) VALUES (?, ?, ?, ?)',
-      [film_id, title, year, poster]
+      'INSERT INTO test_reviews (film_id, title, year, review, vibe, poster_url) VALUES (?, ?, ?, ?, ?, ?)',
+      [film_id, title, year, review, vibe, poster]
     );
     return result;
   }

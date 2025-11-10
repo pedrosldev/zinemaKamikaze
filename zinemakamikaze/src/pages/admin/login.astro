@@ -1,0 +1,159 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+// Si ya está autenticado, redirigir al admin
+const authToken = Astro.cookies.get("admin_auth")?.value;
+const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || "tu-password-segura";
+
+if (authToken === ADMIN_PASSWORD) {
+  return Astro.redirect("/admin");
+}
+---
+
+<Layout>
+  <div class="login-container">
+    <h1>ACCESO ADMINISTRATIVO</h1>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="password">CONTRASEÑA:</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          required
+          autocomplete="current-password"
+        />
+      </div>
+
+      <button type="submit">ENTRAR</button>
+      <p id="errorMessage" class="error-message"></p>
+    </form>
+  </div>
+</Layout>
+
+<style>
+  .login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 2rem;
+    font-family: "Sigmar", sans-serif;
+    background-color: #1c3b70;
+    min-height: 50vh;
+  }
+
+  h1 {
+    color: #c9be9c;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #c9be9c;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid rgba(107, 63, 47, 0.8);
+    border-radius: 4px;
+    background: rgba(26, 26, 24, 0.9);
+    color: #c9be9c;
+    font-family: "Sigmar", sans-serif;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #f5d742;
+    box-shadow: 0 0 10px rgba(245, 215, 66, 0.3);
+  }
+
+  button {
+    width: 100%;
+    background: #f5d742;
+    color: #000;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: "Sigmar", sans-serif;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+
+  button:hover {
+    background: #d4b82a;
+    transform: scale(1.05);
+  }
+
+  button:disabled {
+    background: #666;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .error-message {
+    color: #f44336;
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: bold;
+  }
+</style>
+
+<script>
+  document
+    .getElementById("loginForm")
+    ?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const form = e.target as HTMLFormElement;
+      const password = (form.querySelector("#password") as HTMLInputElement)
+        .value;
+      const errorMessage = document.getElementById("errorMessage");
+      const submitBtn = form.querySelector(
+        "button[type='submit']"
+      ) as HTMLButtonElement;
+
+      if (!errorMessage || !submitBtn) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "VERIFICANDO...";
+      errorMessage.textContent = "";
+
+      try {
+        const response = await fetch("/api/admin-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          window.location.href = "/admin";
+        } else {
+          errorMessage.textContent = "CONTRASEÑA INCORRECTA";
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        errorMessage.textContent = "ERROR DE CONEXIÓN";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "ENTRAR";
+      }
+    });
+</script>
