@@ -18,7 +18,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    await insertReview(body.film_id, body.title, body.year, body.poster);
+    await insertReview(body.film_id, body.title, body.year, body.review, body.vibe, body.poster);
 
     return new Response(
       JSON.stringify({ message: 'Review guardada exitosamente' }),

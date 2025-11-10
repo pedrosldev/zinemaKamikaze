@@ -81,7 +81,17 @@ if (authToken !== ADMIN_PASSWORD) {
 
         <div class="form-group">
           <label for="vibe">VIBE:</label>
-          <input type="text" id="vibe" name="vibe" required />
+          <!-- <input type="text" id="vibe" name="vibe" required /> -->
+          <select name="vibe" id="vibe">
+            <option value="eutanasia">EUTANASIA</option>
+            <option value="vomito">VOMITO</option>
+            <option value="aburrida">ABURRIDA</option>
+            <option value="pasable">PASABLE</option>
+            <option value="disfrutable">DISFRUTABLE</option>
+            <option value="entretenida">ENTRETENIDA</option>
+            <option value="mola">MOLA</option>
+            <option value="obra maestra">OBRA MAESTRA</option>
+          </select>
         </div>
 
         <div class="form-group">
@@ -257,6 +267,69 @@ if (authToken !== ADMIN_PASSWORD) {
 
   .logout-btn:hover {
     background: #d32f2f;
+  }
+
+  /* Estilo para el select - versión mejorada */
+  select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid rgba(107, 63, 47, 0.8);
+    border-radius: 4px;
+    background: rgba(26, 26, 24, 0.9);
+    color: #c9be9c;
+    font-family: "Sigmar", sans-serif;
+    font-size: 1rem;
+    box-sizing: border-box;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'><path fill='%23c9be9c' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 12px;
+    padding-right: 2.5rem;
+    transition: all 0.3s ease;
+  }
+
+  select:focus {
+    outline: none;
+    border-color: #f5d742;
+    box-shadow: 0 0 10px rgba(245, 215, 66, 0.3);
+  }
+
+  select:hover {
+    border-color: #f5d742;
+  }
+
+  /* Estilo para las opciones */
+  select option {
+    background: rgba(26, 26, 24, 0.95);
+    color: #c9be9c;
+    font-family: "Sigmar", sans-serif;
+    padding: 0.5rem;
+    border: none;
+  }
+
+  select option:hover {
+    background: #f5d742;
+    color: #000;
+  }
+
+  /* Para navegadores WebKit (Chrome, Safari) */
+  select::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  select::-webkit-scrollbar-track {
+    background: rgba(26, 26, 24, 0.9);
+  }
+
+  select::-webkit-scrollbar-thumb {
+    background: #f5d742;
+    border-radius: 4px;
+  }
+
+  select::-webkit-scrollbar-thumb:hover {
+    background: #d4b82a;
   }
 
   @keyframes flicker {
