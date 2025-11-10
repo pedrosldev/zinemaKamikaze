@@ -2,12 +2,20 @@
 // src/pages/admin/index.astro
 import Layout from "../../layouts/Layout.astro";
 import { getActiveTokens } from "../../lib/db";
+const authToken = Astro.cookies.get("admin_auth")?.value;
+const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || "tu-password-segura";
 
 const activeTokens = await getActiveTokens();
+if (authToken !== ADMIN_PASSWORD) {
+  return Astro.redirect("/admin/login");
+}
 ---
 
 <Layout>
   <div class="admin-container">
+    <div class="logout-container">
+      <button id="logoutBtn" class="logout-btn">CERRAR SESIÓN</button>
+    </div>
     <h1>ZONA DE ADMINISTRACIÓN - TOKENS</h1>
 
     <div class="tokens-section">
@@ -228,6 +236,29 @@ const activeTokens = await getActiveTokens();
     transform: scale(1.05);
   }
 
+  /* Añadir estos estilos */
+  .logout-container {
+    text-align: right;
+    margin-bottom: 1rem;
+  }
+
+  .logout-btn {
+    background: #f44336;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: "Sigmar", sans-serif;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .logout-btn:hover {
+    background: #d32f2f;
+  }
+
   @keyframes flicker {
     0%,
     100% {
@@ -340,6 +371,14 @@ const activeTokens = await getActiveTokens();
           alert("ERROR AL GUARDAR LA CRÍTICA");
         }
       });
+    }
+  });
+  document.getElementById("logoutBtn")?.addEventListener("click", async () => {
+    try {
+      await fetch("/api/admin-logout", { method: "POST" });
+      window.location.href = "/admin/login";
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
     }
   });
 </script>
