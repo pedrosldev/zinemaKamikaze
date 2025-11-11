@@ -93,3 +93,51 @@ export async function getActiveTokens(): Promise<TokenRow[]> {
   );
   return rows;
 }
+
+export async function getReviewsWithNullReview() {
+  try {
+    const [rows] = await pool.execute(
+      'SELECT id, film_id, title, year, type, vibe, poster_url FROM test_reviews WHERE review IS NULL'
+    );
+    return rows;
+  } catch (error) {
+    console.error('Error getting reviews with null review:', error);
+    throw error;
+  }
+}
+
+// Actualizar una review existente
+export async function updateReview(
+  id: number,
+  film_id: number,
+  title: string,
+  year: number,
+  review: string,
+  vibe: string,
+  poster_url: string
+) {
+  try {
+    const [result] = await pool.execute(
+      'UPDATE test_reviews SET film_id = ?, title = ?, year = ?, review = ?, vibe = ?, poster_url = ? WHERE id = ?',
+      [film_id, title, year, review, vibe, poster_url, id]
+    );
+    return result;
+  } catch (error) {
+    console.error('Error updating review:', error);
+    throw error;
+  }
+}
+
+// Función adicional: Obtener review por ID para edición
+export async function getReviewForEdit(id: number) {
+  try {
+    const [rows] = await pool.execute(
+      'SELECT id, film_id, title, year, type, vibe, poster_url, review FROM test_reviews WHERE id = ?',
+      [id]
+    );
+    return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+  } catch (error) {
+    console.error('Error getting review for edit:', error);
+    throw error;
+  }
+}
