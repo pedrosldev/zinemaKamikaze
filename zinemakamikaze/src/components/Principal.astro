@@ -447,6 +447,233 @@ const vibes = await getAllVibes();
       transform: translate(0, 0) scale(1);
     }
   }
+
+  /* Añade estas media queries al final de tu <style> */
+
+  /* Tablets y pantallas medianas (hasta 1024px) */
+  @media screen and (max-width: 1024px) {
+    main {
+      grid-template-areas:
+        "a a b b"
+        "c c c c"
+        "d d e e"
+        "d d e e"
+        "f f f f";
+      grid-template-rows: auto auto 1fr 1fr auto;
+      height: auto;
+      min-height: 100vh;
+    }
+
+    .findSurprise {
+      padding: 12px 20px;
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+    }
+
+    .token-input-container h3 {
+      font-size: 1rem;
+    }
+
+    .token-input {
+      width: 90%;
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Móviles grandes (hasta 768px) */
+  @media screen and (max-width: 768px) {
+    main {
+      grid-template-areas:
+        "a"
+        "b"
+        "c"
+        "d"
+        "e"
+        "f";
+      grid-template-rows: auto auto auto auto 300px auto;
+      grid-template-columns: 1fr;
+      padding: 0;
+    }
+
+    main > div:not(.film-grain):not(.old-film-scratches) {
+      min-height: 80px;
+      padding: 1rem;
+    }
+
+    .a h1 {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .d {
+      min-height: 200px;
+      padding: 1.5rem 1rem;
+    }
+
+    .e {
+      min-height: 300px;
+      height: 300px;
+    }
+
+    .findSurprise {
+      padding: 10px 16px;
+      font-size: 0.8rem;
+      letter-spacing: 1.5px;
+    }
+
+    .findSurprise-wide {
+      padding: 10px 20px;
+    }
+
+    .token-input-container {
+      padding: 0.5rem;
+    }
+
+    .token-input-container h3 {
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      margin-bottom: 0.75rem;
+    }
+
+    .token-input {
+      width: 95%;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+
+    .token-btn {
+      padding: 10px 20px;
+      font-size: 0.9rem;
+    }
+
+    #contenido {
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 0 10px;
+    }
+  }
+
+  /* Móviles pequeños (hasta 480px) */
+  @media screen and (max-width: 480px) {
+    main {
+      grid-template-rows: auto auto auto auto 250px auto;
+    }
+
+    .a h1 {
+      font-size: 1.2rem;
+    }
+
+    .b,
+    .c {
+      font-size: 0.9rem;
+    }
+
+    .d {
+      min-height: 180px;
+      padding: 1rem 0.5rem;
+    }
+
+    .e {
+      min-height: 250px;
+      height: 250px;
+    }
+
+    .findSurprise {
+      padding: 8px 12px;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+    }
+
+    .findSurprise-wide {
+      padding: 8px 16px;
+    }
+
+    .token-input-container h3 {
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+    }
+
+    .token-input {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 0.75rem;
+    }
+
+    .token-btn {
+      padding: 8px 16px;
+      font-size: 0.8rem;
+    }
+
+    .token-message {
+      font-size: 0.75rem;
+    }
+
+    #contenido {
+      font-size: 0.8rem;
+    }
+  }
+
+  /* Landscape en móviles */
+  @media screen and (max-width: 896px) and (orientation: landscape) {
+    main {
+      grid-template-areas:
+        "a b c"
+        "d e e"
+        "f e e";
+      grid-template-rows: auto 1fr auto;
+      grid-template-columns: 1fr 2fr 1fr;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .e {
+      min-height: 100%;
+    }
+
+    .d {
+      overflow-y: auto;
+    }
+  }
+
+  /* Ajustes generales para todos los tamaños */
+  @media screen and (max-width: 1024px) {
+    /* Hacer las animaciones menos intensas en móviles */
+    @keyframes flicker {
+      0%,
+      100% {
+        filter: brightness(0.85) contrast(0.95);
+      }
+      50% {
+        filter: brightness(0.9) contrast(1);
+      }
+    }
+
+    .b > .film-grain,
+    .f > .film-grain,
+    .a > .old-film-scratches,
+    .f > .old-film-scratches {
+      opacity: 0.1;
+    }
+
+    /* Mejorar legibilidad en pantallas pequeñas */
+    main > div:not(.film-grain):not(.old-film-scratches) {
+      background-image: linear-gradient(
+          to right,
+          rgba(107, 63, 47, 0.6) 4px,
+          transparent 4px
+        ),
+        linear-gradient(to bottom, rgba(107, 63, 47, 0.6) 4px, transparent 4px),
+        linear-gradient(to left, rgba(107, 63, 47, 0.6) 4px, transparent 4px),
+        linear-gradient(to top, rgba(107, 63, 47, 0.6) 4px, transparent 4px);
+    }
+  }
+
+  /* Prevenir zoom en inputs en iOS */
+  @media screen and (max-width: 768px) {
+    .token-input {
+      font-size: 16px; /* iOS no hace zoom si es >= 16px */
+    }
+  }
 </style>
 
 <script>

@@ -112,6 +112,272 @@ if (authToken === ADMIN_PASSWORD) {
     margin-top: 1rem;
     font-weight: bold;
   }
+
+  /* Añade estas media queries al final de tu <style> */
+
+  /* Tablets y pantallas medianas (hasta 1024px) */
+  @media screen and (max-width: 1024px) {
+    .login-container {
+      max-width: 450px;
+      margin: 80px auto;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    input {
+      font-size: 0.95rem;
+    }
+
+    button {
+      font-size: 1rem;
+      padding: 0.9rem 1.8rem;
+    }
+  }
+
+  /* Tablets pequeños (hasta 768px) */
+  @media screen and (max-width: 768px) {
+    .login-container {
+      max-width: 90%;
+      margin: 60px auto;
+      padding: 1.75rem;
+      min-height: 45vh;
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      letter-spacing: 1.5px;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+    }
+
+    input {
+      padding: 0.7rem;
+      font-size: 0.9rem;
+    }
+
+    button {
+      padding: 0.85rem 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .error-message {
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Móviles (hasta 480px) */
+  @media screen and (max-width: 480px) {
+    .login-container {
+      max-width: 95%;
+      margin: 40px auto;
+      padding: 1.5rem;
+      min-height: 40vh;
+    }
+
+    h1 {
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      margin-bottom: 1.25rem;
+      line-height: 1.3;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.5px;
+    }
+
+    input {
+      padding: 0.65rem;
+      font-size: 16px; /* Mínimo 16px para evitar zoom en iOS */
+      border-width: 2px;
+    }
+
+    button {
+      padding: 0.8rem 1.25rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    .error-message {
+      font-size: 0.85rem;
+      margin-top: 0.85rem;
+    }
+  }
+
+  /* Móviles muy pequeños (hasta 360px) */
+  @media screen and (max-width: 360px) {
+    .login-container {
+      margin: 30px auto;
+      padding: 1.25rem;
+    }
+
+    h1 {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+    }
+
+    input {
+      padding: 0.6rem;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .error-message {
+      font-size: 0.8rem;
+    }
+  }
+
+  /* Landscape en móviles */
+  @media screen and (max-width: 896px) and (orientation: landscape) {
+    .login-container {
+      max-width: 500px;
+      margin: 30px auto;
+      padding: 1.5rem;
+      min-height: auto;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    input {
+      padding: 0.65rem;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+    }
+  }
+
+  /* Ajustes visuales para móviles */
+  @media screen and (max-width: 768px) {
+    /* Mejorar área de toque para inputs */
+    input {
+      min-height: 44px; /* Tamaño mínimo recomendado para touch */
+    }
+
+    button {
+      min-height: 48px; /* Botón táctil estándar */
+      transition: all 0.3s ease;
+    }
+
+    /* Eliminar zoom en hover en móviles */
+    button:hover {
+      transform: scale(1.02);
+    }
+
+    /* Mejorar feedback visual */
+    input:focus {
+      box-shadow: 0 0 8px rgba(245, 215, 66, 0.4);
+    }
+
+    /* Ajuste para teclados virtuales */
+    .login-container {
+      margin-bottom: 40px;
+    }
+  }
+
+  /* Soporte para pantallas con notch (iPhone X+) */
+  @supports (padding: max(0px)) {
+    @media screen and (max-width: 768px) {
+      .login-container {
+        margin-left: max(20px, env(safe-area-inset-left));
+        margin-right: max(20px, env(safe-area-inset-right));
+        padding-top: max(1.5rem, env(safe-area-inset-top));
+        padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+      }
+    }
+  }
+
+  /* Estados de carga y error mejorados para móvil */
+  @media screen and (max-width: 768px) {
+    button:disabled {
+      opacity: 0.7;
+    }
+
+    .error-message {
+      padding: 0.5rem;
+      border-radius: 4px;
+      background-color: rgba(244, 67, 54, 0.1);
+      border-left: 3px solid #f44336;
+    }
+  }
+
+  /* Optimización de rendimiento para móviles */
+  @media screen and (max-width: 768px) {
+    /* Prevenir comportamiento extraño con zoom en iOS */
+    input,
+    button {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+
+    /* Mejorar renderizado */
+    .login-container {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Optimizar transiciones */
+    button,
+    input {
+      will-change: transform;
+    }
+  }
+
+  /* Ajuste para pantallas muy altas (modo portrait en tablets) */
+  @media screen and (min-height: 900px) and (max-width: 768px) {
+    .login-container {
+      margin: 120px auto;
+    }
+  }
+
+  /* Ajuste para pantallas muy cortas */
+  @media screen and (max-height: 600px) {
+    .login-container {
+      margin: 20px auto;
+      padding: 1rem;
+      min-height: auto;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 0.75rem;
+    }
+  }
 </style>
 
 <script>
