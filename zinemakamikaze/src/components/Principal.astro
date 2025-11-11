@@ -574,6 +574,8 @@ const vibes = await getAllVibes();
           const filmId = pelicula.films[film].id;
           const poster = pelicula.films[film].poster_path || "";
           const year = pelicula.films[film].year || "Unknown";
+          const review = null;
+          const vibe = null;
           const title = pelicula.films[film].title;
           console.log(pelicula.films[film].id);
 
@@ -586,6 +588,8 @@ const vibes = await getAllVibes();
               film_id: filmId,
               title: title,
               year: year,
+              review: review,
+              vibe: vibe,
               poster: poster,
             }),
           })
