@@ -1,7 +1,8 @@
 import type { APIRoute } from "astro";
 
 export const POST: APIRoute = async ({ cookies }) => {
-    cookies.delete("admin_auth", { path: "/" });
+    // cookies.delete("admin_auth", { path: "/" });
+    cookies.delete("admin_auth", { path: "/", sameSite: "strict" });
 
     return new Response(JSON.stringify({ success: true }), {
         status: 200,
