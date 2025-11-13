@@ -9,7 +9,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       // Establecer cookie de autenticación (válida por 24 horas)
       cookies.set("admin_auth", ADMIN_PASSWORD, {
         httpOnly: true,
-        secure: import.meta.env.PROD,
+        secure: false,
         sameSite: "strict",
         maxAge: 60 * 60 * 24, // 24 horas
         path: "/"
