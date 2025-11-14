@@ -930,7 +930,7 @@ const vibes = await getAllVibes();
 
   // Evento para el clic en .c - Popup explicativo
   document.addEventListener("DOMContentLoaded", function () {
-    const cElement = document.querySelector(".c");
+    const cElement = document.querySelector(".c") as HTMLDivElement;
 
     if (cElement) {
       cElement.style.cursor = "pointer"; // Cambiar cursor para indicar que es clickeable
@@ -1036,7 +1036,7 @@ const vibes = await getAllVibes();
 
         // Cerrar al hacer clic en el botón
         const closeButton = document.getElementById("closePopup");
-        closeButton.addEventListener("click", closePopup);
+        closeButton?.addEventListener("click", closePopup);
 
         // Cerrar al hacer clic fuera del contenido
         popupOverlay.addEventListener("click", function (e) {
