@@ -340,6 +340,41 @@ const vibes = await getAllVibes();
 
   .c {
     grid-area: c;
+    /* Color de fondo azul */
+    background-color: #1a54fa;
+    /* Filtro de color azul */
+    filter: brightness(0.8) contrast(0.9);
+
+    /* Primero la imagen de fondo con !important para sobrescribir el selector general */
+    background-image: 
+    /* Capa de color azul semi-transparente sobre la imagen */
+      linear-gradient(rgba(26, 84, 250, 0.5), rgba(26, 84, 250, 0.5)),
+      /* Los gradientes para los bordes */
+        linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      /* La imagen de fondo al final */ url(/images/eye_speculum.jpg) !important;
+
+    /* Las posiciones para cada capa (importante mantener el orden) */
+    background-position:
+      center,
+      0 0,
+      0 0,
+      100% 0,
+      0 100%,
+      center !important; /* posición de la imagen */
+
+    /* Los tamaños para cada capa */
+    background-size:
+      cover,
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      cover !important; /* tamaño de la imagen */
+
+    background-repeat: no-repeat !important;
   }
 
   .d {
