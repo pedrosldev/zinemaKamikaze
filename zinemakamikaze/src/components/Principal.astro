@@ -23,7 +23,7 @@ const vibes = await getAllVibes();
     <div class="old-film-scratches"></div>
   </div>
   <div class="b">Actor 2</div>
-  <div class="c">Escena 1</div>
+  <div class="c"><p>¿Qué es Zinemakamikaze?</p></div>
   <div class="d">
     <!-- Input para el token -->
     <div class="token-input-container" id="tokenContainer">
@@ -375,6 +375,22 @@ const vibes = await getAllVibes();
       cover !important; /* tamaño de la imagen */
 
     background-repeat: no-repeat !important;
+
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    padding-top: 10px;
+    padding-left: 20px;
+    color: #f5d742; /* Amarillo para mejor contraste */
+    text-shadow:
+      2px 2px 0 #000,
+      -1px -1px 0 #000,
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+      0 0 10px rgba(0, 0, 0, 0.7);
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
   }
 
   .d {
