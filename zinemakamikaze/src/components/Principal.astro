@@ -23,6 +23,26 @@ const vibes = await getAllVibes();
     <div class="old-film-scratches"></div>
   </div>
   <div class="b">
+    <div class="moviola-controls">
+      <div class="moviola-slider-container">
+        <label for="speedControl" class="moviola-label">VELOCIDAD MOVIOLA</label
+        >
+        <div class="range-speed">
+          <input
+            type="range"
+            id="speedControl"
+            class="moviola-slider"
+            min="0.1"
+            max="2"
+            step="0.1"
+            value="0.5"
+          />
+          <div class="speed-display">
+            <span class="speed-value">1.0x</span>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="flipbook-frame">
       <!-- <div class="film-perforations"></div> -->
       <div class="flipbook-images">
@@ -492,6 +512,110 @@ const vibes = await getAllVibes();
     75% {
       opacity: 0.6;
     }
+  }
+
+  /* Controles de moviola */
+
+  .range-speed {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+  }
+  .moviola-controls {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: rgba(26, 26, 24, 0.95);
+    padding: 8px 12px;
+    border: 2px solid rgba(107, 63, 47, 0.8);
+    border-radius: 6px;
+    backdrop-filter: blur(10px);
+    min-width: 200px;
+    max-width: 220px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  }
+
+  .moviola-slider-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .moviola-label {
+    color: #f5d742;
+    font-family: "Sigmar", sans-serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    width: 100%;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .moviola-slider {
+    width: 150px;
+    height: 5px;
+    background: rgba(107, 63, 47, 0.6);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+    margin-right:5px;
+  }
+
+  .moviola-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #f5d742;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  }
+
+  .moviola-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #f5d742;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  }
+
+  .speed-display {
+    display: flex;
+    align-items: center;
+  }
+
+  .speed-value {
+    color: #c9be9c;
+    font-family: "Sigmar", sans-serif;
+    font-size: 0.7rem;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1px 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(245, 215, 66, 0.3);
+    line-height: 1;
+    display: inline-block;
+  }
+
+  /* Estados del slider al interactuar */
+  .moviola-slider:active {
+    transform: scale(1.02);
+  }
+
+  .moviola-slider::-webkit-slider-thumb:hover {
+    background: #d4b82a;
+    transform: scale(1.1);
   }
 
   .c {
@@ -1222,5 +1346,56 @@ const vibes = await getAllVibes();
         this.style.transform = "scale(1)";
       });
     }
+  });
+
+  // Control de velocidad de la moviola
+  const speedControl = document.getElementById(
+    "speedControl"
+  ) as HTMLInputElement;
+  const speedValue = document.querySelector(".speed-value") as HTMLSpanElement;
+  const flipbookImages = document.querySelectorAll(
+    ".flipbook-image"
+  ) as NodeListOf<HTMLElement>;
+
+  function updateSpeed() {
+    if (!speedControl || !speedValue || flipbookImages.length === 0) return;
+
+    const speed = parseFloat(speedControl.value);
+    speedValue.textContent = `${speed.toFixed(1)}x`;
+
+    // Calcular la duración base (0.8s es la duración por defecto a velocidad 1.0)
+    const baseDuration = 0.8;
+    const newDuration = baseDuration / speed;
+
+    // Aplicar nueva duración a todas las imágenes
+    flipbookImages.forEach((img, index) => {
+      img.style.animationDuration = `${newDuration}s`;
+      const delayPerFrame = newDuration / 5;
+      img.style.animationDelay = `${delayPerFrame * index}s`;
+    });
+  }
+
+  if (speedControl && speedValue && flipbookImages.length > 0) {
+    speedControl.addEventListener("input", updateSpeed);
+
+    // Inicializar con el valor actual
+    updateSpeed();
+  }
+
+  // Añade esto al JavaScript para los botones de preset
+  document.querySelectorAll(".speed-preset").forEach((button) => {
+    button.addEventListener("click", function () {
+      const speed = parseFloat(this.dataset.speed);
+      if (speedControl) {
+        speedControl.value = speed.toString();
+        updateSpeed();
+      }
+
+      // Actualizar estado activo
+      document.querySelectorAll(".speed-preset").forEach((btn) => {
+        btn.classList.remove("active");
+      });
+      this.classList.add("active");
+    });
   });
 </script>
