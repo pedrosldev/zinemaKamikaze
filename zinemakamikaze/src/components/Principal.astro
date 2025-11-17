@@ -24,7 +24,7 @@ const vibes = await getAllVibes();
   </div>
   <div class="b">
     <div class="flipbook-frame">
-      <div class="film-perforations"></div>
+      <!-- <div class="film-perforations"></div> -->
       <div class="flipbook-images">
         <div
           class="flipbook-image"
@@ -378,7 +378,7 @@ const vibes = await getAllVibes();
     justify-content: center;
   }
 
-  /* Marco estático de película */
+  /* Marco estático de película SIN perforaciones */
   .flipbook-frame {
     width: 80%;
     max-width: 500px;
@@ -390,37 +390,12 @@ const vibes = await getAllVibes();
     box-shadow:
       inset 0 0 20px rgba(0, 0, 0, 0.9),
       0 5px 20px rgba(0, 0, 0, 0.7);
+    border-radius: 2px; /* Esquinas ligeramente redondeadas */
   }
 
-  /* Perforaciones de película en los bordes */
-  .film-perforations::before,
-  .film-perforations::after {
-    content: "";
-    position: absolute;
-    width: 12px;
-    height: 100%;
-    top: 0;
-    background: linear-gradient(
-        rgba(107, 63, 47, 0.4) 0%,
-        rgba(107, 63, 47, 0.4) 100%
-      ),
-      radial-gradient(circle at 6px 10px, #000 3px, transparent 3.5px),
-      radial-gradient(circle at 6px 30px, #000 3px, transparent 3.5px),
-      radial-gradient(circle at 6px 50px, #000 3px, transparent 3.5px),
-      radial-gradient(circle at 6px 70px, #000 3px, transparent 3.5px),
-      radial-gradient(circle at 6px 90px, #000 3px, transparent 3.5px);
-    background-repeat: repeat-y;
-    background-size: 12px 100px;
-    pointer-events: none;
-    z-index: 10;
-  }
-
-  .film-perforations::before {
-    left: 0;
-  }
-
-  .film-perforations::after {
-    right: 0;
+  /* ELIMINAMOS las perforaciones de película */
+  .film-perforations {
+    display: none;
   }
 
   /* Contenedor de imágenes */
@@ -430,7 +405,7 @@ const vibes = await getAllVibes();
     position: relative;
   }
 
-  /* Cada imagen individual */
+  /* Cada imagen individual - ANIMACIÓN MÁS RÁPIDA */
   .flipbook-image {
     position: absolute;
     top: 0;
@@ -442,36 +417,32 @@ const vibes = await getAllVibes();
     background-repeat: no-repeat;
     opacity: 0;
     filter: brightness(0.85) contrast(1.2) saturate(0.8) sepia(0.2);
-    animation: flipbookAnimation 2.5s infinite;
+    animation: fastFlipbook 0.8s infinite; /* Más rápido: 0.8s en lugar de 1.25s */
   }
 
-  /* Animación continua y fluida */
+  /* Delays más cortos para mayor velocidad */
   .flipbook-image:nth-child(1) {
     animation-delay: 0s;
   }
-
   .flipbook-image:nth-child(2) {
-    animation-delay: 0.5s;
-  }
-
+    animation-delay: 0.16s;
+  } /* 0.8s / 5 = 0.16s */
   .flipbook-image:nth-child(3) {
-    animation-delay: 1s;
+    animation-delay: 0.32s;
   }
-
   .flipbook-image:nth-child(4) {
-    animation-delay: 1.5s;
+    animation-delay: 0.48s;
   }
-
   .flipbook-image:nth-child(5) {
-    animation-delay: 2s;
+    animation-delay: 0.64s;
   }
 
-  @keyframes flipbookAnimation {
+  @keyframes fastFlipbook {
     0% {
       opacity: 0;
       transform: scale(1);
     }
-    5% {
+    8% {
       opacity: 1;
       transform: scale(1.02);
     }
@@ -489,7 +460,7 @@ const vibes = await getAllVibes();
     }
   }
 
-  /* Efecto de parpadeo de proyector */
+  /* Efecto de parpadeo de proyector MÁS RÁPIDO */
   .flipbook-frame::after {
     content: "";
     position: absolute;
@@ -504,7 +475,7 @@ const vibes = await getAllVibes();
     );
     pointer-events: none;
     z-index: 5;
-    animation: projectorFlicker 2s ease-in-out infinite;
+    animation: projectorFlicker 1s ease-in-out infinite; /* Más rápido: 1s */
   }
 
   @keyframes projectorFlicker {
