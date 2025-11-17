@@ -23,40 +23,33 @@ const vibes = await getAllVibes();
     <div class="old-film-scratches"></div>
   </div>
   <div class="b">
-    <div class="film-strip">
-      <div class="film-strip-container">
-        <!-- Duplicamos las imágenes para crear el loop infinito -->
-     
-        <div class="film-frame">
-          <img src="/images/cartoon/frame1.png" alt="Frame 1" />
+    <div class="flipbook-frame">
+      <div class="film-perforations"></div>
+      <div class="flipbook-images">
+        <div
+          class="flipbook-image"
+          style="background-image: url(/images/cartoon/frame1.png);"
+        >
         </div>
-        <div class="film-frame">
-          <img src="/images/cartoon/frame2.png" alt="Frame 2" />
+        <div
+          class="flipbook-image"
+          style="background-image: url(/images/cartoon/frame2.png);"
+        >
         </div>
-        <div class="film-frame">
-          <img src="/images/cartoon/frame3.png" alt="Frame 3" />
+        <div
+          class="flipbook-image"
+          style="background-image: url(/images/cartoon/frame3.png);"
+        >
         </div>
-        <div class="film-frame">
-          <img src="/images/cartoon/frame4.png" alt="Frame 4" />
+        <div
+          class="flipbook-image"
+          style="background-image: url(/images/cartoon/frame4.png);"
+        >
         </div>
-        <div class="film-frame">
-          <img src="/images/cartoon/frame5.png" alt="Frame 5" />
-        </div>
-        <!-- Duplicado para loop infinito -->
-        <div class="film-frame">
-          <img src="/images/cartoon/frame1.png" alt="Frame 1" />
-        </div>
-        <div class="film-frame">
-          <img src="/images/cartoon/frame2.png" alt="Frame 2" />
-        </div>
-        <div class="film-frame">
-          <img src="/images/cartoon/frame3.png" alt="Frame 3" />
-        </div>
-        <div class="film-frame">
-          <img src="/images/cartoon/frame4.png" alt="Frame 4" />
-        </div>
-        <div class="film-frame">
-          <img src="/images/cartoon/frame5.png" alt="Frame 5" />
+        <div
+          class="flipbook-image"
+          style="background-image: url(/images/cartoon/frame5.png);"
+        >
         </div>
       </div>
     </div>
@@ -373,126 +366,160 @@ const vibes = await getAllVibes();
     grid-area: a;
   }
 
+  /* Reemplaza los estilos de .b y chronophotography con estos */
+
   .b {
     grid-area: b;
     overflow: hidden;
     position: relative;
-    padding: 0 !important;
-  }
-
-  .film-strip {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .film-strip-container {
+    padding: 15px !important;
     display: flex;
-    gap: 10px;
-    animation: filmRoll 10s linear infinite;
-    height: 100%;
     align-items: center;
+    justify-content: center;
   }
 
-  .film-frame {
-    flex-shrink: 0;
-    width: 150px;
-    height: 90%;
-    background: #000;
-    border: 3px solid rgba(107, 63, 47, 0.8);
+  /* Marco estático de película */
+  .flipbook-frame {
+    width: 80%;
+    max-width: 500px;
+    height: 85%;
+    background: #0a0a0a;
+    border: 4px solid rgba(107, 63, 47, 0.9);
     position: relative;
     overflow: hidden;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow:
+      inset 0 0 20px rgba(0, 0, 0, 0.9),
+      0 5px 20px rgba(0, 0, 0, 0.7);
   }
 
-  /* Perforaciones de película en los lados */
-  .film-frame::before,
-  .film-frame::after {
+  /* Perforaciones de película en los bordes */
+  .film-perforations::before,
+  .film-perforations::after {
     content: "";
     position: absolute;
-    width: 100%;
+    width: 12px;
     height: 100%;
     top: 0;
-    background-image: radial-gradient(
-        circle at 10px 15%,
-        rgba(107, 63, 47, 0.9) 4px,
-        transparent 5px
+    background: linear-gradient(
+        rgba(107, 63, 47, 0.4) 0%,
+        rgba(107, 63, 47, 0.4) 100%
       ),
-      radial-gradient(
-        circle at 10px 50%,
-        rgba(107, 63, 47, 0.9) 4px,
-        transparent 5px
-      ),
-      radial-gradient(
-        circle at 10px 85%,
-        rgba(107, 63, 47, 0.9) 4px,
-        transparent 5px
-      );
-    background-size: 20px 100%;
+      radial-gradient(circle at 6px 10px, #000 3px, transparent 3.5px),
+      radial-gradient(circle at 6px 30px, #000 3px, transparent 3.5px),
+      radial-gradient(circle at 6px 50px, #000 3px, transparent 3.5px),
+      radial-gradient(circle at 6px 70px, #000 3px, transparent 3.5px),
+      radial-gradient(circle at 6px 90px, #000 3px, transparent 3.5px);
     background-repeat: repeat-y;
+    background-size: 12px 100px;
     pointer-events: none;
+    z-index: 10;
   }
 
-  .film-frame::before {
+  .film-perforations::before {
     left: 0;
   }
 
-  .film-frame::after {
+  .film-perforations::after {
     right: 0;
-    background-image: radial-gradient(
-        circle at 10px 15%,
-        rgba(107, 63, 47, 0.9) 4px,
-        transparent 5px
-      ),
-      radial-gradient(
-        circle at 10px 50%,
-        rgba(107, 63, 47, 0.9) 4px,
-        transparent 5px
-      ),
-      radial-gradient(
-        circle at 10px 85%,
-        rgba(107, 63, 47, 0.9) 4px,
-        transparent 5px
-      );
-    background-position: right;
   }
 
-  .film-frame img {
+  /* Contenedor de imágenes */
+  .flipbook-images {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    filter: brightness(0.8) contrast(0.9) sepia(0.2);
+    position: relative;
   }
 
-  @keyframes filmRoll {
+  /* Cada imagen individual */
+  .flipbook-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    filter: brightness(0.85) contrast(1.2) saturate(0.8) sepia(0.2);
+    animation: flipbookAnimation 2.5s infinite;
+  }
+
+  /* Animación continua y fluida */
+  .flipbook-image:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  .flipbook-image:nth-child(2) {
+    animation-delay: 0.5s;
+  }
+
+  .flipbook-image:nth-child(3) {
+    animation-delay: 1s;
+  }
+
+  .flipbook-image:nth-child(4) {
+    animation-delay: 1.5s;
+  }
+
+  .flipbook-image:nth-child(5) {
+    animation-delay: 2s;
+  }
+
+  @keyframes flipbookAnimation {
     0% {
-      transform: translateX(0);
+      opacity: 0;
+      transform: scale(1);
+    }
+    5% {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+    15% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    20% {
+      opacity: 0;
+      transform: scale(0.98);
     }
     100% {
-      transform: translateX(-50%);
+      opacity: 0;
+      transform: scale(1);
     }
   }
 
-  /* Pausar al hover */
-  .film-strip-container:hover {
-    animation-play-state: paused;
+  /* Efecto de parpadeo de proyector */
+  .flipbook-frame::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 30%,
+      rgba(0, 0, 0, 0.3) 100%
+    );
+    pointer-events: none;
+    z-index: 5;
+    animation: projectorFlicker 2s ease-in-out infinite;
   }
 
-  /* Ajustes responsive */
-  @media screen and (max-width: 768px) {
-    .film-frame {
-      width: 100px;
+  @keyframes projectorFlicker {
+    0%,
+    100% {
+      opacity: 0.7;
     }
-
-    .film-strip-container {
-      animation: filmRoll 15s linear infinite;
+    25% {
+      opacity: 0.5;
     }
-  }
-
-  @media screen and (max-width: 480px) {
-    .film-frame {
-      width: 80px;
+    50% {
+      opacity: 0.8;
+    }
+    75% {
+      opacity: 0.6;
     }
   }
 
