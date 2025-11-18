@@ -23,10 +23,10 @@ interface ReviewRow extends RowDataPacket {
   interface VibeRow extends RowDataPacket {
     vibe: string;
   }
-  export async function insertReview(film_id: number, title: string, year: number, review: string, vibe: string, poster: string) {
+  export async function insertReview(film_id: number, title: string, year: number, review: string, vibe: string, poster: string, viewing_period: boolean = true  ) {
     const [result] = await pool.execute(
-      'INSERT INTO test_reviews (film_id, title, year, review, vibe, poster_url) VALUES (?, ?, ?, ?, ?, ?)',
-      [film_id, title, year, review, vibe, poster]
+      'INSERT INTO test_reviews (film_id, title, year, review, vibe, poster_url, viewing_period) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [film_id, title, year, review, vibe, poster, viewing_period]
     );
     return result;
   }
@@ -114,12 +114,13 @@ export async function updateReview(
   year: number,
   review: string,
   vibe: string,
-  poster_url: string
+  poster_url: string,
+  viewing_period: boolean = false
 ) {
   try {
     const [result] = await pool.execute(
-      'UPDATE test_reviews SET film_id = ?, title = ?, year = ?, review = ?, vibe = ?, poster_url = ? WHERE id = ?',
-      [film_id, title, year, review, vibe, poster_url, id]
+      'UPDATE test_reviews SET film_id = ?, title = ?, year = ?, review = ?, vibe = ?, poster_url = ?, viewing_period=? WHERE id = ?',
+      [film_id, title, year, review, vibe, poster_url, viewing_period, id]
     );
     return result;
   } catch (error) {
@@ -140,4 +141,11 @@ export async function getReviewForEdit(id: number) {
     console.error('Error getting review for edit:', error);
     throw error;
   }
+}
+
+export async function getLatestMovie() {
+  const [rows] = await pool.query<RowDataPacket[]>(
+    "SELECT * FROM test_reviews ORDER BY id DESC LIMIT 1"
+  );
+  return rows.length > 0 ? rows[0] : null;
 }

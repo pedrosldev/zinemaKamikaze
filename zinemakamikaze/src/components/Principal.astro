@@ -1,10 +1,12 @@
 ---
 const left = "ZINEMA KAMIKAZE!";
 const right = "";
-import { getAllVibes } from "../lib/db";
+import { getAllVibes, getLatestMovie } from "../lib/db";
 import Vibrarcodion from "./Vibrarcodion.astro";
 
 const vibes = await getAllVibes();
+const latestMovie = await getLatestMovie();
+const isViewingPeriod = latestMovie?.viewing_period ?? false;
 ---
 
 <head>
@@ -21,7 +23,7 @@ const vibes = await getAllVibes();
     <h1>ZINEMA KAMIKAZE!!!</h1>
     <div class="film-grain"></div>
     <div class="old-film-scratches"></div>
-        <div class="moviola-controls">
+    <div class="moviola-controls">
       <div class="moviola-slider-container">
         <label for="speedControl" class="moviola-label">VELOCIDAD MOVIOLA</label
         >
@@ -42,10 +44,10 @@ const vibes = await getAllVibes();
       </div>
     </div>
   </div>
+
   <div class="b">
     <small>Expectativas con la película:</small>
     <div class="flipbook-frame">
-      <!-- <div class="film-perforations"></div> -->
       <div class="flipbook-images">
         <div
           class="flipbook-image"
@@ -77,31 +79,81 @@ const vibes = await getAllVibes();
   </div>
 
   <div class="c"><p>¿Qué es Zinemakamikaze?</p></div>
-  <div class="d">
-    <!-- Input para el token -->
-    <div class="token-input-container" id="tokenContainer">
-      <h3>INTRODUCE TU CÓDIGO DE ACCESO:</h3>
-      <input
-        type="text"
-        id="tokenInput"
-        placeholder="Ingresa el código aquí..."
-        class="token-input"
-      />
-      <button id="validateToken" class="token-btn">VALIDAR CÓDIGO</button>
-      <p id="tokenMessage" class="token-message"></p>
-    </div>
 
-    <!-- Botón original (oculto inicialmente) -->
-    <h1
-      class="findSurprise findSurprise-perforations findSurprise-sepia findSurprise-wide"
-      id="btnLeer"
-      style="display: none;"
-    >
-      Y LA ELEGIDA ES...
-    </h1>
+  <div class="d">
+    {
+      isViewingPeriod ? (
+        <div class="viewing-period-info">
+          <div class="info-icon">🎬</div>
+          <h3>PRÓXIMA CRÍTICA EN PROCESO</h3>
+          <p>Actualmente estoy visionando y escribiendo la crítica de:</p>
+          <div class="movie-pointing-info">
+            <h4>
+              "{latestMovie.title}" ({latestMovie.year})
+            </h4>
+            <p>Mira el cartel 👉</p>
+            <div class="arrow-indicator">➡️</div>
+          </div>
+          <div class="status-message">
+            <em>La crítica estará disponible pronto...</em>
+          </div>
+        </div>
+      ) : (
+        <div class="token-input-container" id="tokenContainer">
+          <h3>INTRODUCE TU CÓDIGO DE ACCESO:</h3>
+          <input
+            type="text"
+            id="tokenInput"
+            placeholder="Ingresa el código aquí..."
+            class="token-input"
+          />
+          <button id="validateToken" class="token-btn">
+            VALIDAR CÓDIGO
+          </button>
+          <p id="tokenMessage" class="token-message" />
+        </div>
+      )
+    }
+
+    {
+      !isViewingPeriod && (
+        <h1
+          class="findSurprise findSurprise-perforations findSurprise-sepia findSurprise-wide"
+          id="btnLeer"
+          style="display: none;"
+        >
+          Y LA ELEGIDA ES...
+        </h1>
+      )
+    }
     <div id="contenido"></div>
   </div>
-  <div class="e surprise"></div>
+
+<div class="e surprise">
+  {isViewingPeriod && latestMovie ? (
+    <div class="current-poster">
+      <img
+        src={
+          latestMovie.poster_url
+            ? `https://image.tmdb.org/t/p/w500${latestMovie.poster_url}`
+            : "/images/noImg.jpg"
+        }
+        alt={latestMovie.title}
+        class="poster-image-active"
+      />
+      <div class="poster-overlay">
+        <span class="viewing-badge">EN VISIONADO</span>
+      </div>
+    </div>
+  ) : (
+    <!-- Contenido alternativo cuando NO hay periodo de visionado -->
+    <div class="no-movie-placeholder">
+      <div class="placeholder-icon">🎭</div>
+      <p>Próxima película por seleccionar</p>
+    </div>
+  )}
+</div>
+
   <div class="f">
     <div class="film-grain"></div>
     <div class="old-film-scratches"></div>
@@ -522,7 +574,6 @@ const vibes = await getAllVibes();
     display: flex;
     justify-content: center;
     align-items: center;
-  
   }
   .moviola-controls {
     position: absolute;
@@ -568,7 +619,7 @@ const vibes = await getAllVibes();
     border-radius: 3px;
     outline: none;
     -webkit-appearance: none;
-    margin-right:5px;
+    margin-right: 5px;
   }
 
   .moviola-slider::-webkit-slider-thumb {
@@ -1203,6 +1254,10 @@ const vibes = await getAllVibes();
           }
 
           contenidoDiv!.innerHTML = `<strong>${title} (${year})</strong>`;
+
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
         })
         .catch((error) => {
           contenidoDiv!.textContent = "Error: " + error.message;
