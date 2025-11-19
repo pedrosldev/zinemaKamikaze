@@ -23,56 +23,94 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
     <h1>ZINEMA KAMIKAZE!!!</h1>
     <div class="film-grain"></div>
     <div class="old-film-scratches"></div>
-    <div class="moviola-controls">
-      <div class="moviola-slider-container">
-        <label for="speedControl" class="moviola-label">VELOCIDAD MOVIOLA</label
-        >
-        <div class="range-speed">
-          <input
-            type="range"
-            id="speedControl"
-            class="moviola-slider"
-            min="0.1"
-            max="2"
-            step="0.1"
-            value="0.5"
-          />
-          <div class="speed-display">
-            <span class="speed-value">1.0x</span>
+  </div>
+
+  <div class="b" id="flipbookTrigger">
+    <small>Expectativas con la película</small>
+    <div class="flipbook-container" style="display: none;">
+      <div class="flipbook-frame">
+        <div class="flipbook-images">
+          <div
+            class="flipbook-image"
+            style="background-image: url(/images/cartoon/frame-gun1.png);"
+          >
+          </div>
+          <div
+            class="flipbook-image"
+            style="background-image: url(/images/cartoon/frame-gun2.png);"
+          >
+          </div>
+          <div
+            class="flipbook-image"
+            style="background-image: url(/images/cartoon/frame-gun3.png);"
+          >
+          </div>
+          <div
+            class="flipbook-image"
+            style="background-image: url(/images/cartoon/frame-gun2.png);"
+          >
+          </div>
+          <div
+            class="flipbook-image"
+            style="background-image: url(/images/cartoon/frame-gun1.png);"
+          >
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="b">
-    <small>Expectativas con la película:</small>
-    <div class="flipbook-frame">
-      <div class="flipbook-images">
-        <div
-          class="flipbook-image"
-          style="background-image: url(/images/cartoon/frame-gun1.png);"
-        >
+  <!-- Popup Moviola -->
+  <div class="moviola-popup-overlay" id="moviolaPopup" style="display: none;">
+    <button class="moviola-popup-close" id="closeMoviolaPopup">CERRAR</button>
+    <div class="moviola-popup-content">
+      <div class="flipbook-frame">
+        <div class="flipbook-images">
+          <div
+            class="flipbook-image"
+            style="background-image: url(/images/cartoon/frame-gun1.png);"
+          >
+          </div>
+          <div
+            class="flipbook-image"
+            style="background-image: url(/images/cartoon/frame-gun2.png);"
+          >
+          </div>
+          <div
+            class="flipbook-image"
+            style="background-image: url(/images/cartoon/frame-gun3.png);"
+          >
+          </div>
+          <div
+            class="flipbook-image"
+            style="background-image: url(/images/cartoon/frame-gun2.png);"
+          >
+          </div>
+          <div
+            class="flipbook-image"
+            style="background-image: url(/images/cartoon/frame-gun1.png);"
+          >
+          </div>
         </div>
-        <div
-          class="flipbook-image"
-          style="background-image: url(/images/cartoon/frame-gun2.png);"
-        >
-        </div>
-        <div
-          class="flipbook-image"
-          style="background-image: url(/images/cartoon/frame-gun3.png);"
-        >
-        </div>
-        <div
-          class="flipbook-image"
-          style="background-image: url(/images/cartoon/frame-gun2.png);"
-        >
-        </div>
-        <div
-          class="flipbook-image"
-          style="background-image: url(/images/cartoon/frame-gun1.png);"
-        >
+      </div>
+      <div class="moviola-controls visible">
+        <div class="moviola-slider-container">
+          <label for="speedControl" class="moviola-label">VELOCIDAD MOVIOLA</label
+          >
+          <div class="range-speed">
+            <input
+              type="range"
+              id="speedControl"
+              class="moviola-slider"
+              min="0.1"
+              max="2"
+              step="0.1"
+              value="0.5"
+            />
+            <div class="speed-display">
+              <span class="speed-value">1.0x</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -454,9 +492,8 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
 
   /* Marco estático de película SIN perforaciones */
   .flipbook-frame {
-    width: 80%;
-    max-width: 500px;
-    height: 85%;
+    width: 100%;
+    height: 100%;
     background: #0a0a0a;
     border: 4px solid rgba(107, 63, 47, 0.9);
     position: relative;
@@ -589,6 +626,82 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
     min-width: 200px;
     max-width: 220px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .moviola-controls.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Popup overlay */
+  .moviola-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(5px);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .moviola-popup-overlay.active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .moviola-popup-content {
+    position: relative;
+    width: 90%;
+    max-width: 700px;
+    height: 80vh;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .moviola-popup-content .flipbook-frame {
+    width: 100%;
+    height: 100%;
+    max-width: 600px;
+  }
+
+  .moviola-popup-close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #f5d742;
+    color: #000;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Sigmar', sans-serif;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    z-index: 10001;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  }
+
+  .moviola-popup-close:hover {
+    background: #d4b82a;
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.7);
   }
 
   .moviola-slider-container {
@@ -1401,6 +1514,43 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
       cElement.addEventListener("mouseleave", function () {
         this.style.filter = "brightness(0.8) contrast(0.9)";
         this.style.transform = "scale(1)";
+      });
+    }
+  });
+
+  // Popup de Moviola
+  document.addEventListener("DOMContentLoaded", function () {
+    const flipbookTrigger = document.getElementById("flipbookTrigger");
+    const moviolaPopup = document.getElementById("moviolaPopup") as HTMLElement;
+    const closeMoviolaPopup = document.getElementById("closeMoviolaPopup");
+
+    if (flipbookTrigger && moviolaPopup && closeMoviolaPopup) {
+      // Abrir popup al hacer clic en .b
+      flipbookTrigger.addEventListener("click", function () {
+        moviolaPopup.style.display = "flex";
+        moviolaPopup.classList.add("active");
+      });
+
+      // Cerrar popup con el botón
+      closeMoviolaPopup.addEventListener("click", function () {
+        moviolaPopup.style.display = "none";
+        moviolaPopup.classList.remove("active");
+      });
+
+      // Cerrar popup al hacer clic fuera del contenido
+      moviolaPopup.addEventListener("click", function (e) {
+        if (e.target === moviolaPopup) {
+          moviolaPopup.style.display = "none";
+          moviolaPopup.classList.remove("active");
+        }
+      });
+
+      // Cerrar popup con la tecla Escape
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && moviolaPopup.classList.contains("active")) {
+          moviolaPopup.style.display = "none";
+          moviolaPopup.classList.remove("active");
+        }
       });
     }
   });
