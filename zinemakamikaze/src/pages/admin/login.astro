@@ -12,6 +12,7 @@ if (authToken === ADMIN_PASSWORD) {
 
 <Layout>
   <div class="login-container">
+    <a href="/">Inicio</a>
     <h1>ACCESO ADMINISTRATIVO</h1>
 
     <form id="loginForm">
@@ -33,6 +34,15 @@ if (authToken === ADMIN_PASSWORD) {
 </Layout>
 
 <style>
+  a{
+    color: #c9be9c;
+    text-decoration: none;
+    font-family: "Sigmar", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    display: inline-block;
+  }
   .login-container {
     max-width: 400px;
     margin: 100px auto;
