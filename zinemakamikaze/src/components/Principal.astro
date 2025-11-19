@@ -1230,77 +1230,8 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
       return;
     }
 
-    // Función para validar el token
-    async function validateToken(token: string) {
-      try {
-        validateTokenBtn!.disabled = true;
-        validateTokenBtn!.textContent = "VALIDANDO...";
-        tokenMessage!.textContent = "";
-        tokenMessage!.className = "token-message";
-
-        const response = await fetch("/api/validate-tokens", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token: token.trim() }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok && result.valid) {
-          // Token válido - mostrar el botón de evento
-          tokenMessage!.textContent =
-            "¡CÓDIGO VÁLIDO! Ahora puedes generar la crítica.";
-          tokenMessage!.className = "token-message token-success";
-          tokenContainer!.style.display = "none";
-          btnLeer!.style.display = "block";
-
-          // Efecto de confeti para validación exitosa
-          confetti({
-            particleCount: 50,
-            spread: 70,
-            origin: { y: 0.6 },
-          });
-        } else {
-          // Token inválido
-          tokenMessage!.textContent =
-            result.message || "CÓDIGO INVÁLIDO. Inténtalo de nuevo.";
-          tokenMessage!.className = "token-message token-error";
-        }
-      } catch (error) {
-        console.error("Error al validar el token:", error);
-        tokenMessage!.textContent = "ERROR DE CONEXIÓN. Inténtalo más tarde.";
-        tokenMessage!.className = "token-message token-error";
-      } finally {
-        validateTokenBtn!.disabled = false;
-        validateTokenBtn!.textContent = "VALIDAR CÓDIGO";
-      }
-    }
-
-    // Event listener para el botón de validar
-    validateTokenBtn!.addEventListener("click", function () {
-      const token = tokenInput!.value.trim();
-      if (!token) {
-        tokenMessage!.textContent = "POR FAVOR, INTRODUCE UN CÓDIGO.";
-        tokenMessage!.className = "token-message token-error";
-        return;
-      }
-      validateToken(token);
-    });
-
-    // También validar al presionar Enter
-    tokenInput!.addEventListener("keypress", function (e) {
-      if (e.key === "Enter") {
-        const token = tokenInput!.value.trim();
-        if (token) {
-          validateToken(token);
-        }
-      }
-    });
-
-    // Función para generar la crítica
-    btnLeer!.addEventListener("click", function () {
+    // Función para generar la película
+    function generateMovie() {
       confetti({
         particleCount: 100,
         spread: 70,
@@ -1380,6 +1311,83 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
         .catch((error) => {
           contenidoDiv!.textContent = "Error: " + error.message;
         });
+    }
+
+    // Función para validar el token
+    async function validateToken(token: string) {
+      try {
+        validateTokenBtn!.disabled = true;
+        validateTokenBtn!.textContent = "VALIDANDO...";
+        tokenMessage!.textContent = "";
+        tokenMessage!.className = "token-message";
+
+        const response = await fetch("/api/validate-tokens", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: token.trim() }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.valid) {
+          // Token válido - ocultar contenedor y generar película directamente
+          tokenMessage!.textContent = "¡CÓDIGO VÁLIDO! Generando película...";
+          tokenMessage!.className = "token-message token-success";
+          tokenContainer!.style.display = "none";
+
+          // Efecto de confeti para validación exitosa
+          confetti({
+            particleCount: 50,
+            spread: 70,
+            origin: { y: 0.6 },
+          });
+
+          // Generar la película directamente después de una breve pausa
+          setTimeout(() => {
+            generateMovie();
+          }, 500);
+        } else {
+          // Token inválido
+          tokenMessage!.textContent =
+            result.message || "CÓDIGO INVÁLIDO. Inténtalo de nuevo.";
+          tokenMessage!.className = "token-message token-error";
+        }
+      } catch (error) {
+        console.error("Error al validar el token:", error);
+        tokenMessage!.textContent = "ERROR DE CONEXIÓN. Inténtalo más tarde.";
+        tokenMessage!.className = "token-message token-error";
+      } finally {
+        validateTokenBtn!.disabled = false;
+        validateTokenBtn!.textContent = "VALIDAR CÓDIGO";
+      }
+    }
+
+    // Event listener para el botón de validar
+    validateTokenBtn!.addEventListener("click", function () {
+      const token = tokenInput!.value.trim();
+      if (!token) {
+        tokenMessage!.textContent = "POR FAVOR, INTRODUCE UN CÓDIGO.";
+        tokenMessage!.className = "token-message token-error";
+        return;
+      }
+      validateToken(token);
+    });
+
+    // También validar al presionar Enter
+    tokenInput!.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        const token = tokenInput!.value.trim();
+        if (token) {
+          validateToken(token);
+        }
+      }
+    });
+
+    // Función para generar la crítica (mantener por si acaso)
+    btnLeer!.addEventListener("click", function () {
+      generateMovie();
     });
   });
 
