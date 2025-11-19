@@ -162,6 +162,10 @@ const { titulo = "Vibreviews" } = Astro.props;
     transition: color 0.2s;
     display: block;
     font-size: 0.9rem;
+    text-shadow:
+      0 0 10px #00ff00,
+      0 0 10px #00ff00,
+      0 0 10px #00ff00;
   }
 
   .vibe-enlace:hover {
@@ -173,7 +177,7 @@ const { titulo = "Vibreviews" } = Astro.props;
   document.addEventListener("DOMContentLoaded", () => {
     const botonPrincipal = document.querySelector(".acordeon-titulo-principal");
 
-    botonPrincipal.addEventListener("click", () => {
+    botonPrincipal?.addEventListener("click", () => {
       const estaExpandido =
         botonPrincipal.getAttribute("aria-expanded") === "true";
 
