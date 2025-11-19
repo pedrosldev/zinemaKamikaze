@@ -122,15 +122,14 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
     {
       isViewingPeriod ? (
         <div class="viewing-period-info">
-          <div class="info-icon">🎬</div>
-          <h3>PRÓXIMA CRÍTICA EN PROCESO</h3>
-          <p>Actualmente estoy visionando y escribiendo la crítica de:</p>
+         
+          <h3>PRÓXIMA CRÍTICA EN PROCESO 👉</h3>
+         
           <div class="movie-pointing-info">
             <h4>
               "{latestMovie.title}" ({latestMovie.year})
             </h4>
-            <p>Mira el cartel 👉</p>
-            <div class="arrow-indicator">➡️</div>
+    
           </div>
           <div class="status-message">
             <em>La crítica estará disponible pronto...</em>
@@ -179,9 +178,7 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
         alt={latestMovie.title}
         class="poster-image-active"
       />
-      <div class="poster-overlay">
-        <span class="viewing-badge">EN VISIONADO</span>
-      </div>
+    
     </div>
   ) : (
     <!-- Contenido alternativo cuando NO hay periodo de visionado -->
@@ -324,6 +321,12 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
   .token-error {
     color: #f44336;
   }
+
+  .poster-image-active {
+    max-height: 450px; /* o el valor que prefieras */
+    width: auto;
+    object-fit: contain;
+}
 
   /* Estilos existentes para .findSurprise */
   .findSurprise {
