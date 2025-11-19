@@ -493,7 +493,8 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
   /* Marco estático de película SIN perforaciones */
   .flipbook-frame {
     width: 100%;
-    height: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
     background: #0a0a0a;
     border: 4px solid rgba(107, 63, 47, 0.9);
     position: relative;
@@ -523,7 +524,7 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
     left: 0;
     width: 100%;
     height: 100%;
-    background-size: cover;
+    background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
     opacity: 0;
