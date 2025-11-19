@@ -1531,39 +1531,268 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
     }
   });
 
-  // Popup de Moviola
+  // Popup de Moviola - dinámico como el popup de .c
   document.addEventListener("DOMContentLoaded", function () {
     const flipbookTrigger = document.getElementById("flipbookTrigger");
-    const moviolaPopup = document.getElementById("moviolaPopup") as HTMLElement;
-    const closeMoviolaPopup = document.getElementById("closeMoviolaPopup");
 
-    if (flipbookTrigger && moviolaPopup && closeMoviolaPopup) {
-      // Abrir popup al hacer clic en .b
+    if (flipbookTrigger) {
+      flipbookTrigger.style.cursor = "pointer";
+
       flipbookTrigger.addEventListener("click", function () {
-        moviolaPopup.style.display = "flex";
-        moviolaPopup.classList.add("active");
-      });
+        // Crear el overlay del popup
+        const popupOverlay = document.createElement("div");
+        popupOverlay.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.85);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 9999;
+          backdrop-filter: blur(5px);
+        `;
 
-      // Cerrar popup con el botón
-      closeMoviolaPopup.addEventListener("click", function () {
-        moviolaPopup.style.display = "none";
-        moviolaPopup.classList.remove("active");
-      });
+        // Crear el contenido del popup
+        const popupContent = document.createElement("div");
+        popupContent.style.cssText = `
+          position: relative;
+          width: 90%;
+          max-width: 700px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 15px;
+          padding: 20px;
+        `;
 
-      // Cerrar popup al hacer clic fuera del contenido
-      moviolaPopup.addEventListener("click", function (e) {
-        if (e.target === moviolaPopup) {
-          moviolaPopup.style.display = "none";
-          moviolaPopup.classList.remove("active");
+        // Crear el botón de cerrar
+        const closeButton = document.createElement("button");
+        closeButton.textContent = "CERRAR";
+        closeButton.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #f5d742;
+          color: #000;
+          border: none;
+          padding: 12px 20px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-family: 'Sigmar', sans-serif;
+          font-weight: bold;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          transition: all 0.3s ease;
+          z-index: 10001;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        `;
+
+        // Crear el flipbook frame
+        const flipbookFrame = document.createElement("div");
+        flipbookFrame.style.cssText = `
+          width: 100%;
+          max-width: 600px;
+          aspect-ratio: 16 / 9;
+          background: #0a0a0a;
+          border: 4px solid rgba(107, 63, 47, 0.9);
+          position: relative;
+          overflow: hidden;
+          box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9), 0 5px 20px rgba(0, 0, 0, 0.7);
+          border-radius: 2px;
+        `;
+
+        const flipbookImages = document.createElement("div");
+        flipbookImages.style.cssText = `
+          width: 100%;
+          height: 100%;
+          position: relative;
+        `;
+        
+        // Añadir las imágenes del flipbook
+        const images = [
+          '/images/cartoon/frame-gun1.png',
+          '/images/cartoon/frame-gun2.png',
+          '/images/cartoon/frame-gun3.png',
+          '/images/cartoon/frame-gun2.png',
+          '/images/cartoon/frame-gun1.png'
+        ];
+
+        images.forEach((src, index) => {
+          const img = document.createElement("div");
+          img.className = "flipbook-image";
+          img.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: 110% 110%;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-image: url(${src});
+            opacity: 0;
+            filter: brightness(0.85) contrast(1.2) saturate(0.8) sepia(0.2);
+            animation: fastFlipbook 0.8s infinite;
+            animation-delay: ${index * 0.16}s;
+          `;
+          flipbookImages.appendChild(img);
+        });
+
+        // Añadir efecto de parpadeo
+        const flickerOverlay = document.createElement("div");
+        flickerOverlay.style.cssText = `
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.3) 100%);
+          pointer-events: none;
+          z-index: 5;
+          animation: projectorFlicker 1s ease-in-out infinite;
+        `;
+
+        flipbookFrame.appendChild(flipbookImages);
+        flipbookFrame.appendChild(flickerOverlay);
+
+        // Crear los controles de moviola (fuera del frame)
+        const controls = document.createElement("div");
+        controls.style.cssText = `
+          background: rgba(26, 26, 24, 0.95);
+          padding: 8px 12px;
+          border: 2px solid rgba(107, 63, 47, 0.8);
+          border-radius: 6px;
+          backdrop-filter: blur(10px);
+          min-width: 200px;
+          max-width: 220px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        `;
+        
+        controls.innerHTML = `
+          <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <label for="speedControlPopup" style="color: #f5d742; font-family: 'Sigmar', sans-serif; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); width: 100%; text-align: center; margin-bottom: 4px;">VELOCIDAD MOVIOLA</label>
+            <div style="display: flex; justify-content: center; align-items: center;">
+              <input
+                type="range"
+                id="speedControlPopup"
+                style="width: 150px; height: 5px; background: rgba(107, 63, 47, 0.6); border-radius: 3px; outline: none; -webkit-appearance: none; margin-right: 5px;"
+                min="0.1"
+                max="2"
+                step="0.1"
+                value="1.0"
+              />
+              <div style="display: flex; align-items: center;">
+                <span style="color: #c9be9c; font-family: 'Sigmar', sans-serif; font-size: 0.7rem; font-weight: bold; background: rgba(0, 0, 0, 0.5); padding: 1px 6px; border-radius: 8px; border: 1px solid rgba(245, 215, 66, 0.3); line-height: 1; display: inline-block;">1.0x</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Ensamblar el popup
+        popupContent.appendChild(flipbookFrame);
+        popupContent.appendChild(controls);
+        popupOverlay.appendChild(closeButton);
+        popupOverlay.appendChild(popupContent);
+        document.body.appendChild(popupOverlay);
+
+        // Función para cerrar el popup
+        function closePopup() {
+          document.body.removeChild(popupOverlay);
         }
-      });
 
-      // Cerrar popup con la tecla Escape
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape" && moviolaPopup.classList.contains("active")) {
-          moviolaPopup.style.display = "none";
-          moviolaPopup.classList.remove("active");
+        // Cerrar al hacer clic en el botón
+        closeButton.addEventListener("click", closePopup);
+
+        // Cerrar al hacer clic fuera del contenido
+        popupOverlay.addEventListener("click", function (e) {
+          if (e.target === popupOverlay) {
+            closePopup();
+          }
+        });
+
+        // Cerrar con la tecla Escape
+        document.addEventListener("keydown", function closeOnEscape(e) {
+          if (e.key === "Escape") {
+            closePopup();
+            document.removeEventListener("keydown", closeOnEscape);
+          }
+        });
+
+        // Inicializar controles de velocidad para este popup
+        const speedControlPopup = document.getElementById("speedControlPopup") as HTMLInputElement;
+        const speedValuePopup = controls.querySelector("span") as HTMLSpanElement;
+        const flipbookImagesPopup = flipbookImages.querySelectorAll(".flipbook-image") as NodeListOf<HTMLElement>;
+
+        // Agregar estilos CSS para el thumb del slider
+        const style = document.createElement('style');
+        style.textContent = `
+          #speedControlPopup::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #f5d742;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #000;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+          }
+          #speedControlPopup::-webkit-slider-thumb:hover {
+            background: #d4b82a;
+            transform: scale(1.1);
+          }
+          #speedControlPopup::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #f5d742;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #000;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+          }
+          #speedControlPopup:active {
+            transform: scale(1.02);
+          }
+        `;
+        document.head.appendChild(style);
+
+        function updateSpeedPopup() {
+          if (!speedControlPopup || !speedValuePopup || flipbookImagesPopup.length === 0) return;
+
+          const speed = parseFloat(speedControlPopup.value);
+          speedValuePopup.textContent = `${speed.toFixed(1)}x`;
+
+          const baseDuration = 0.8;
+          const newDuration = baseDuration / speed;
+
+          flipbookImagesPopup.forEach((img, index) => {
+            img.style.animationDuration = `${newDuration}s`;
+            const delayPerFrame = newDuration / 5;
+            img.style.animationDelay = `${delayPerFrame * index}s`;
+          });
         }
+
+        if (speedControlPopup && speedValuePopup && flipbookImagesPopup.length > 0) {
+          speedControlPopup.addEventListener("input", updateSpeedPopup);
+          updateSpeedPopup();
+        }
+
+        // Hover effect en el botón cerrar
+        closeButton.addEventListener("mouseenter", function() {
+          this.style.background = "#d4b82a";
+          this.style.transform = "scale(1.05)";
+          this.style.boxShadow = "0 6px 15px rgba(0, 0, 0, 0.7)";
+        });
+
+        closeButton.addEventListener("mouseleave", function() {
+          this.style.background = "#f5d742";
+          this.style.transform = "scale(1)";
+          this.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.5)";
+        });
       });
     }
   });
