@@ -1485,12 +1485,7 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
         popupOverlay.appendChild(popupContent);
         document.body.appendChild(popupOverlay);
 
-        // Efecto de confeti al abrir el popup
-        confetti({
-          particleCount: 30,
-          spread: 60,
-          origin: { y: 0.6 },
-        });
+       
 
         // Función para cerrar el popup
         function closePopup() {
