@@ -778,10 +778,10 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
       grid-template-areas:
         "a"
         "b"
-        "c"
+        "f"
         "d"
         "e"
-        "f";
+        "c";
       grid-template-rows: auto auto auto auto 300px auto;
       grid-template-columns: 1fr;
       padding: 0;
@@ -859,6 +859,13 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
   @media screen and (max-width: 480px) {
     main {
       grid-template-rows: auto auto auto auto 250px auto;
+      grid-template-areas:
+        "a"
+        "b"
+        "f"
+        "d"
+        "e"
+        "c";
     }
 
     .a h1 {
