@@ -778,10 +778,10 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
       grid-template-areas:
         "a"
         "b"
-        "c"
+        "f"
         "d"
         "e"
-        "f";
+        "c";
       grid-template-rows: auto auto auto auto 300px auto;
       grid-template-columns: 1fr;
       padding: 0;
@@ -843,12 +843,29 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
       text-align: center;
       padding: 0 10px;
     }
+
+      .poster-image-active {
+    max-height: 200px; 
+  
+}
+
+
+  .c p {
+    font-size: 1rem;
+  }
   }
 
   /* Móviles pequeños (hasta 480px) */
   @media screen and (max-width: 480px) {
     main {
       grid-template-rows: auto auto auto auto 250px auto;
+      grid-template-areas:
+        "a"
+        "b"
+        "f"
+        "d"
+        "e"
+        "c";
     }
 
     .a h1 {
@@ -859,6 +876,10 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
     .c {
       font-size: 0.9rem;
     }
+
+      .c p {
+    font-size: 0.8rem;
+  }
 
     .d {
       min-height: 180px;
@@ -903,6 +924,11 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
     #contenido {
       font-size: 0.8rem;
     }
+
+          .poster-image-active {
+    max-height: 200px; 
+  
+}
   }
 
   /* Landscape en móviles */
@@ -917,6 +943,10 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
       height: 100vh;
       overflow-y: auto;
     }
+
+      .c p {
+    font-size: 0.5rem;
+  }
 
     .e {
       min-height: 100%;
