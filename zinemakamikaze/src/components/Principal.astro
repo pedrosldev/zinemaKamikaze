@@ -1402,6 +1402,7 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
 
   // Popup de Moviola - dinámico como el popup de .c
 
+// Popup de Moviola SIMPLIFICADO con superposición del público
 document.addEventListener("DOMContentLoaded", function () {
     const flipbookTrigger = document.getElementById("flipbookTrigger");
 
@@ -1425,7 +1426,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 backdrop-filter: blur(3px);
             `;
 
-            // Crear el contenido del popup - ESTRUCTURA DE CINE
+            // Crear el contenido del popup
             const popupContent = document.createElement("div");
             popupContent.style.cssText = `
                 position: relative;
@@ -1443,45 +1444,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 overflow: hidden;
             `;
 
-            // FONDO CON PÚBLICO DE CINE (más bajo, como butacas)
-            const audienceBackground = document.createElement("div");
-            audienceBackground.style.cssText = `
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                height: 40%;
-                background-image: url('/images/cinema_audience.jpg');
-                background-size: cover;
-                background-position: center top;
-                background-repeat: no-repeat;
-                filter: brightness(0.4) contrast(1.2) grayscale(30%);
-                z-index: 1;
-            `;
-
-            // CAPA DE GRADIENTE PARA TRANSICIÓN ENTRE PANTALLA Y PÚBLICO
-            const screenGradient = document.createElement("div");
-            screenGradient.style.cssText = `
-                position: absolute;
-                bottom: 40%;
-                left: 0;
-                width: 100%;
-                height: 30%;
-                background: linear-gradient(to bottom, 
-                    transparent 0%, 
-                    rgba(0, 0, 0, 0.3) 20%,
-                    rgba(0, 0, 0, 0.6) 50%,
-                    rgba(0, 0, 0, 0.8) 100%);
-                z-index: 2;
-                pointer-events: none;
-            `;
-
-            // PANTALLA DE CINE (parte superior - donde va el flipbook)
+            // PANTALLA DE CINE (parte principal)
             const cinemaScreen = document.createElement("div");
             cinemaScreen.style.cssText = `
                 position: relative;
                 width: 100%;
-                height: 60%;
+                height: 70%;
                 background: 
                     radial-gradient(ellipse at center top, 
                         rgba(120, 0, 0, 0.1) 0%, 
@@ -1491,11 +1459,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                z-index: 3;
-                border-bottom: 3px solid #333;
+                z-index: 1;
             `;
 
-            // MARCO DE PANTALLA DE CINE (CON EL FLIPBOOK ORIGINAL)
+            // MARCO DE PANTALLA DE CINE
             const screenFrame = document.createElement("div");
             screenFrame.style.cssText = `
                 width: 85%;
@@ -1509,10 +1476,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     inset 0 0 20px rgba(0, 0, 0, 0.9),
                     0 5px 20px rgba(0, 0, 0, 0.7);
                 border-radius: 2px;
-                z-index: 4;
+                z-index: 2;
             `;
 
-            // CONTENEDOR DE IMÁGENES DEL FLIPBOOK ORIGINAL
+            // CONTENEDOR DE IMÁGENES DEL FLIPBOOK
             const flipbookImages = document.createElement("div");
             flipbookImages.style.cssText = `
                 width: 100%;
@@ -1520,7 +1487,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 position: relative;
             `;
             
-            // AÑADIR LAS IMÁGENES DEL FLIPBOOK CON LOS ESTILOS ORIGINALES
+            // AÑADIR LAS IMÁGENES DEL FLIPBOOK
             const images = [
                 '/images/cartoon/frame1.png',
                 '/images/cartoon/frame2.png',
@@ -1549,7 +1516,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 flipbookImages.appendChild(img);
             });
 
-            // EFECTO DE PARPADEO DE PROYECTOR ORIGINAL
+            // EFECTO DE PARPADEO DE PROYECTOR
             const flickerOverlay = document.createElement("div");
             flickerOverlay.style.cssText = `
                 position: absolute;
@@ -1563,11 +1530,34 @@ document.addEventListener("DOMContentLoaded", function () {
                     rgba(0, 0, 0, 0.3) 100%
                 );
                 pointer-events: none;
-                z-index: 5;
+                z-index: 3;
                 animation: projectorFlicker 1s ease-in-out infinite;
             `;
 
-            // CONTROLES EN LA PARTE INFERIOR (sobre el público)
+            // PÚBLICO SUPERPUESTO (parte inferior que se solapa)
+            const audienceOverlay = document.createElement("div");
+            audienceOverlay.style.cssText = `
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 40%;
+                background-image: url('/images/cinema_audience.jpg');
+                background-size: cover;
+                background-position: center top;
+                background-repeat: no-repeat;
+                filter: brightness(0.4) contrast(1.2) grayscale(30%);
+                z-index: 4; /* POR ENCIMA de la pantalla */
+                
+                /* Borde superior difuminado para suavizar la transición */
+                mask-image: linear-gradient(to top, 
+                    transparent 0%,
+                    black 20%,
+                    black 100%
+                );
+            `;
+
+            // CONTROLES
             const controlsContainer = document.createElement("div");
             controlsContainer.style.cssText = `
                 position: absolute;
@@ -1579,7 +1569,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 border: 2px solid rgba(255, 215, 0, 0.5);
                 border-radius: 10px;
                 backdrop-filter: blur(10px);
-                z-index: 10;
+                z-index: 10; /* Por encima de todo */
                 box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
             `;
             
@@ -1589,7 +1579,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         🎬 VELOCIDAD PROYECTOR 🎬
                     </label>
                     <div style="display: flex; justify-content: center; align-items: center; gap: 15px;">
-                        <span style="color: #FFD700; font-size: 0.8rem; font-family: 'Sigmar', sans-serif;">LENTO</span>
+                        <span style="color: #FFD700; font-size: 0.8rem;  font-family: 'Sigmar', sans-serif;">LENTO</span>
                         <input
                             type="range"
                             id="speedControlPopup"
@@ -1599,7 +1589,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             step="0.1"
                             value="1.0"
                         />
-                        <span style="color: #FFD700; font-size: 0.8rem; font-family: 'Sigmar', sans-serif;">RÁPIDO</span>
+                        <span style="color: #FFD700; font-size: 0.8rem;  font-family: 'Sigmar', sans-serif;">RÁPIDO</span>
                         <div style="display: flex; align-items: center; margin-left: 10px;">
                             <span id="speedValueDisplay" style="color: #FFD700; font-family: 'Sigmar', sans-serif; font-size: 1rem; font-weight: bold; background: rgba(139, 69, 19, 0.8); padding: 5px 12px; border-radius: 10px; border: 2px solid #FFD700; line-height: 1; display: inline-block; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);">
                                 1.0x
@@ -1609,7 +1599,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
             `;
 
-            // BOTÓN DE CERRAR CON ESTILO DE TEATRO
+            // BOTÓN DE CERRAR
             const closeButton = document.createElement("button");
             closeButton.textContent = "SALIR DEL CINE";
             closeButton.style.cssText = `
@@ -1632,25 +1622,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 border: 2px solid #FFD700;
             `;
 
-            // ENSAMBLAJE DE LA SALA DE CINE
+            // ENSAMBLAJE
             screenFrame.appendChild(flipbookImages);
             screenFrame.appendChild(flickerOverlay);
             
             cinemaScreen.appendChild(screenFrame);
             
-            popupContent.appendChild(audienceBackground);
-            popupContent.appendChild(screenGradient);
             popupContent.appendChild(cinemaScreen);
+            popupContent.appendChild(audienceOverlay); // Público POR ENCIMA
             popupContent.appendChild(controlsContainer);
             
             popupOverlay.appendChild(closeButton);
             popupOverlay.appendChild(popupContent);
             document.body.appendChild(popupOverlay);
 
-            // AÑADIR SOLO LAS ANIMACIONES NECESARIAS DEL FLIPBOOK ORIGINAL
+            // AÑADIR ESTILOS CSS
             const style = document.createElement('style');
             style.textContent = `
-                /* ANIMACIÓN ORIGINAL DEL FLIPBOOK */
+                /* ANIMACIÓN DEL FLIPBOOK */
                 @keyframes fastFlipbook {
                     0% {
                         opacity: 0;
@@ -1674,7 +1663,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 }
 
-                /* EFECTO DE PARPADEO ORIGINAL */
+                /* EFECTO DE PARPADEO */
                 @keyframes projectorFlicker {
                     0%, 100% {
                         opacity: 0.7;
@@ -1719,7 +1708,7 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
             document.head.appendChild(style);
 
-            // FUNCIONALIDAD DE CONTROLES (ORIGINAL)
+            // FUNCIONALIDAD DE CONTROLES
             const speedControlPopup = document.getElementById("speedControlPopup") as HTMLInputElement;
             const speedValuePopup = document.getElementById("speedValueDisplay") as HTMLSpanElement;
             const flipbookImagesPopup = flipbookImages.querySelectorAll("div") as NodeListOf<HTMLElement>;
