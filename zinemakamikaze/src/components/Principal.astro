@@ -26,7 +26,8 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
      {
       isViewingPeriod ? (
   <div class="b" id="flipbookTrigger">
-    <small>Expectativas con la película</small>
+    <small class="movie">Expectativas con el visionado</small>
+    <small class="movie">(Haz click para abrir)</small>
 
   </div>) : <div class="b">Proximamente...</div>
     }
@@ -461,6 +462,11 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
     z-index: 2;
     opacity: 0.6;
     animation: scratchesMoving 8s linear infinite;
+  }
+
+  .movie{
+    color: #FFD700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5)
   }
 
   /* Animación de rayas pasando de abajo hacia arriba */
