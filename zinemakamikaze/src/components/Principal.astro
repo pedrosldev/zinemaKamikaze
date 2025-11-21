@@ -1595,7 +1595,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         />
                         <span style="color: #FFD700; font-size: 0.8rem;">RÁPIDO</span>
                         <div style="display: flex; align-items: center; margin-left: 10px;">
-                            <span style="color: #FFD700; font-family: 'Sigmar', sans-serif; font-size: 1rem; font-weight: bold; background: rgba(139, 69, 19, 0.8); padding: 5px 12px; border-radius: 10px; border: 2px solid #FFD700; line-height: 1; display: inline-block; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);">
+                            <span id="speedValueDisplay" style="color: #FFD700; font-family: 'Sigmar', sans-serif; font-size: 1rem; font-weight: bold; background: rgba(139, 69, 19, 0.8); padding: 5px 12px; border-radius: 10px; border: 2px solid #FFD700; line-height: 1; display: inline-block; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);">
                                 1.0x
                             </span>
                         </div>
@@ -1715,7 +1715,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // FUNCIONALIDAD DE CONTROLES (ORIGINAL)
             const speedControlPopup = document.getElementById("speedControlPopup") as HTMLInputElement;
-            const speedValuePopup = controlsContainer.querySelector("span") as HTMLSpanElement;
+            const speedValuePopup = document.getElementById("speedValueDisplay") as HTMLSpanElement;
             const flipbookImagesPopup = flipbookImages.querySelectorAll("div") as NodeListOf<HTMLElement>;
 
             function updateSpeedPopup() {
