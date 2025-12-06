@@ -523,24 +523,24 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
     background-repeat: no-repeat;
     opacity: 0;
     filter: brightness(0.85) contrast(1.2) saturate(0.8) sepia(0.2);
-    animation: fastFlipbook 0.8s infinite; /* Más rápido: 0.8s en lugar de 1.25s */
+    animation: fastFlipbook 2s infinite; /* Velocidad ajustada a 2s para hacerla más lenta */
   }
 
-  /* Delays más cortos para mayor velocidad */
+  /* Delays ajustados para velocidad más lenta */
   .flipbook-image:nth-child(1) {
     animation-delay: 0s;
   }
   .flipbook-image:nth-child(2) {
-    animation-delay: 0.16s;
-  } /* 0.8s / 5 = 0.16s */
+    animation-delay: 0.4s;
+  } /* 2s / 5 = 0.4s */
   .flipbook-image:nth-child(3) {
-    animation-delay: 0.32s;
+    animation-delay: 0.8s;
   }
   .flipbook-image:nth-child(4) {
-    animation-delay: 0.48s;
+    animation-delay: 1.2s;
   }
   .flipbook-image:nth-child(5) {
-    animation-delay: 0.64s;
+    animation-delay: 1.6s;
   }
 
   @keyframes fastFlipbook {
@@ -1517,8 +1517,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     background-image: url(${src});
                     opacity: 0;
                     filter: brightness(0.85) contrast(1.2) saturate(0.8) sepia(0.2);
-                    animation: fastFlipbook 0.8s infinite;
-                    animation-delay: ${index * 0.16}s;
+                    animation: fastFlipbook 2s infinite;
+                    animation-delay: ${index * 0.4}s;
                 `;
                 flipbookImages.appendChild(img);
             });
@@ -1601,7 +1601,7 @@ controlsContainer.innerHTML = `
                     min="0.3"
                     max="2"
                     step="0.1"
-                    value="1.0"
+                    value="0.3"
                 />
                 <span style="color: #FFD700; font-size: clamp(0.6rem, 1.8vw, 0.8rem); font-family: 'Sigmar', sans-serif; white-space: nowrap;">
                     RÁPIDO
