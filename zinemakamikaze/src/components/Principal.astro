@@ -1497,16 +1497,18 @@ document.addEventListener("DOMContentLoaded", function () {
             // ];
              const images = [
                 '/images/interview/0.png',
+                'images/interview/cartel_0.png',
                 '/images/interview/1.png',
                 '/images/interview/2.png',
                 '/images/interview/3.png',
-                '/images/interview/4.png'
+                '/images/interview/4.png',
+                'images/interview/cartel_1.png',
             ];
 
             images.forEach((src, index) => {
                 const img = document.createElement("div");
-                // Para la primera imagen, usar delay negativo para que comience visible más tiempo
-                const delay = index === 0 ? -0.3 : index * 0.6;
+                // Calcular delay para 7 imágenes: cada una se muestra 0.7s
+                const delay = index * 0.7;
                 img.style.cssText = `
                     position: absolute;
                     top: 0;
@@ -1517,9 +1519,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     background-position: center;
                     background-repeat: no-repeat;
                     background-image: url(${src});
-                    opacity: ${index === 0 ? '1' : '0'};
+                    opacity: 0;
                     filter: brightness(0.85) contrast(1.2) saturate(0.8) sepia(0.2);
-                    animation: fastFlipbook 3s infinite;
+                    animation: fastFlipbook 4.9s infinite;
                     animation-delay: ${delay}s;
                 `;
                 flipbookImages.appendChild(img);
@@ -1658,23 +1660,19 @@ controlsContainer.innerHTML = `
             // AÑADIR ESTILOS CSS
             const style = document.createElement('style');
             style.textContent = `
-                /* ANIMACIÓN DEL FLIPBOOK */
+                /* ANIMACIÓN DEL FLIPBOOK - 7 imágenes secuenciales */
                 @keyframes fastFlipbook {
                     0% {
-                        opacity: 0;
+                        opacity: 1;
                         transform: scale(1);
                     }
-                    8% {
+                    12% {
                         opacity: 1;
                         transform: scale(1.02);
                     }
-                    15% {
-                        opacity: 1;
-                        transform: scale(1);
-                    }
-                    20% {
+                    14.3% {
                         opacity: 0;
-                        transform: scale(0.98);
+                        transform: scale(1);
                     }
                     100% {
                         opacity: 0;
@@ -1738,12 +1736,12 @@ controlsContainer.innerHTML = `
                 const speed = parseFloat(speedControlPopup.value);
                 speedValuePopup.textContent = `${speed.toFixed(1)}x`;
 
-                const baseDuration = 0.8;
+                const baseDuration = 4.9; // 7 imágenes × 0.7s cada una
                 const newDuration = baseDuration / speed;
 
                 flipbookImagesPopup.forEach((img, index) => {
                     img.style.animationDuration = `${newDuration}s`;
-                    const delayPerFrame = newDuration / 5;
+                    const delayPerFrame = 0.7 / speed; // Cada imagen dura 0.7s
                     img.style.animationDelay = `${delayPerFrame * index}s`;
                 });
             }
