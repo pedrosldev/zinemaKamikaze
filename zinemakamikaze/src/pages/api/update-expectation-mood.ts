@@ -1,0 +1,39 @@
+import type { APIRoute } from 'astro';
+import { updateExpectationMood } from '../../lib/db';
+
+export const prerender = false;
+
+export const POST: APIRoute = async ({ request }) => {
+    const body = await request.json();
+
+    if (!body.id) {
+        return new Response(
+            JSON.stringify({ message: 'El id de la review es obligatorio' }),
+            {
+                status: 400,
+                headers: { 'Content-Type': 'application/json' },
+            }
+        );
+    }
+
+    try {
+        await updateExpectationMood(body.id, body.expectation_mood || null);
+
+        return new Response(
+            JSON.stringify({ message: 'Expectativa actualizada exitosamente' }),
+            {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+            }
+        );
+    } catch (error) {
+        console.error(error);
+        return new Response(
+            JSON.stringify({ message: 'Error al actualizar la expectativa' }),
+            {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' },
+            }
+        );
+    }
+};

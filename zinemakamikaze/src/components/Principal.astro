@@ -5,6 +5,71 @@ import Vibrarcodion from "./Vibrarcodion.astro";
 const vibes = await getAllVibes();
 const latestMovie = await getLatestMovie();
 const isViewingPeriod = latestMovie?.viewing_period ?? false;
+const expectationMood: string | null = latestMovie?.expectation_mood || null;
+
+// Definir secuencias de imágenes según el mood
+// Cada mood tiene su carpeta en /images/expectations/
+// Las imágenes dentro deben nombrarse: 1.png, 2.png, 3.png, etc. en el orden deseado
+const moodSequences: Record<string, string[]> = {
+  excitement: [
+    '/images/expectations/excitement/1.png',
+    '/images/expectations/excitement/2.png',
+    '/images/expectations/excitement/3.png',
+    '/images/expectations/excitement/4.png',
+    '/images/expectations/excitement/5.png'
+  ],
+  fear: [
+    '/images/expectations/fear/1.png',
+    '/images/expectations/fear/2.png',
+    '/images/expectations/fear/3.png',
+    '/images/expectations/fear/4.png',
+    '/images/expectations/fear/5.png'
+  ],
+  curiosity: [
+    '/images/expectations/curiosity/1.png',
+    '/images/expectations/curiosity/2.png',
+    '/images/expectations/curiosity/3.png',
+    '/images/expectations/curiosity/4.png',
+    '/images/expectations/curiosity/5.png'
+  ],
+  dread: [
+    '/images/expectations/dread/1.png',
+    '/images/expectations/dread/2.png',
+    '/images/expectations/dread/3.png',
+    '/images/expectations/dread/4.png',
+    '/images/expectations/dread/5.png'
+  ],
+  surprise: [
+    '/images/expectations/surprise/1.png',
+    '/images/expectations/surprise/2.png',
+    '/images/expectations/surprise/3.png',
+    '/images/expectations/surprise/4.png',
+    '/images/expectations/surprise/5.png'
+  ],
+  boredom: [
+    '/images/expectations/boredom/1.png',
+    '/images/expectations/boredom/2.png',
+    '/images/expectations/boredom/3.png',
+    '/images/expectations/boredom/4.png',
+    '/images/expectations/boredom/5.png'
+  ]
+};
+
+// SECUENCIA POR DEFECTO: Usa las imágenes que ya existen en /images/interview/
+const defaultSequence = [
+  '/images/interview/0.png',
+  '/images/interview/cartel_0.png',
+  '/images/interview/1.png',
+  '/images/interview/2.png',
+  '/images/interview/3.png',
+  '/images/interview/cartel_1.png',
+  '/images/interview/coming.png'
+];
+
+// Seleccionar la secuencia según el mood, o usar la secuencia por defecto
+const currentSequence = expectationMood && moodSequences[expectationMood] 
+  ? moodSequences[expectationMood] 
+  : defaultSequence;
 ---
 
 <head>
@@ -28,7 +93,8 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
   <div class="b" id="flipbookTrigger">
     <small class="movie">Expectativas con el visionado</small>
     <small class="movie">(Haz click para abrir)</small>
-
+    <!-- Datos invisibles para el flipbook -->
+    <div id="flipbook-data" data-sequence={JSON.stringify(currentSequence)} style="display: none;"></div>
   </div>) : <div class="b">Proximamente...</div>
     }
 
@@ -1406,7 +1472,10 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
 document.addEventListener("DOMContentLoaded", function () {
     const flipbookTrigger = document.getElementById("flipbookTrigger");
 
-    if (flipbookTrigger) {
+    // Secuencias de imágenes definidas desde el servidor
+    const imageSequence: string[] = JSON.parse(document.getElementById('flipbook-data')?.dataset.sequence || '[]');
+
+    if (flipbookTrigger && imageSequence.length > 0) {
         flipbookTrigger.style.cursor = "pointer";
 
         flipbookTrigger.addEventListener("click", function () {
@@ -1487,28 +1556,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 position: relative;
             `;
             
-            // AÑADIR LAS IMÁGENES DEL FLIPBOOK
-            // const images = [
-            //     '/images/cartoon/frame1.png',
-            //     '/images/cartoon/frame2.png',
-            //     '/images/cartoon/frame3.png',
-            //     '/images/cartoon/frame2.png',
-            //     '/images/cartoon/frame1.png'
-            // ];
-             const images = [
-                '/images/interview/0.png',
-                'images/interview/cartel_0.png',
-                '/images/interview/1.png',
-                '/images/interview/2.png',
-                '/images/interview/3.png',
-                'images/interview/cartel_1.png',
-                '/images/interview/coming.png'
-            ];
-
-            images.forEach((src, index) => {
+            // AÑADIR LAS IMÁGENES DEL FLIPBOOK DESDE EL SERVIDOR
+            imageSequence.forEach((src: string, index: number) => {
                 const img = document.createElement("div");
-                // Calcular delay para 7 imágenes: cada una se muestra 0.7s
-                const delay = index * 0.7;
+                // Calcular delay dinámicamente según el número total de imágenes
+                const totalImages = imageSequence.length;
+                const frameDuration = 0.7; // segundos por frame
+                const totalDuration = totalImages * frameDuration;
+                const delay = index * frameDuration;
+                
                 img.style.cssText = `
                     position: absolute;
                     top: 0;
@@ -1521,7 +1577,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     background-image: url(${src});
                     opacity: 0;
                     filter: brightness(0.85) contrast(1.2) saturate(0.8) sepia(0.2);
-                    animation: fastFlipbook 4.9s infinite;
+                    animation: fastFlipbook ${totalDuration}s infinite;
                     animation-delay: ${delay}s;
                 `;
                 flipbookImages.appendChild(img);
@@ -1660,7 +1716,7 @@ controlsContainer.innerHTML = `
             // AÑADIR ESTILOS CSS
             const style = document.createElement('style');
             style.textContent = `
-                /* ANIMACIÓN DEL FLIPBOOK - 7 imágenes secuenciales */
+                /* ANIMACIÓN DEL FLIPBOOK - Dinámica según número de imágenes */
                 @keyframes fastFlipbook {
                     0% {
                         opacity: 1;
@@ -1670,7 +1726,7 @@ controlsContainer.innerHTML = `
                         opacity: 1;
                         transform: scale(1.02);
                     }
-                    14.3% {
+                    ${100 / imageSequence.length}% {
                         opacity: 0;
                         transform: scale(1);
                     }
@@ -1736,12 +1792,15 @@ controlsContainer.innerHTML = `
                 const speed = parseFloat(speedControlPopup.value);
                 speedValuePopup.textContent = `${speed.toFixed(1)}x`;
 
-                const baseDuration = 4.9; // 7 imágenes × 0.7s cada una
+                // Usar el número real de imágenes
+                const totalImages = imageSequence.length;
+                const frameDuration = 0.7; // segundos por frame
+                const baseDuration = totalImages * frameDuration;
                 const newDuration = baseDuration / speed;
 
                 flipbookImagesPopup.forEach((img, index) => {
                     img.style.animationDuration = `${newDuration}s`;
-                    const delayPerFrame = 0.7 / speed; // Cada imagen dura 0.7s
+                    const delayPerFrame = frameDuration / speed;
                     img.style.animationDelay = `${delayPerFrame * index}s`;
                 });
             }

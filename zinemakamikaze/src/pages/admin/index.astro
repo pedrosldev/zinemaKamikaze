@@ -112,6 +112,25 @@ if (authToken !== ADMIN_PASSWORD) {
         </div>
 
         <div class="form-group">
+          <label for="expectation_mood">MI EXPECTATIVA AL ENTERARME:</label>
+          <select name="expectation_mood" id="expectation_mood">
+            <option value="">-- Sin definir (neutra) --</option>
+            <option value="excitement">🎉 EMOCIÓN - ¡Genial! Tenía ganas de verla</option>
+            <option value="fear">😱 MIEDO - Esto va a ser duro...</option>
+            <option value="curiosity">🤔 CURIOSIDAD - ¿Qué será esto?</option>
+            <option value="dread">😩 HORROR - No puede ser...</option>
+            <option value="surprise">😲 SORPRESA - ¡Vaya! No me lo esperaba</option>
+            <option value="boredom">😴 ABURRIMIENTO - Uf, qué pereza...</option>
+          </select>
+          <small style="color: #999; font-size: 0.8rem; margin-top: 0.5rem; display: block;">
+            Esto definirá la secuencia de flipbook que verán los usuarios
+          </small>
+          <button type="button" id="updateMoodOnly" class="mood-btn" style="margin-top: 10px;">
+            ACTUALIZAR SOLO EXPECTATIVA (sin completar crítica)
+          </button>
+        </div>
+
+        <div class="form-group">
           <label for="vibe">VIBE:</label>
           <select name="vibe" id="vibe" required>
             <option value="eutanasia">EUTANASIA</option>
@@ -325,6 +344,33 @@ if (authToken !== ADMIN_PASSWORD) {
   button[type="submit"]:hover {
     background: #1540c0;
     transform: scale(1.05);
+  }
+
+  .mood-btn {
+    background: #4CAF50;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: "Sigmar", sans-serif;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    width: 100%;
+  }
+
+  .mood-btn:hover {
+    background: #45a049;
+    transform: scale(1.02);
+  }
+
+  .mood-btn:disabled {
+    background: #666;
+    cursor: not-allowed;
+    transform: none;
   }
 
   .logout-container {
@@ -951,7 +997,50 @@ if (authToken !== ADMIN_PASSWORD) {
       document.getElementById("year").value = reviewData.year || "";
       document.getElementById("poster").value = reviewData.poster_url || "";
       document.getElementById("vibe").value = reviewData.vibe || "pasable";
+      document.getElementById("expectation_mood").value = reviewData.expectation_mood || "";
       document.getElementById("review").value = "";
+    }
+
+    // Event listener para actualizar SOLO el mood (sin completar la crítica)
+    const updateMoodOnlyBtn = document.getElementById("updateMoodOnly");
+    if (updateMoodOnlyBtn) {
+      updateMoodOnlyBtn.addEventListener("click", async function () {
+        const reviewId = document.getElementById("review_id").value;
+        const expectationMood = document.getElementById("expectation_mood").value;
+
+        if (!reviewId) {
+          alert("ERROR: No hay una crítica seleccionada");
+          return;
+        }
+
+        try {
+          this.disabled = true;
+          this.textContent = "ACTUALIZANDO...";
+
+          const response = await fetch("/api/update-expectation-mood", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: reviewId,
+              expectation_mood: expectationMood
+            }),
+          });
+
+          if (response.ok) {
+            alert("EXPECTATIVA ACTUALIZADA EXITOSAMENTE\n\nLa película seguirá visible en la página principal hasta que completes la crítica.");
+            location.reload();
+          } else {
+            const error = await response.json();
+            alert("ERROR AL ACTUALIZAR LA EXPECTATIVA: " + (error.message || "Error desconocido"));
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("ERROR AL ACTUALIZAR LA EXPECTATIVA");
+        } finally {
+          this.disabled = false;
+          this.textContent = "ACTUALIZAR SOLO EXPECTATIVA (sin completar crítica)";
+        }
+      });
     }
 
     // Event listener para actualizar review existente

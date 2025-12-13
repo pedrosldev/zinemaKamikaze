@@ -23,10 +23,10 @@ interface ReviewRow extends RowDataPacket {
   interface VibeRow extends RowDataPacket {
     vibe: string;
   }
-  export async function insertReview(film_id: number, title: string, year: number, review: string, vibe: string, poster: string, viewing_period: boolean = true  ) {
+  export async function insertReview(film_id: number, title: string, year: number, review: string, vibe: string, poster: string, viewing_period: boolean = true, expectation_mood: string | null = null  ) {
     const [result] = await pool.execute(
-      'INSERT INTO test_reviews (film_id, title, year, review, vibe, poster_url, viewing_period) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [film_id, title, year, review, vibe, poster, viewing_period]
+      'INSERT INTO test_reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [film_id, title, year, review, vibe, poster, viewing_period, expectation_mood]
     );
     return result;
   }
@@ -115,12 +115,13 @@ export async function updateReview(
   review: string,
   vibe: string,
   poster_url: string,
-  viewing_period: boolean = false
+  viewing_period: boolean = false,
+  expectation_mood: string | null = null
 ) {
   try {
     const [result] = await pool.execute(
-      'UPDATE test_reviews SET film_id = ?, title = ?, year = ?, review = ?, vibe = ?, poster_url = ?, viewing_period=? WHERE id = ?',
-      [film_id, title, year, review, vibe, poster_url, viewing_period, id]
+      'UPDATE test_reviews SET film_id = ?, title = ?, year = ?, review = ?, vibe = ?, poster_url = ?, viewing_period=?, expectation_mood=? WHERE id = ?',
+      [film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, id]
     );
     return result;
   } catch (error) {
@@ -148,4 +149,17 @@ export async function getLatestMovie() {
     "SELECT * FROM test_reviews ORDER BY id DESC LIMIT 1"
   );
   return rows.length > 0 ? rows[0] : null;
+}
+
+export async function updateExpectationMood(id: number, expectation_mood: string) {
+  try {
+    const [result] = await pool.execute(
+      'UPDATE test_reviews SET expectation_mood = ? WHERE id = ?',
+      [expectation_mood, id]
+    );
+    return result;
+  } catch (error) {
+    console.error('Error updating expectation mood:', error);
+    throw error;
+  }
 }
