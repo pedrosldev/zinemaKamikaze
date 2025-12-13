@@ -26,7 +26,8 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
      {
       isViewingPeriod ? (
   <div class="b" id="flipbookTrigger">
-    <small>Expectativas con la película</small>
+    <small class="movie">Expectativas con el visionado</small>
+    <small class="movie">(Haz click para abrir)</small>
 
   </div>) : <div class="b">Proximamente...</div>
     }
@@ -40,7 +41,7 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
       isViewingPeriod ? (
         <div class="viewing-period-info">
          
-          <h3>PRÓXIMA CRÍTICA EN PROCESO 👉</h3>
+          <h3>PRÓXIMA CRÍTICA EN PROCESO</h3>
          
           <div class="movie-pointing-info">
             <h4>
@@ -100,7 +101,7 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
   ) : (
     <!-- Contenido alternativo cuando NO hay periodo de visionado -->
     <div class="no-movie-placeholder">
-      <div class="placeholder-icon">🎭</div>
+      
       <p>Próxima película por seleccionar</p>
     </div>
   )}
@@ -406,8 +407,81 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
     padding: 15px !important;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: end !important;
+    justify-content: end !important;
+    background-image: url(/images/cinema_queue.jpg) !important;
+    background-size: contain;
+    background-position: center;
+    /* Filtro intenso de película antigua en blanco y negro */
+    filter: grayscale(100%) contrast(1.4) brightness(0.85) sepia(40%);
+    animation: oldFilmFocus 3s ease-in-out infinite;
+  }
+
+  /* Animación de desenfoque discontinuo MÁS INTENSO */
+  @keyframes oldFilmFocus {
+    0% {
+      filter: grayscale(100%) contrast(1.4) brightness(0.85) sepia(40%) blur(0px);
+    }
+    15% {
+      filter: grayscale(100%) contrast(1.5) brightness(0.9) sepia(35%) blur(1px);
+    }
+    25% {
+      filter: grayscale(100%) contrast(1.3) brightness(0.8) sepia(45%) blur(4px);
+    }
+    35% {
+      filter: grayscale(100%) contrast(1.4) brightness(0.85) sepia(40%) blur(3px);
+    }
+    50% {
+      filter: grayscale(100%) contrast(1.5) brightness(0.9) sepia(35%) blur(0.5px);
+    }
+    65% {
+      filter: grayscale(100%) contrast(1.3) brightness(0.8) sepia(45%) blur(5px);
+    }
+    80% {
+      filter: grayscale(100%) contrast(1.4) brightness(0.85) sepia(40%) blur(2px);
+    }
+    100% {
+      filter: grayscale(100%) contrast(1.4) brightness(0.85) sepia(40%) blur(0px);
+    }
+  }
+
+  /* Rayas horizontales que pasan de abajo a arriba como en películas antiguas */
+  .b::before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    background-image: 
+      linear-gradient(180deg, transparent 0%, transparent 48%, rgba(255, 255, 255, 0.4) 49%, rgba(255, 255, 255, 0.4) 50%, transparent 51%, transparent 100%),
+      linear-gradient(180deg, transparent 0%, transparent 23%, rgba(0, 0, 0, 0.5) 24%, rgba(0, 0, 0, 0.5) 25%, transparent 26%, transparent 100%),
+      linear-gradient(180deg, transparent 0%, transparent 73%, rgba(255, 255, 255, 0.3) 74%, rgba(255, 255, 255, 0.3) 75%, transparent 76%, transparent 100%);
+    background-size: 100% 100%;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.6;
+    animation: scratchesMoving 8s linear infinite;
+  }
+
+  .movie{
+    color: #FFD700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5)
+  }
+
+  /* Animación de rayas pasando de abajo hacia arriba */
+  @keyframes scratchesMoving {
+    0% {
+      transform: translateY(0);
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(-50%);
+      opacity: 0.6;
+    }
   }
 
   /* Marco estático de película SIN perforaciones */
@@ -449,24 +523,24 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
     background-repeat: no-repeat;
     opacity: 0;
     filter: brightness(0.85) contrast(1.2) saturate(0.8) sepia(0.2);
-    animation: fastFlipbook 0.8s infinite; /* Más rápido: 0.8s en lugar de 1.25s */
+    animation: fastFlipbook 2s infinite; /* Velocidad ajustada a 2s para hacerla más lenta */
   }
 
-  /* Delays más cortos para mayor velocidad */
+  /* Delays ajustados para velocidad más lenta */
   .flipbook-image:nth-child(1) {
     animation-delay: 0s;
   }
   .flipbook-image:nth-child(2) {
-    animation-delay: 0.16s;
-  } /* 0.8s / 5 = 0.16s */
+    animation-delay: 0.4s;
+  } /* 2s / 5 = 0.4s */
   .flipbook-image:nth-child(3) {
-    animation-delay: 0.32s;
+    animation-delay: 0.8s;
   }
   .flipbook-image:nth-child(4) {
-    animation-delay: 0.48s;
+    animation-delay: 1.2s;
   }
   .flipbook-image:nth-child(5) {
-    animation-delay: 0.64s;
+    animation-delay: 1.6s;
   }
 
   @keyframes fastFlipbook {
@@ -474,15 +548,15 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
       opacity: 0;
       transform: scale(1);
     }
-    8% {
+    12% {
       opacity: 1;
       transform: scale(1.02);
     }
-    15% {
+    35% {
       opacity: 1;
       transform: scale(1);
     }
-    20% {
+    45% {
       opacity: 0;
       transform: scale(0.98);
     }
@@ -861,8 +935,8 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
       grid-template-rows: auto auto auto auto 250px auto;
       grid-template-areas:
         "a"
-        "b"
         "f"
+        "b"
         "d"
         "e"
         "c";
@@ -1327,270 +1401,390 @@ const isViewingPeriod = latestMovie?.viewing_period ?? false;
   });
 
   // Popup de Moviola - dinámico como el popup de .c
-  document.addEventListener("DOMContentLoaded", function () {
+
+// Popup de Moviola SIMPLIFICADO con superposición del público
+document.addEventListener("DOMContentLoaded", function () {
     const flipbookTrigger = document.getElementById("flipbookTrigger");
 
     if (flipbookTrigger) {
-      flipbookTrigger.style.cursor = "pointer";
+        flipbookTrigger.style.cursor = "pointer";
 
-      flipbookTrigger.addEventListener("click", function () {
-        // Crear el overlay del popup
-        const popupOverlay = document.createElement("div");
-        popupOverlay.style.cssText = `
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.85);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 9999;
-          backdrop-filter: blur(5px);
-        `;
+        flipbookTrigger.addEventListener("click", function () {
+            // Crear el overlay del popup
+            const popupOverlay = document.createElement("div");
+            popupOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.92);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                backdrop-filter: blur(3px);
+            `;
 
-        // Crear el contenido del popup
-        const popupContent = document.createElement("div");
-        popupContent.style.cssText = `
-          position: relative;
-          width: 90%;
-          max-width: 700px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 15px;
-          padding: 20px;
-        `;
+            // Crear el contenido del popup
+            const popupContent = document.createElement("div");
+            popupContent.style.cssText = `
+                position: relative;
+                width: 95%;
+                max-width: 1000px;
+                height: 90vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 0;
+                padding: 0;
+                background: #000;
+                border-radius: 8px;
+                overflow: hidden;
+            `;
 
-        // Crear el botón de cerrar
-        const closeButton = document.createElement("button");
-        closeButton.textContent = "CERRAR";
-        closeButton.style.cssText = `
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          background: #f5d742;
-          color: #000;
-          border: none;
-          padding: 12px 20px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-family: 'Sigmar', sans-serif;
-          font-weight: bold;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          transition: all 0.3s ease;
-          z-index: 10001;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        `;
+            // PANTALLA DE CINE (parte principal)
+            const cinemaScreen = document.createElement("div");
+            cinemaScreen.style.cssText = `
+                position: relative;
+                width: 100%;
+                height: 70%;
+                background: 
+                    radial-gradient(ellipse at center top, 
+                        rgba(120, 0, 0, 0.1) 0%, 
+                        transparent 70%),
+                    linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 1;
+            `;
 
-        // Crear el flipbook frame
-        const flipbookFrame = document.createElement("div");
-        flipbookFrame.style.cssText = `
-          width: 100%;
-          max-width: 600px;
-          aspect-ratio: 16 / 9;
-          background: #0a0a0a;
-          border: 4px solid rgba(107, 63, 47, 0.9);
-          position: relative;
-          overflow: hidden;
-          box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9), 0 5px 20px rgba(0, 0, 0, 0.7);
-          border-radius: 2px;
-        `;
+            // MARCO DE PANTALLA DE CINE
+            const screenFrame = document.createElement("div");
+            screenFrame.style.cssText = `
+                width: 85%;
+                max-width: 700px;
+                aspect-ratio: 16 / 9;
+                background: #0a0a0a;
+                border: 4px solid rgba(107, 63, 47, 0.9);
+                position: relative;
+                overflow: hidden;
+                box-shadow: 
+                    inset 0 0 20px rgba(0, 0, 0, 0.9),
+                    0 5px 20px rgba(0, 0, 0, 0.7);
+                border-radius: 2px;
+                z-index: 2;
+            `;
 
-        const flipbookImages = document.createElement("div");
-        flipbookImages.style.cssText = `
-          width: 100%;
-          height: 100%;
-          position: relative;
-        `;
-        
-        // Añadir las imágenes del flipbook
-        const images = [
-          '/images/cartoon/frame1.png',
-          '/images/cartoon/frame2.png',
-          '/images/cartoon/frame3.png',
-          '/images/cartoon/frame2.png',
-          '/images/cartoon/frame1.png'
-        ];
+            // CONTENEDOR DE IMÁGENES DEL FLIPBOOK
+            const flipbookImages = document.createElement("div");
+            flipbookImages.style.cssText = `
+                width: 100%;
+                height: 100%;
+                position: relative;
+            `;
+            
+            // AÑADIR LAS IMÁGENES DEL FLIPBOOK
+            // const images = [
+            //     '/images/cartoon/frame1.png',
+            //     '/images/cartoon/frame2.png',
+            //     '/images/cartoon/frame3.png',
+            //     '/images/cartoon/frame2.png',
+            //     '/images/cartoon/frame1.png'
+            // ];
+             const images = [
+                '/images/interview/0.png',
+                'images/interview/cartel_0.png',
+                '/images/interview/1.png',
+                '/images/interview/2.png',
+                '/images/interview/3.png',
+                'images/interview/cartel_1.png',
+                '/images/interview/coming.png'
+            ];
 
-        images.forEach((src, index) => {
-          const img = document.createElement("div");
-          img.className = "flipbook-image";
-          img.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: 110% 110%;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-image: url(${src});
-            opacity: 0;
-            filter: brightness(0.85) contrast(1.2) saturate(0.8) sepia(0.2);
-            animation: fastFlipbook 0.8s infinite;
-            animation-delay: ${index * 0.16}s;
-          `;
-          flipbookImages.appendChild(img);
-        });
+            images.forEach((src, index) => {
+                const img = document.createElement("div");
+                // Calcular delay para 7 imágenes: cada una se muestra 0.7s
+                const delay = index * 0.7;
+                img.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-size: 110% 110%;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-image: url(${src});
+                    opacity: 0;
+                    filter: brightness(0.85) contrast(1.2) saturate(0.8) sepia(0.2);
+                    animation: fastFlipbook 4.9s infinite;
+                    animation-delay: ${delay}s;
+                `;
+                flipbookImages.appendChild(img);
+            });
 
-        // Añadir efecto de parpadeo
-        const flickerOverlay = document.createElement("div");
-        flickerOverlay.style.cssText = `
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.3) 100%);
-          pointer-events: none;
-          z-index: 5;
-          animation: projectorFlicker 1s ease-in-out infinite;
-        `;
+            // EFECTO DE PARPADEO DE PROYECTOR
+            const flickerOverlay = document.createElement("div");
+            flickerOverlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(
+                    ellipse at center,
+                    transparent 30%,
+                    rgba(0, 0, 0, 0.3) 100%
+                );
+                pointer-events: none;
+                z-index: 3;
+                animation: projectorFlicker 1s ease-in-out infinite;
+            `;
 
-        flipbookFrame.appendChild(flipbookImages);
-        flipbookFrame.appendChild(flickerOverlay);
+            // PÚBLICO SUPERPUESTO (parte inferior que se solapa)
+            const audienceOverlay = document.createElement("div");
+            audienceOverlay.style.cssText = `
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 40%;
+                background-image: url('/images/cinema_audience.png');
+                background-size: cover;
+                background-position: center top;
+                background-repeat: no-repeat;
+                filter: brightness(0.4) contrast(1.2) grayscale(30%);
+                z-index: 4; /* POR ENCIMA de la pantalla */
+                
+                /* Borde superior difuminado para suavizar la transición */
+                mask-image: linear-gradient(to top, 
+                    transparent 0%,
+                    black 20%,
+                    black 100%
+                );
+            `;
 
-        // Crear los controles de moviola (fuera del frame)
-        const controls = document.createElement("div");
-        controls.style.cssText = `
-          background: rgba(26, 26, 24, 0.95);
-          padding: 8px 12px;
-          border: 2px solid rgba(107, 63, 47, 0.8);
-          border-radius: 6px;
-          backdrop-filter: blur(10px);
-          min-width: 200px;
-          max-width: 220px;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        `;
-        
-        controls.innerHTML = `
-          <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
-            <label for="speedControlPopup" style="color: #f5d742; font-family: 'Sigmar', sans-serif; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); width: 100%; text-align: center; margin-bottom: 4px;">VELOCIDAD MOVIOLA</label>
-            <div style="display: flex; justify-content: center; align-items: center;">
-              <input
-                type="range"
-                id="speedControlPopup"
-                style="width: 150px; height: 5px; background: rgba(107, 63, 47, 0.6); border-radius: 3px; outline: none; -webkit-appearance: none; margin-right: 5px;"
-                min="0.1"
-                max="2"
-                step="0.1"
-                value="1.0"
-              />
-              <div style="display: flex; align-items: center;">
-                <span style="color: #c9be9c; font-family: 'Sigmar', sans-serif; font-size: 0.7rem; font-weight: bold; background: rgba(0, 0, 0, 0.5); padding: 1px 6px; border-radius: 8px; border: 1px solid rgba(245, 215, 66, 0.3); line-height: 1; display: inline-block;">1.0x</span>
-              </div>
+            // CONTROLES
+const controlsContainer = document.createElement("div");
+controlsContainer.style.cssText = `
+    position: absolute;
+    bottom: 190px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: clamp(10px, 2vw, 15px) clamp(15px, 3vw, 25px);
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    z-index: 10;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    width: 90%;
+    max-width: 500px;
+    min-width: 280px;
+    box-sizing: border-box;
+`;
+
+controlsContainer.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 1.5vw, 10px); width: 100%;">
+        <label for="speedControlPopup" style="color: #FFD700; font-family: 'Sigmar', sans-serif; font-size: clamp(0.7rem, 2vw, 0.9rem); text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); text-align: center; line-height: 1.2;">
+            🎬 VELOCIDAD PROYECTOR 🎬
+        </label>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 1.5vw, 10px); width: 100%;">
+            <div style="display: flex; justify-content: center; align-items: center; gap: clamp(8px, 2vw, 15px); width: 100%; flex-wrap: wrap;">
+                <span style="color: #FFD700; font-size: clamp(0.6rem, 1.8vw, 0.8rem); font-family: 'Sigmar', sans-serif; white-space: nowrap;">
+                    LENTO
+                </span>
+                <input
+                    type="range"
+                    id="speedControlPopup"
+                    style="width: min(200px, 50vw); height: 6px; background: linear-gradient(to right, #8B4513, #FFD700, #8B4513); border-radius: 4px; outline: none; -webkit-appearance: none; flex: 1; min-width: 120px;"
+                    min="0.3"
+                    max="2"
+                    step="0.1"
+                    value="0.3"
+                />
+                <span style="color: #FFD700; font-size: clamp(0.6rem, 1.8vw, 0.8rem); font-family: 'Sigmar', sans-serif; white-space: nowrap;">
+                    RÁPIDO
+                </span>
             </div>
-          </div>
-        `;
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <span id="speedValueDisplay" style="color: #FFD700; font-family: 'Sigmar', sans-serif; font-size: clamp(0.8rem, 2.5vw, 1rem); font-weight: bold; background: rgba(139, 69, 19, 0.8); padding: clamp(3px, 1vw, 5px) clamp(8px, 2vw, 12px); border-radius: 8px; border: 2px solid #FFD700; line-height: 1; display: inline-block; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);">
+                    1.0x
+                </span>
+            </div>
+        </div>
+    </div>
+`;
 
-        // Ensamblar el popup
-        popupContent.appendChild(flipbookFrame);
-        popupContent.appendChild(controls);
-        popupOverlay.appendChild(closeButton);
-        popupOverlay.appendChild(popupContent);
-        document.body.appendChild(popupOverlay);
+            // BOTÓN DE CERRAR
+            const closeButton = document.createElement("button");
+            closeButton.textContent = "SALIR DEL CINE";
+            closeButton.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #8B4513, #D4AF37);
+                color: #000;
+                border: none;
+                padding: 12px 25px;
+                border-radius: 25px;
+                cursor: pointer;
+                font-family: 'Sigmar', sans-serif;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                transition: all 0.3s ease;
+                z-index: 10001;
+                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+                border: 2px solid #FFD700;
+            `;
 
-        // Función para cerrar el popup
-        function closePopup() {
-          document.body.removeChild(popupOverlay);
-        }
+            // ENSAMBLAJE
+            screenFrame.appendChild(flipbookImages);
+            screenFrame.appendChild(flickerOverlay);
+            
+            cinemaScreen.appendChild(screenFrame);
+            
+            popupContent.appendChild(cinemaScreen);
+            popupContent.appendChild(audienceOverlay); // Público POR ENCIMA
+            popupContent.appendChild(controlsContainer);
+            
+            popupOverlay.appendChild(closeButton);
+            popupOverlay.appendChild(popupContent);
+            document.body.appendChild(popupOverlay);
 
-        // Cerrar al hacer clic en el botón
-        closeButton.addEventListener("click", closePopup);
+            // AÑADIR ESTILOS CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                /* ANIMACIÓN DEL FLIPBOOK - 7 imágenes secuenciales */
+                @keyframes fastFlipbook {
+                    0% {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                    12% {
+                        opacity: 1;
+                        transform: scale(1.02);
+                    }
+                    14.3% {
+                        opacity: 0;
+                        transform: scale(1);
+                    }
+                    100% {
+                        opacity: 0;
+                        transform: scale(1);
+                    }
+                }
 
-        // Cerrar al hacer clic fuera del contenido
-        popupOverlay.addEventListener("click", function (e) {
-          if (e.target === popupOverlay) {
-            closePopup();
-          }
+                /* EFECTO DE PARPADEO */
+                @keyframes projectorFlicker {
+                    0%, 100% {
+                        opacity: 0.7;
+                    }
+                    25% {
+                        opacity: 0.5;
+                    }
+                    50% {
+                        opacity: 0.8;
+                    }
+                    75% {
+                        opacity: 0.6;
+                    }
+                }
+
+                /* ESTILOS DEL SLIDER */
+                #speedControlPopup::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    width: 20px;
+                    height: 20px;
+                    background: #FFD700;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    border: 2px solid #8B4513;
+                    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+                    transition: all 0.2s ease;
+                }
+                #speedControlPopup::-webkit-slider-thumb:hover {
+                    background: #FFFFFF;
+                    transform: scale(1.2);
+                    box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
+                }
+                #speedControlPopup::-moz-range-thumb {
+                    width: 20px;
+                    height: 20px;
+                    background: #FFD700;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    border: 2px solid #8B4513;
+                    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+                }
+            `;
+            document.head.appendChild(style);
+
+            // FUNCIONALIDAD DE CONTROLES
+            const speedControlPopup = document.getElementById("speedControlPopup") as HTMLInputElement;
+            const speedValuePopup = document.getElementById("speedValueDisplay") as HTMLSpanElement;
+            const flipbookImagesPopup = flipbookImages.querySelectorAll("div") as NodeListOf<HTMLElement>;
+
+            function updateSpeedPopup() {
+                if (!speedControlPopup || !speedValuePopup || flipbookImagesPopup.length === 0) return;
+
+                const speed = parseFloat(speedControlPopup.value);
+                speedValuePopup.textContent = `${speed.toFixed(1)}x`;
+
+                const baseDuration = 4.9; // 7 imágenes × 0.7s cada una
+                const newDuration = baseDuration / speed;
+
+                flipbookImagesPopup.forEach((img, index) => {
+                    img.style.animationDuration = `${newDuration}s`;
+                    const delayPerFrame = 0.7 / speed; // Cada imagen dura 0.7s
+                    img.style.animationDelay = `${delayPerFrame * index}s`;
+                });
+            }
+
+            if (speedControlPopup && speedValuePopup && flipbookImagesPopup.length > 0) {
+                speedControlPopup.addEventListener("input", updateSpeedPopup);
+                updateSpeedPopup();
+            }
+
+            // FUNCIONES DE CIERRE
+            function closePopup() {
+                document.body.removeChild(popupOverlay);
+            }
+
+            closeButton.addEventListener("click", closePopup);
+            popupOverlay.addEventListener("click", function (e) {
+                if (e.target === popupOverlay) {
+                    closePopup();
+                }
+            });
+
+            document.addEventListener("keydown", function closeOnEscape(e) {
+                if (e.key === "Escape") {
+                    closePopup();
+                    document.removeEventListener("keydown", closeOnEscape);
+                }
+            });
+
+            // EFECTOS HOVER
+            closeButton.addEventListener("mouseenter", function() {
+                this.style.background = "linear-gradient(135deg, #D4AF37, #FFD700)";
+                this.style.transform = "scale(1.1)";
+                this.style.boxShadow = "0 6px 20px rgba(255, 215, 0, 0.8)";
+            });
+
+            closeButton.addEventListener("mouseleave", function() {
+                this.style.background = "linear-gradient(135deg, #8B4513, #D4AF37)";
+                this.style.transform = "scale(1)";
+                this.style.boxShadow = "0 4px 15px rgba(255, 215, 0, 0.5)";
+            });
         });
-
-        // Cerrar con la tecla Escape
-        document.addEventListener("keydown", function closeOnEscape(e) {
-          if (e.key === "Escape") {
-            closePopup();
-            document.removeEventListener("keydown", closeOnEscape);
-          }
-        });
-
-        // Inicializar controles de velocidad para este popup
-        const speedControlPopup = document.getElementById("speedControlPopup") as HTMLInputElement;
-        const speedValuePopup = controls.querySelector("span") as HTMLSpanElement;
-        const flipbookImagesPopup = flipbookImages.querySelectorAll(".flipbook-image") as NodeListOf<HTMLElement>;
-
-        // Agregar estilos CSS para el thumb del slider
-        const style = document.createElement('style');
-        style.textContent = `
-          #speedControlPopup::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            background: #f5d742;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #000;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-          }
-          #speedControlPopup::-webkit-slider-thumb:hover {
-            background: #d4b82a;
-            transform: scale(1.1);
-          }
-          #speedControlPopup::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
-            background: #f5d742;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #000;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-          }
-          #speedControlPopup:active {
-            transform: scale(1.02);
-          }
-        `;
-        document.head.appendChild(style);
-
-        function updateSpeedPopup() {
-          if (!speedControlPopup || !speedValuePopup || flipbookImagesPopup.length === 0) return;
-
-          const speed = parseFloat(speedControlPopup.value);
-          speedValuePopup.textContent = `${speed.toFixed(1)}x`;
-
-          const baseDuration = 0.8;
-          const newDuration = baseDuration / speed;
-
-          flipbookImagesPopup.forEach((img, index) => {
-            img.style.animationDuration = `${newDuration}s`;
-            const delayPerFrame = newDuration / 5;
-            img.style.animationDelay = `${delayPerFrame * index}s`;
-          });
-        }
-
-        if (speedControlPopup && speedValuePopup && flipbookImagesPopup.length > 0) {
-          speedControlPopup.addEventListener("input", updateSpeedPopup);
-          updateSpeedPopup();
-        }
-
-        // Hover effect en el botón cerrar
-        closeButton.addEventListener("mouseenter", function() {
-          this.style.background = "#d4b82a";
-          this.style.transform = "scale(1.05)";
-          this.style.boxShadow = "0 6px 15px rgba(0, 0, 0, 0.7)";
-        });
-
-        closeButton.addEventListener("mouseleave", function() {
-          this.style.background = "#f5d742";
-          this.style.transform = "scale(1)";
-          this.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.5)";
-        });
-      });
     }
-  });
+});
 
 
 </script>
