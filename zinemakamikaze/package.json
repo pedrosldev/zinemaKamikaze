@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "deploy": "rm -rf dist .astro && pnpm run build && pm2 restart zinemakamikaze"
   },
   "dependencies": {
     "@astrojs/node": "^9.5.1",
