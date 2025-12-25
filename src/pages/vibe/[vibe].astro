@@ -69,10 +69,39 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
         />
       </div>
     </div>
+    <div id="mobile-tip" class="mobile-toast">
+      Pulsa otra vez para leer la crítica
+    </div>
   </main>
 </Layout>
 
 <style>
+  .mobile-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    /* Empieza centrado pero oculto bajo la pantalla */
+    transform: translateX(-50%) translateY(150px);
+    background: #f5d742; /* Tu amarillo */
+    color: #1c3b70; /* Tu azul oscuro */
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-family: "Sigmar", sans-serif;
+    font-weight: bold;
+    z-index: 2000;
+    /* Transición suave con efecto rebote */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    display: none; /* Invisible en escritorio */
+  }
+
+  /* Se activa solo al añadir esta clase con JS */
+  .mobile-toast.visible {
+    transform: translateX(-50%) translateY(0);
+  }
   /* Estructura principal */
   .reviews-layout {
     margin: 0;
@@ -526,6 +555,10 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     .scroll-down {
       margin-bottom: 3px;
     }
+
+    .mobile-toast {
+      display: block; /* Solo lo activamos en móviles/tablets */
+    }
   }
 
   /* Móviles (hasta 480px) */
@@ -574,6 +607,7 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
       width: 20px;
       height: 20px;
     }
+  
   }
 
   /* Landscape en móviles y tablets */
@@ -616,6 +650,7 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     .review-item {
       width: 90%;
     }
+ 
   }
 
   /* Ajustes para efectos visuales en móviles */
@@ -720,25 +755,36 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
       if (li) updateSidebar(li.dataset.posterUrl);
     });
 
+    const mobileTip = document.getElementById("mobile-tip");
+
     // 3. Evento Click mejorado (Móvil + Tablet)
     document.querySelectorAll(".review-item").forEach((item) => {
       item.addEventListener("click", function (e) {
         if (window.innerWidth <= 768) {
           const poster = this.dataset.posterUrl;
 
-          // Si el cartel no es el actual, lo mostramos y bloqueamos el link
           if (sidebar.getAttribute("data-current-poster") !== poster) {
             e.preventDefault();
             updateSidebar(poster);
             sidebar.setAttribute("data-current-poster", poster);
 
-            // Efecto visual de selección
+            // Mostrar el aviso visual
+            mobileTip.classList.add("visible");
+
+            // Ocultar el aviso después de 3 segundos
+            setTimeout(() => {
+              mobileTip.classList.remove("visible");
+            }, 3000);
+
+            // Feedback visual en el item
             document
               .querySelectorAll(".review-item")
               .forEach((el) => (el.style.filter = "brightness(1)"));
             this.style.filter = "brightness(1.5) contrast(1.1)";
+          } else {
+            // Si ya era el actual, al navegar ocultamos el tip por si acaso
+            mobileTip.classList.remove("visible");
           }
-          // Si pulsa de nuevo el mismo, el link funciona normal
         }
       });
     });
