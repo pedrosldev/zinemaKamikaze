@@ -94,11 +94,8 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     filter: brightness(0.8) contrast(0.9);
     position: relative;
     overflow: hidden;
-    background-image: linear-gradient(
-        to right,
-        rgba(107, 63, 47, 0.8) 6px,
-        transparent 6px
-      ),
+    background-image:
+      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
@@ -141,11 +138,8 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     overflow: hidden;
     width: 400px; /* Más ancho que antes */
     min-width: 400px;
-    background-image: linear-gradient(
-        to right,
-        rgba(107, 63, 47, 0.8) 6px,
-        transparent 6px
-      ),
+    background-image:
+      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
@@ -159,6 +153,9 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     box-sizing: border-box;
     padding: 20px;
     opacity: 0;
+    transition:
+      background-image 0.5s ease-in-out,
+      opacity 0.5s ease;
     /* animation: flicker 3s infinite; */
   }
 
@@ -172,11 +169,8 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
     position: relative;
-    background-image: linear-gradient(
-        to right,
-        rgba(107, 63, 47, 0.8) 6px,
-        transparent 6px
-      ),
+    background-image:
+      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
@@ -646,11 +640,8 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     .full-width-header,
     .wide-sidebar,
     .content-scrollable {
-      background-image: linear-gradient(
-          to right,
-          rgba(107, 63, 47, 0.6) 4px,
-          transparent 4px
-        ),
+      background-image:
+        linear-gradient(to right, rgba(107, 63, 47, 0.6) 4px, transparent 4px),
         linear-gradient(to bottom, rgba(107, 63, 47, 0.6) 4px, transparent 4px),
         linear-gradient(to left, rgba(107, 63, 47, 0.6) 4px, transparent 4px),
         linear-gradient(to top, rgba(107, 63, 47, 0.6) 4px, transparent 4px);
@@ -704,47 +695,77 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
 
 <script is:inline>
   document.addEventListener("DOMContentLoaded", () => {
-    document.querySelector(".scroll-up")?.addEventListener("click", () => {
-      const container = document.querySelector(".content-scrollable");
-      container.scrollBy({ top: -200, behavior: "smooth" });
-    });
+    const sidebar = document.querySelector(".wide-sidebar");
+    const scrollContainer = document.querySelector(".content-scrollable");
+    const header = document.querySelector(".full-width-header");
 
-    document.querySelector(".scroll-down")?.addEventListener("click", () => {
-      const container = document.querySelector(".content-scrollable");
-      container.scrollBy({ top: 200, behavior: "smooth" });
-    });
-    document.querySelector("ul").addEventListener("mouseover", (e) => {
-      const li = e.target.closest(".review-item");
-      const poster = li ? li.dataset.posterUrl : "";
+    // 1. Función para actualizar la imagen (Reutilizable)
+    const updateSidebar = (poster) => {
+      if (!poster || !sidebar) return;
       const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
-      const sidebar = document.querySelector(".wide-sidebar");
       sidebar.style.backgroundImage = `url(${posterUrl})`;
       sidebar.style.backgroundSize = "cover";
       sidebar.style.backgroundPosition = "center";
       sidebar.style.filter = "brightness(0.8) contrast(0.9)";
+      sidebar.style.opacity = "1";
+      // Reiniciamos la animación de flicker para que el cartel nuevo también parpadee
       sidebar.style.animation = "none";
       sidebar.offsetHeight; // Trigger reflow
       sidebar.style.animation = "flicker 3s infinite";
+    };
+
+    // 2. Evento Mouseover (Escritorio)
+    document.querySelector("ul").addEventListener("mouseover", (e) => {
+      const li = e.target.closest(".review-item");
+      if (li) updateSidebar(li.dataset.posterUrl);
     });
-    // Animación del header
-    const header = document.querySelector(".full-width-header");
-    const sidebar = document.querySelector(".wide-sidebar");
+
+    // 3. Evento Click mejorado (Móvil + Tablet)
+    document.querySelectorAll(".review-item").forEach((item) => {
+      item.addEventListener("click", function (e) {
+        if (window.innerWidth <= 768) {
+          const poster = this.dataset.posterUrl;
+
+          // Si el cartel no es el actual, lo mostramos y bloqueamos el link
+          if (sidebar.getAttribute("data-current-poster") !== poster) {
+            e.preventDefault();
+            updateSidebar(poster);
+            sidebar.setAttribute("data-current-poster", poster);
+
+            // Efecto visual de selección
+            document
+              .querySelectorAll(".review-item")
+              .forEach((el) => (el.style.filter = "brightness(1)"));
+            this.style.filter = "brightness(1.5) contrast(1.1)";
+          }
+          // Si pulsa de nuevo el mismo, el link funciona normal
+        }
+      });
+    });
+
+    // 4. Flechas de Scroll (Tu código original)
+    document.querySelector(".scroll-up")?.addEventListener("click", () => {
+      scrollContainer.scrollBy({ top: -200, behavior: "smooth" });
+    });
+
+    document.querySelector(".scroll-down")?.addEventListener("click", () => {
+      scrollContainer.scrollBy({ top: 200, behavior: "smooth" });
+    });
+
+    // 5. Animaciones de carga (Tu código original mejorado)
     if (header) {
       header.style.animation = "none";
-      header.offsetHeight; // Trigger reflow
+      header.offsetHeight;
       header.style.animation = "";
     }
-
     if (sidebar) {
       sidebar.style.animation = "none";
-      sidebar.offsetWidth; // Trigger reflow
+      sidebar.offsetWidth;
       sidebar.style.animation = "slideInFromTop 1.5s";
-      // sidebar.style.animationDelay = '1.5s';
       sidebar.style.opacity = "1";
     }
 
-    // Scroll con rueda del mouse
-    const scrollContainer = document.querySelector(".content-scrollable");
+    // 6. Scroll con rueda (Tu código original)
     if (scrollContainer) {
       scrollContainer.addEventListener("wheel", (e) => {
         e.preventDefault();
