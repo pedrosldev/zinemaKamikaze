@@ -607,7 +607,6 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
       width: 20px;
       height: 20px;
     }
-  
   }
 
   /* Landscape en móviles y tablets */
@@ -650,7 +649,6 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     .review-item {
       width: 90%;
     }
- 
   }
 
   /* Ajustes para efectos visuales en móviles */
@@ -750,10 +748,12 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
     };
 
     // 2. Evento Mouseover (Escritorio)
-    document.querySelector("ul").addEventListener("mouseover", (e) => {
-      const li = e.target.closest(".review-item");
-      if (li) updateSidebar(li.dataset.posterUrl);
-    });
+    document
+      .querySelector(".reviews-list")
+      .addEventListener("mouseover", (e) => {
+        const li = e.target.closest(".review-item");
+        if (li) updateSidebar(li.dataset.posterUrl);
+      });
 
     const mobileTip = document.getElementById("mobile-tip");
 
