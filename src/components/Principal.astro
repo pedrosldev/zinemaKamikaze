@@ -168,7 +168,7 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
         src={
           latestMovie.poster_url
             ? `https://image.tmdb.org/t/p/w500${latestMovie.poster_url}`
-            : "/images/noImg.jpg"
+            : "/images/noImg.png"
         }
         alt={latestMovie.title}
         class="poster-image-active"
@@ -1287,7 +1287,7 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
             });
 
           if (!poster) {
-            surpriseDiv!.style.backgroundImage = `url(/images/noImg.jpg)`;
+            surpriseDiv!.style.backgroundImage = `url(/images/noImg.png)`;
             surpriseDiv!.style.backgroundSize = "100% 100%";
             surpriseDiv!.style.backgroundPosition = "center";
             surpriseDiv!.style.backgroundRepeat = "no-repeat";
