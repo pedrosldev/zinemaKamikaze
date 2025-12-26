@@ -1,11 +1,11 @@
 import type { APIRoute } from 'astro';
-import { validateToken, deactivateToken } from '../../lib/db';
+import { claimToken } from '../../lib/db';
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
-    const { token } = body;
+    const { token, selected_by } = body;
 
     if (!token) {
         return new Response(
@@ -15,12 +15,10 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     try {
-        const isValid = await validateToken(token);
+        // Una sola operación atómica: valida Y reclama el token
+        const claimed = await claimToken(token, selected_by || 'Anónimo');
 
-        if (isValid) {
-            // Desactivar el token después de usarlo (para un solo uso)
-            await deactivateToken(token);
-
+        if (claimed) {
             return new Response(
                 JSON.stringify({
                     valid: true,

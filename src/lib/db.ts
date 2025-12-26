@@ -23,10 +23,10 @@ interface ReviewRow extends RowDataPacket {
   interface VibeRow extends RowDataPacket {
     vibe: string;
   }
-  export async function insertReview(film_id: number, title: string, year: number, review: string, vibe: string, poster: string, viewing_period: boolean = true, expectation_mood: string | null = null  ) {
+  export async function insertReview(film_id: number, title: string, year: number, review: string, vibe: string, poster: string, viewing_period: boolean = true, expectation_mood: string | null = null, selected_by: string | null = null  ) {
     const [result] = await pool.execute(
-      'INSERT INTO test_reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [film_id, title, year, review, vibe, poster, viewing_period, expectation_mood]
+      'INSERT INTO test_reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [film_id, title, year, review, vibe, poster, viewing_period, expectation_mood, selected_by]
     );
     return result;
   }
@@ -85,6 +85,34 @@ export async function deactivateToken(token: string): Promise<void> {
     "UPDATE trigger_tokens SET is_active = false WHERE token = ?",
     [token]
   );
+}
+
+// Función atómica para reclamar un token (evita race conditions)
+export async function claimToken(token: string, used_by: string = 'Anónimo'): Promise<boolean> {
+  try {
+    const [result]: any = await pool.execute(
+      `UPDATE trigger_tokens 
+       SET is_active = false, used_by = ? 
+       WHERE token = ? AND is_active = true`,
+      [used_by, token]
+    );
+    
+    // Si affectedRows = 1, el token era válido y se reclamó exitosamente
+    // Si affectedRows = 0, el token ya estaba usado o no existe
+    return result.affectedRows === 1;
+  } catch (error) {
+    console.error('Error claiming token:', error);
+    return false;
+  }
+}
+
+// Obtener datos completos de un token
+export async function getTokenData(token: string) {
+  const [rows]: any = await pool.query(
+    "SELECT * FROM trigger_tokens WHERE token = ? LIMIT 1",
+    [token]
+  );
+  return rows.length > 0 ? rows[0] : null;
 }
 
 export async function getActiveTokens(): Promise<TokenRow[]> {

@@ -128,6 +128,17 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
             placeholder="Ingresa el código aquí..."
             class="token-input"
           />
+          <div class="selected-by-container">
+            <label for="selectedByInput">¿Quieres firmar tu elección? (Opcional)</label>
+            <input
+              type="text"
+              id="selectedByInput"
+              placeholder="Anónimo, @usuario, tu nombre..."
+              maxlength="100"
+              class="selected-by-input"
+            />
+            <small>Si lo dejas vacío, serás anónimo</small>
+          </div>
           <button id="validateToken" class="token-btn">
             VALIDAR CÓDIGO
           </button>
@@ -304,6 +315,49 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
 
   .token-error {
     color: #f44336;
+  }
+
+  /* Estilos para el campo de identificación opcional */
+  .selected-by-container {
+    margin: 15px 0;
+    width: 100%;
+  }
+
+  .selected-by-container label {
+    display: block;
+    color: #c9be9c;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .selected-by-input {
+    width: 70%;
+    max-width: 300px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    border: 2px solid rgba(107, 63, 47, 0.8);
+    border-radius: 4px;
+    background: rgba(26, 26, 24, 0.9);
+    color: #c9be9c;
+    font-family: "Sigmar", sans-serif;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+  }
+
+  .selected-by-input:focus {
+    outline: none;
+    border-color: #f5d742;
+    box-shadow: 0 0 10px rgba(245, 215, 66, 0.3);
+  }
+
+  .selected-by-container small {
+    display: block;
+    color: #999;
+    font-size: 0.75rem;
+    margin-top: 5px;
+    font-style: italic;
   }
 
   .poster-image-active {
@@ -1156,6 +1210,9 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
     const contenidoDiv = document.getElementById("contenido") as HTMLDivElement;
     const surpriseDiv = document.querySelector(".surprise") as HTMLDivElement;
 
+    // Variable para guardar el token validado
+    let validatedToken: string | null = null;
+
     // Verificar que todos los elementos existen
     if (
       !tokenInput ||
@@ -1211,6 +1268,7 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
               review: review,
               vibe: vibe,
               poster: poster,
+              token: validatedToken,  // Enviar el token para asociar el used_by
             }),
           })
             .then((response) => {
@@ -1261,17 +1319,27 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
         tokenMessage!.textContent = "";
         tokenMessage!.className = "token-message";
 
+        // Obtener el nombre/usuario opcional
+        const selectedByInput = document.getElementById("selectedByInput") as HTMLInputElement;
+        const selectedBy = selectedByInput?.value.trim() || "Anónimo";
+
         const response = await fetch("/api/validate-tokens", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ token: token.trim() }),
+          body: JSON.stringify({ 
+            token: token.trim(),
+            selected_by: selectedBy 
+          }),
         });
 
         const result = await response.json();
 
         if (response.ok && result.valid) {
+          // Guardar el token validado
+          validatedToken = token.trim();
+          
           // Token válido - ocultar contenedor y generar película directamente
           tokenMessage!.textContent = "¡CÓDIGO VÁLIDO! Generando película...";
           tokenMessage!.className = "token-message token-success";
