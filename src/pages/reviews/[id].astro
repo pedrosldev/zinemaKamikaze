@@ -226,6 +226,7 @@ const review = await getReviewById(Number(Astro.params.id));
   }
 
   .mood-label {
+    font-family: "Sigmar", sans-serif;
     color: #c9be9c;
     font-size: 0.7rem;
     text-transform: uppercase;
@@ -389,35 +390,65 @@ const review = await getReviewById(Number(Astro.params.id));
 @media screen and (max-width: 768px) {
   header {
     height: auto;
-    min-height: 15dvh;
-    padding: 12px;
+    min-height: 12dvh;
+    padding: 8px;
+  }
+
+  .header-content {
+    gap: 0.5rem;
+    align-items: flex-start;
+    padding-top: 5px;
+  }
+
+  .header-center {
+    justify-content: flex-start;
   }
 
   header h1 {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     line-height: 1.2;
-    padding: 0 10px;
-  }
-
-  header > div {
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 10px;
+    padding: 0 5px;
+    margin-bottom: 0.5rem;
   }
 
   header a {
-    font-size: 0.85rem;
-    padding: 5px 10px;
+    font-size: 0.7rem;
+    padding: 3px 6px;
     display: inline-block;
   }
 
+  .mood-container {
+    gap: 0.25rem;
+  }
+
+  .mood-title {
+    font-size: 0.5rem;
+    max-width: 60px;
+    line-height: 1.1;
+  }
+
+  .mood-badge {
+    width: 35px;
+    height: 35px;
+    border-width: 1.5px;
+  }
+
+  .mood-emoji {
+    font-size: 1.2rem;
+  }
+
+  .mood-label {
+    font-size: 0.55rem;
+    margin-top: 0.15rem;
+  }
+
   .credits-container {
-    height: 70dvh;
+    height: 73dvh;
   }
 
   .credits-text {
     padding: 0 15px;
-    animation-duration: 25s; /* Más lento en móvil para mejor lectura */
+    animation-duration: 25s;
   }
 
   .credits-text p {
@@ -435,47 +466,59 @@ const review = await getReviewById(Number(Astro.params.id));
     width: 40px;
     height: 40px;
   }
-
-  .mood-badge {
-    width: 40px;
-    height: 40px;
-  }
-
-  .mood-emoji {
-    font-size: 1.4rem;
-  }
 }
 
 /* Móviles (hasta 480px) */
 @media screen and (max-width: 480px) {
   header {
-    min-height: 18dvh;
-    padding: 10px;
+    min-height: 11dvh;
+    padding: 6px;
+  }
+
+  .header-content {
+    gap: 0.3rem;
   }
 
   header h1 {
-    font-size: 1.1rem;
-    line-height: 1.2;
-    padding: 0 5px;
+    font-size: 1rem;
+    line-height: 1.15;
+    padding: 0 3px;
     word-wrap: break-word;
-  }
-
-  header > div {
-    gap: 0.4rem;
+    margin-bottom: 0.4rem;
   }
 
   header a {
-    font-size: 0.75rem;
-    padding: 4px 8px;
+    font-size: 0.65rem;
+    padding: 2px 5px;
+  }
+
+  .mood-title {
+    font-size: 0.45rem;
+    max-width: 50px;
+  }
+
+  .mood-badge {
+    width: 30px;
+    height: 30px;
+    border-width: 1px;
+  }
+
+  .mood-emoji {
+    font-size: 1rem;
+  }
+
+  .mood-label {
+    font-size: 0.5rem;
+    margin-top: 0.1rem;
   }
 
   .credits-container {
-    height: 68dvh;
+    height: 74dvh;
   }
 
   .credits-text {
     padding: 0 10px;
-    animation-duration: 30s; /* Aún más lento en pantallas pequeñas */
+    animation-duration: 30s;
   }
 
   .credits-text p {
@@ -485,7 +528,7 @@ const review = await getReviewById(Number(Astro.params.id));
   }
 
   .toggle-container {
-    height: 14dvh;
+    height: 15dvh;
     padding: 6px;
   }
 
