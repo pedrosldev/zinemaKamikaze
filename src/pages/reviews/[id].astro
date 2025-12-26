@@ -36,7 +36,7 @@ const review = await getReviewById(Number(Astro.params.id));
         <!-- Contenedor de créditos -->
         <div class="credits-container">
   <div id="credits-text" class="credits-text">
-    {review.review.split('\n').map(line => <p>{line}</p>)}
+    {review.review.split('\n').map((line: string) => <p>{line}</p>)}
   </div>
 </div>
 
