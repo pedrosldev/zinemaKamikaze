@@ -97,7 +97,7 @@ export async function getActiveTokens(): Promise<TokenRow[]> {
 export async function getReviewsWithNullReview() {
   try {
     const [rows] = await pool.execute(
-      'SELECT id, film_id, title, year, type, vibe, poster_url FROM test_reviews WHERE review IS NULL'
+      'SELECT id, film_id, title, year, type, vibe, poster_url, expectation_mood FROM test_reviews WHERE review IS NULL'
     );
     return rows;
   } catch (error) {
@@ -116,12 +116,13 @@ export async function updateReview(
   vibe: string,
   poster_url: string,
   viewing_period: boolean = false,
-  expectation_mood: string | null = null
+  expectation_mood: string | null = null,
+  final_mood: string | null = null
 ) {
   try {
     const [result] = await pool.execute(
-      'UPDATE test_reviews SET film_id = ?, title = ?, year = ?, review = ?, vibe = ?, poster_url = ?, viewing_period=?, expectation_mood=? WHERE id = ?',
-      [film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, id]
+      'UPDATE test_reviews SET film_id = ?, title = ?, year = ?, review = ?, vibe = ?, poster_url = ?, viewing_period=?, expectation_mood=?, final_mood=? WHERE id = ?',
+      [film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, final_mood, id]
     );
     return result;
   } catch (error) {

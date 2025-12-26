@@ -26,7 +26,8 @@ export const POST: APIRoute = async ({ request }) => {
             body.vibe,
             body.poster,
             false, // viewing_period
-            body.expectation_mood || null // expectation_mood
+            body.expectation_mood || null, // expectation_mood
+            body.final_mood || null // final_mood
         );
 
         return new Response(

@@ -21,15 +21,77 @@ const review = await getReviewById(Number(Astro.params.id));
           />
         </head>
         <header>
-          <h1>
-            {review.title}{" "}
-            {review.year && review.year !== 0 ? `(${review.year})` : ""}
-          </h1>
-          <div style="display: flex; gap: 1rem; justify-content: center;">
-            <a href={`/vibe/${review.vibe}`}>Volver a {review.vibe}</a>
-            <a href="/" class="back-link">
-              Volver al listado
-            </a>
+          <div class="header-content">
+            <!-- Icono expectativa inicial (izquierda) -->
+            {review.expectation_mood && (
+              <div class="mood-container">
+                <p class="mood-title">Mi expectativa antes de verla</p>
+                <div class="mood-badge initial" title="Cuando me enteré">
+                  <span class="mood-emoji">
+                    {review.expectation_mood === 'excitement' && '🎉'}
+                    {review.expectation_mood === 'fear' && '😱'}
+                    {review.expectation_mood === 'curiosity' && '🤔'}
+                    {review.expectation_mood === 'dread' && '😩'}
+                    {review.expectation_mood === 'surprise' && '😲'}
+                    {review.expectation_mood === 'boredom' && '😴'}
+                  </span>
+                </div>
+                <small class="mood-label">
+                  {review.expectation_mood === 'excitement' && 'Emoción'}
+                  {review.expectation_mood === 'fear' && 'Miedo'}
+                  {review.expectation_mood === 'curiosity' && 'Curiosidad'}
+                  {review.expectation_mood === 'dread' && 'Horror'}
+                  {review.expectation_mood === 'surprise' && 'Sorpresa'}
+                  {review.expectation_mood === 'boredom' && 'Aburrimiento'}
+                </small>
+              </div>
+            )}
+            
+            <div class="header-center">
+              <h1>
+                {review.title}{" "}
+                {review.year && review.year !== 0 ? `(${review.year})` : ""}
+              </h1>
+              <div style="display: flex; gap: 1rem; justify-content: center;">
+                <a href={`/vibe/${review.vibe}`}>Volver a {review.vibe}</a>
+                <a href="/" class="back-link">
+                  Volver al listado
+                </a>
+              </div>
+            </div>
+            
+            <!-- Icono mood final (derecha) -->
+            {review.final_mood && (
+              <div class="mood-container">
+                <p class="mood-title">Mi expectativa después de verla</p>
+                <div class="mood-badge final" title="Después de verla">
+                  <span class="mood-emoji">
+                    {review.final_mood === 'excitement' && '🎉'}
+                    {review.final_mood === 'fear' && '😱'}
+                    {review.final_mood === 'curiosity' && '🤔'}
+                    {review.final_mood === 'dread' && '😩'}
+                    {review.final_mood === 'surprise' && '😲'}
+                    {review.final_mood === 'boredom' && '😴'}
+                    {review.final_mood === 'satisfaction' && '😌'}
+                    {review.final_mood === 'disappointment' && '😞'}
+                    {review.final_mood === 'love' && '😍'}
+                    {review.final_mood === 'hate' && '🤬'}
+                  </span>
+                </div>
+                <small class="mood-label">
+                  {review.final_mood === 'excitement' && 'Emoción'}
+                  {review.final_mood === 'fear' && 'Miedo'}
+                  {review.final_mood === 'curiosity' && 'Curiosidad'}
+                  {review.final_mood === 'dread' && 'Horror'}
+                  {review.final_mood === 'surprise' && 'Sorpresa'}
+                  {review.final_mood === 'boredom' && 'Aburrimiento'}
+                  {review.final_mood === 'satisfaction' && 'Satisfacción'}
+                  {review.final_mood === 'disappointment' && 'Decepción'}
+                  {review.final_mood === 'love' && 'Amor'}
+                  {review.final_mood === 'hate' && 'Odio'}
+                </small>
+              </div>
+            )}
           </div>
         </header>
 
@@ -72,14 +134,11 @@ const review = await getReviewById(Number(Astro.params.id));
 
 <style>
   header {
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    justify-content: center;
     background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
     animation: flicker 3s infinite;
     height: 20dvh;
+    padding: 1rem;
         background-image:
                 /* Borde izquierdo */
       linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
@@ -99,6 +158,83 @@ const review = await getReviewById(Number(Astro.params.id));
     background-repeat: no-repeat;
     box-sizing: border-box;
   }
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    gap: 1rem;
+  }
+
+  .header-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+  }
+
+  .mood-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .mood-title {
+    color: #f5d742;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+    text-align: center;
+    max-width: 80px;
+    line-height: 1.2;
+  }
+
+  .mood-badge {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(245, 215, 66, 0.6);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+  }
+
+  .mood-badge:hover {
+    transform: scale(1.1);
+    border-color: #f5d742;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .mood-badge.final {
+    border-color: rgba(201, 190, 156, 0.8);
+  }
+
+  .mood-badge.final:hover {
+    border-color: #c9be9c;
+  }
+
+  .mood-emoji {
+    font-size: 1.8rem;
+    line-height: 1;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
+  }
+
+  .mood-label {
+    color: #c9be9c;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.25rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
   h1, p, a {
     font-family: "Sigmar", sans-serif;
     text-align: center;
@@ -238,6 +374,15 @@ const review = await getReviewById(Number(Astro.params.id));
     width: 45px;
     height: 45px;
   }
+
+  .mood-badge {
+    width: 45px;
+    height: 45px;
+  }
+
+  .mood-emoji {
+    font-size: 1.6rem;
+  }
 }
 
 /* Tablets pequeños (hasta 768px) */
@@ -289,6 +434,15 @@ const review = await getReviewById(Number(Astro.params.id));
   .toggle-container img {
     width: 40px;
     height: 40px;
+  }
+
+  .mood-badge {
+    width: 40px;
+    height: 40px;
+  }
+
+  .mood-emoji {
+    font-size: 1.4rem;
   }
 }
 
