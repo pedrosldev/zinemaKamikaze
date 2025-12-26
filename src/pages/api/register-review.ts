@@ -1,6 +1,6 @@
 // src/pages/api/register-review.ts
 import type { APIRoute } from 'astro';
-import { insertReview } from '../../lib/db';
+import { insertReview, getTokenData } from '../../lib/db';
 
 export const prerender = false;
 
@@ -18,7 +18,24 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    await insertReview(body.film_id, body.title, body.year, body.review, body.vibe, body.poster);
+    // Si se proporcionó un token, obtener el used_by de ahí
+    let selected_by = 'Anónimo';
+    if (body.token) {
+      const tokenData = await getTokenData(body.token);
+      selected_by = tokenData?.used_by || 'Anónimo';
+    }
+
+    await insertReview(
+      body.film_id, 
+      body.title, 
+      body.year, 
+      body.review, 
+      body.vibe, 
+      body.poster,
+      true,  // viewing_period
+      null,  // expectation_mood
+      selected_by  // selected_by
+    );
 
     return new Response(
       JSON.stringify({ message: 'Review guardada exitosamente' }),
