@@ -1736,49 +1736,53 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // CONTROLES
 const controlsContainer = document.createElement("div");
+
+// Detectar si estamos en landscape en pantalla pequeña
+const isSmallLandscape = window.matchMedia("(max-width: 896px) and (orientation: landscape)").matches;
+
 controlsContainer.style.cssText = `
     position: absolute;
-    bottom: 190px;
+    bottom: ${isSmallLandscape ? '80px' : '190px'};
     left: 50%;
     transform: translateX(-50%);
     background: rgba(0, 0, 0, 0.9);
-    padding: clamp(10px, 2vw, 15px) clamp(15px, 3vw, 25px);
+    padding: ${isSmallLandscape ? '5px 10px' : 'clamp(10px, 2vw, 15px) clamp(15px, 3vw, 25px)'};
     border: 2px solid rgba(255, 215, 0, 0.5);
     border-radius: 10px;
     backdrop-filter: blur(10px);
     z-index: 10;
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-    width: 90%;
-    max-width: 500px;
-    min-width: 280px;
+    width: ${isSmallLandscape ? '80%' : '90%'};
+    max-width: ${isSmallLandscape ? '350px' : '500px'};
+    min-width: ${isSmallLandscape ? '200px' : '280px'};
     box-sizing: border-box;
 `;
 
 controlsContainer.innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 1.5vw, 10px); width: 100%;">
-        <label for="speedControlPopup" style="color: #FFD700; font-family: 'Sigmar', sans-serif; font-size: clamp(0.7rem, 2vw, 0.9rem); text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); text-align: center; line-height: 1.2;">
+    <div style="display: flex; flex-direction: ${isSmallLandscape ? 'row' : 'column'}; align-items: center; gap: ${isSmallLandscape ? '8px' : 'clamp(8px, 1.5vw, 10px)'}; width: 100%;">
+        <label for="speedControlPopup" style="color: #FFD700; font-family: 'Sigmar', sans-serif; font-size: ${isSmallLandscape ? '0.5rem' : 'clamp(0.7rem, 2vw, 0.9rem)'}; text-transform: uppercase; letter-spacing: 0.5px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); text-align: center; line-height: 1; white-space: nowrap; ${isSmallLandscape ? 'display: none;' : ''}">
             🎬 VELOCIDAD PROYECTOR 🎬
         </label>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 1.5vw, 10px); width: 100%;">
-            <div style="display: flex; justify-content: center; align-items: center; gap: clamp(8px, 2vw, 15px); width: 100%; flex-wrap: wrap;">
-                <span style="color: #FFD700; font-size: clamp(0.6rem, 1.8vw, 0.8rem); font-family: 'Sigmar', sans-serif; white-space: nowrap;">
+        <div style="display: flex; flex-direction: row; align-items: center; gap: ${isSmallLandscape ? '5px' : 'clamp(8px, 1.5vw, 10px)'}; width: 100%; justify-content: center;">
+            <div style="display: flex; justify-content: center; align-items: center; gap: ${isSmallLandscape ? '5px' : 'clamp(8px, 2vw, 15px)'}; flex: 1;">
+                <span style="color: #FFD700; font-size: ${isSmallLandscape ? '0.5rem' : 'clamp(0.6rem, 1.8vw, 0.8rem)'}; font-family: 'Sigmar', sans-serif; white-space: nowrap;">
                     LENTO
                 </span>
                 <input
                     type="range"
                     id="speedControlPopup"
-                    style="width: min(200px, 50vw); height: 6px; background: linear-gradient(to right, #8B4513, #FFD700, #8B4513); border-radius: 4px; outline: none; -webkit-appearance: none; flex: 1; min-width: 120px;"
+                    style="width: ${isSmallLandscape ? '100px' : 'min(200px, 50vw)'}; height: ${isSmallLandscape ? '4px' : '6px'}; background: linear-gradient(to right, #8B4513, #FFD700, #8B4513); border-radius: 4px; outline: none; -webkit-appearance: none; flex: 1; min-width: ${isSmallLandscape ? '80px' : '120px'};"
                     min="0.3"
                     max="2"
                     step="0.1"
                     value="0.3"
                 />
-                <span style="color: #FFD700; font-size: clamp(0.6rem, 1.8vw, 0.8rem); font-family: 'Sigmar', sans-serif; white-space: nowrap;">
+                <span style="color: #FFD700; font-size: ${isSmallLandscape ? '0.5rem' : 'clamp(0.6rem, 1.8vw, 0.8rem)'}; font-family: 'Sigmar', sans-serif; white-space: nowrap;">
                     RÁPIDO
                 </span>
             </div>
             <div style="display: flex; align-items: center; justify-content: center;">
-                <span id="speedValueDisplay" style="color: #FFD700; font-family: 'Sigmar', sans-serif; font-size: clamp(0.8rem, 2.5vw, 1rem); font-weight: bold; background: rgba(139, 69, 19, 0.8); padding: clamp(3px, 1vw, 5px) clamp(8px, 2vw, 12px); border-radius: 8px; border: 2px solid #FFD700; line-height: 1; display: inline-block; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);">
+                <span id="speedValueDisplay" style="color: #FFD700; font-family: 'Sigmar', sans-serif; font-size: ${isSmallLandscape ? '0.6rem' : 'clamp(0.8rem, 2.5vw, 1rem)'}; font-weight: bold; background: rgba(139, 69, 19, 0.8); padding: ${isSmallLandscape ? '2px 6px' : 'clamp(3px, 1vw, 5px) clamp(8px, 2vw, 12px)'}; border-radius: 8px; border: 2px solid #FFD700; line-height: 1; display: inline-block; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);">
                     1.0x
                 </span>
             </div>
