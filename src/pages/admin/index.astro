@@ -112,6 +112,20 @@ if (authToken !== ADMIN_PASSWORD) {
         </div>
 
         <div class="form-group">
+          <label for="youtube_id">ID DEL VIDEO DE YOUTUBE:</label>
+          <input 
+            type="text" 
+            id="youtube_id" 
+            name="youtube_id" 
+            placeholder="Ej: dQw4w9WgXcQ (11 caracteres)"
+            maxlength="20"
+          />
+          <small style="color: #999; font-size: 0.9em; display: block; margin-top: 4px;">
+            Opcional. Extrae el ID de la URL: youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong>
+          </small>
+        </div>
+
+        <div class="form-group">
           <label for="expectation_mood">MI EXPECTATIVA AL ENTERARME:</label>
           <select name="expectation_mood" id="expectation_mood">
             <option value="">-- Sin definir (neutra) --</option>
@@ -195,6 +209,20 @@ if (authToken !== ADMIN_PASSWORD) {
         <div class="form-group">
           <label for="new_poster">URL DEL PÓSTER:</label>
           <input type="text" id="new_poster" name="poster" />
+        </div>
+
+        <div class="form-group">
+          <label for="new_youtube_id">ID DEL VIDEO DE YOUTUBE:</label>
+          <input 
+            type="text" 
+            id="new_youtube_id" 
+            name="youtube_id" 
+            placeholder="Ej: dQw4w9WgXcQ (11 caracteres)"
+            maxlength="20"
+          />
+          <small style="color: #999; font-size: 0.9em; display: block; margin-top: 4px;">
+            Opcional. Extrae el ID de la URL: youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong>
+          </small>
         </div>
 
         <div class="form-group">
@@ -1024,6 +1052,7 @@ if (authToken !== ADMIN_PASSWORD) {
       document.getElementById("title").value = reviewData.title || "";
       document.getElementById("year").value = reviewData.year || "";
       document.getElementById("poster").value = reviewData.poster_url || "";
+      document.getElementById("youtube_id").value = reviewData.youtube_id || "";
       document.getElementById("vibe").value = reviewData.vibe || "pasable";
       
       const expectationMoodSelect = document.getElementById("expectation_mood");
