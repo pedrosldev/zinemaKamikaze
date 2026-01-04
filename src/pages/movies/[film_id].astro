@@ -8,7 +8,7 @@ const filmId = Number(Astro.params.film_id);
 const reviews = await getReviewsByFilmId(filmId);
 
 if (!reviews || reviews.length === 0) {
-  return Astro.redirect('/404');
+  return Astro.redirect("/404");
 }
 
 const movie = reviews[0]; // Información básica de la película
@@ -29,11 +29,16 @@ const movie = reviews[0]; // Información básica de la película
   <header class="movie-header">
     <div class="header-content">
       <div class="movie-info">
-        <h1>{movie.title} {movie.year && movie.year !== 0 ? `(${movie.year})` : ''}</h1>
+        <h1>
+          {movie.title}
+          {movie.year && movie.year !== 0 ? `(${movie.year})` : ""}
+        </h1>
         <p class="viewing-count">
-          {reviews.length === 1 
-            ? 'Has visto esta película 1 vez' 
-            : `Has visto esta película ${reviews.length} veces`}
+          {
+            reviews.length === 1
+              ? "Has visto esta película 1 vez"
+              : `Has visto esta película ${reviews.length} veces`
+          }
         </p>
         <div class="navigation-links">
           <a href={`/vibe/${movie.vibe}`}>← Volver a {movie.vibe}</a>
@@ -44,115 +49,124 @@ const movie = reviews[0]; // Información básica de la película
   </header>
 
   <main class="reviews-timeline">
-    {reviews.map((review, index) => (
-      <article class="review-card">
-        <header class="review-header">
-          <h2>📽️ Visionado #{index + 1}</h2>
-          {review.watched_date && (
-            <p class="watch-date">
-              {new Date(review.watched_date).toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </p>
-          )}
-          {review.selected_by && (
-            <p class="selector">🎲 Seleccionada por: <strong>{review.selected_by}</strong></p>
-          )}
-        </header>
+    {
+      reviews.map((review, index) => (
+        <article class="review-card">
+          <header class="review-header">
+            <h2>📽️ Visionado #{index + 1}</h2>
+            {review.watched_date && (
+              <p class="watch-date">
+                {new Date(review.watched_date).toLocaleDateString("es-ES", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+            )}
+            {review.selected_by && (
+              <p class="selector">
+                🎲 Seleccionada por: <strong>{review.selected_by}</strong>
+              </p>
+            )}
+          </header>
 
-        {/* Preview del video si existe */}
-        {review.youtube_id && (
-          <div class="video-preview">
-            <lite-youtube 
-              videoid={review.youtube_id}
-              style={`background-image: url('https://i.ytimg.com/vi/${review.youtube_id}/hqdefault.jpg');`}
-            ></lite-youtube>
-            <div class="video-overlay">▶️ Video crítica</div>
-          </div>
-        )}
-
-        {/* Comparación de moods */}
-        <div class="mood-comparison">
-          {review.expectation_mood && (
-            <div class="mood-item">
-              <span class="mood-label">Expectativa inicial</span>
-              <div class="mood-badge">
-                <span class="mood-emoji">
-                  {review.expectation_mood === 'excitement' && '🎉'}
-                  {review.expectation_mood === 'fear' && '😱'}
-                  {review.expectation_mood === 'curiosity' && '🤔'}
-                  {review.expectation_mood === 'dread' && '😩'}
-                  {review.expectation_mood === 'surprise' && '😲'}
-                  {review.expectation_mood === 'boredom' && '😴'}
-                </span>
-                <span class="mood-name">
-                  {review.expectation_mood === 'excitement' && 'Emoción'}
-                  {review.expectation_mood === 'fear' && 'Miedo'}
-                  {review.expectation_mood === 'curiosity' && 'Curiosidad'}
-                  {review.expectation_mood === 'dread' && 'Horror'}
-                  {review.expectation_mood === 'surprise' && 'Sorpresa'}
-                  {review.expectation_mood === 'boredom' && 'Aburrimiento'}
-                </span>
+          {/* Preview del video si existe */}
+          {review.youtube_id && (
+            <div class="video-preview">
+              <div class="video-wrapper">
+                <lite-youtube
+                  videoid={review.youtube_id}
+                  style={`background-image: url('https://i.ytimg.com/vi/${review.youtube_id}/hqdefault.jpg');`}
+                />
               </div>
+              <div class="video-overlay">▶️ Video crítica</div>
             </div>
           )}
 
-          {review.final_mood && (
-            <div class="mood-item">
-              <span class="mood-label">Después de verla</span>
-              <div class="mood-badge final">
-                <span class="mood-emoji">
-                  {review.final_mood === 'excitement' && '🎉'}
-                  {review.final_mood === 'fear' && '😱'}
-                  {review.final_mood === 'curiosity' && '🤔'}
-                  {review.final_mood === 'dread' && '😩'}
-                  {review.final_mood === 'surprise' && '😲'}
-                  {review.final_mood === 'boredom' && '😴'}
-                  {review.final_mood === 'satisfaction' && '😌'}
-                  {review.final_mood === 'disappointment' && '😞'}
-                  {review.final_mood === 'love' && '😍'}
-                  {review.final_mood === 'hate' && '🤬'}
-                </span>
-                <span class="mood-name">
-                  {review.final_mood === 'excitement' && 'Emoción'}
-                  {review.final_mood === 'fear' && 'Miedo'}
-                  {review.final_mood === 'curiosity' && 'Curiosidad'}
-                  {review.final_mood === 'dread' && 'Horror'}
-                  {review.final_mood === 'surprise' && 'Sorpresa'}
-                  {review.final_mood === 'boredom' && 'Aburrimiento'}
-                  {review.final_mood === 'satisfaction' && 'Satisfacción'}
-                  {review.final_mood === 'disappointment' && 'Decepción'}
-                  {review.final_mood === 'love' && 'Amor'}
-                  {review.final_mood === 'hate' && 'Odio'}
-                </span>
+          {/* Comparación de moods */}
+          <div class="mood-comparison">
+            {review.expectation_mood && (
+              <div class="mood-item">
+                <span class="mood-label">Expectativa inicial</span>
+                <div class="mood-badge">
+                  <span class="mood-emoji">
+                    {review.expectation_mood === "excitement" && "🎉"}
+                    {review.expectation_mood === "fear" && "😱"}
+                    {review.expectation_mood === "curiosity" && "🤔"}
+                    {review.expectation_mood === "dread" && "😩"}
+                    {review.expectation_mood === "surprise" && "😲"}
+                    {review.expectation_mood === "boredom" && "😴"}
+                  </span>
+                  <span class="mood-name">
+                    {review.expectation_mood === "excitement" && "Emoción"}
+                    {review.expectation_mood === "fear" && "Miedo"}
+                    {review.expectation_mood === "curiosity" && "Curiosidad"}
+                    {review.expectation_mood === "dread" && "Horror"}
+                    {review.expectation_mood === "surprise" && "Sorpresa"}
+                    {review.expectation_mood === "boredom" && "Aburrimiento"}
+                  </span>
+                </div>
               </div>
+            )}
+
+            {review.final_mood && (
+              <div class="mood-item">
+                <span class="mood-label">Después de verla</span>
+                <div class="mood-badge final">
+                  <span class="mood-emoji">
+                    {review.final_mood === "excitement" && "🎉"}
+                    {review.final_mood === "fear" && "😱"}
+                    {review.final_mood === "curiosity" && "🤔"}
+                    {review.final_mood === "dread" && "😩"}
+                    {review.final_mood === "surprise" && "😲"}
+                    {review.final_mood === "boredom" && "😴"}
+                    {review.final_mood === "satisfaction" && "😌"}
+                    {review.final_mood === "disappointment" && "😞"}
+                    {review.final_mood === "love" && "😍"}
+                    {review.final_mood === "hate" && "🤬"}
+                  </span>
+                  <span class="mood-name">
+                    {review.final_mood === "excitement" && "Emoción"}
+                    {review.final_mood === "fear" && "Miedo"}
+                    {review.final_mood === "curiosity" && "Curiosidad"}
+                    {review.final_mood === "dread" && "Horror"}
+                    {review.final_mood === "surprise" && "Sorpresa"}
+                    {review.final_mood === "boredom" && "Aburrimiento"}
+                    {review.final_mood === "satisfaction" && "Satisfacción"}
+                    {review.final_mood === "disappointment" && "Decepción"}
+                    {review.final_mood === "love" && "Amor"}
+                    {review.final_mood === "hate" && "Odio"}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Preview del texto si no hay video */}
+          {!review.youtube_id && review.review && (
+            <div class="text-preview">
+              <Fragment set:html={review.review.substring(0, 300) + "..."} />
             </div>
           )}
-        </div>
 
-        {/* Preview del texto si no hay video */}
-        {!review.youtube_id && review.review && (
-          <div class="text-preview">
-            <Fragment set:html={review.review.substring(0, 300) + '...'} />
-          </div>
-        )}
-
-        <footer class="review-footer">
-          <a href={`/reviews/${review.id}`} class="view-full-review">
-            {review.youtube_id ? '▶️ Ver video crítica completa' : '📝 Leer crítica completa'} →
-          </a>
-        </footer>
-      </article>
-    ))}
+          <footer class="review-footer">
+            <a href={`/reviews/${review.id}`} class="view-full-review">
+              {review.youtube_id
+                ? "▶️ Ver video crítica completa"
+                : "📝 Leer crítica completa"}{" "}
+              →
+            </a>
+          </footer>
+        </article>
+      ))
+    }
   </main>
 </Layout>
 
 <script>
   // Importar lite-youtube dinámicamente solo en el cliente
-  if (typeof window !== 'undefined') {
-    import('@justinribeiro/lite-youtube');
+  if (typeof window !== "undefined") {
+    import("@justinribeiro/lite-youtube");
   }
 </script>
 
@@ -167,7 +181,11 @@ const movie = reviews[0]; // Información básica de la película
       linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
       linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
-    background-position: 0 0, 0 0, 100% 0, 0 100%;
+    background-position:
+      0 0,
+      0 0,
+      100% 0,
+      0 100%;
     background-size: 100% 100%;
     background-repeat: no-repeat;
     margin-bottom: 2rem;
@@ -270,45 +288,52 @@ const movie = reviews[0]; // Información básica de la película
     margin: 1rem 0;
     border-radius: 8px;
     overflow: hidden;
-    max-height: 400px;
-    z-index: 100;
     width: 100%;
-    max-width: 100%;
+    /* Mantener relación de aspecto 16:9 */
+    aspect-ratio: 16 / 9;
+    max-height: 400px;
+  }
+
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
   }
 
   lite-youtube {
     background-color: #000;
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
     display: block;
-    contain: layout size style;
+    contain: content;
     background-position: center center;
     background-size: cover;
     cursor: pointer;
-    max-width: 100%;
-    z-index: 100;
-    width: 100% !important;
-    height: auto !important;
+    z-index: 1;
   }
 
-  /* Cuando el video se activa (iframe cargado), elevarlo aún más */
+  lite-youtube::before {
+    content: "";
+    display: block;
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 ratio */
+  }
+
   lite-youtube.lyt-activated {
-    z-index: 200;
+    z-index: 2;
   }
 
   lite-youtube iframe {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    z-index: 200;
-  }
-
-  lite-youtube::before {
-    content: '';
-    display: block;
-    position: relative;
-    padding-bottom: 56.25%; /* 16:9 */
+    top: 0;
+    left: 0;
+    border: 0;
+    z-index: 2;
   }
 
   .video-overlay {
@@ -318,12 +343,20 @@ const movie = reviews[0]; // Información básica de la película
     transform: translate(-50%, -50%);
     background: rgba(0, 0, 0, 0.7);
     color: white;
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 8px;
     font-family: "Sigmar", sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     pointer-events: none;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    z-index: 3;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Ocultar overlay cuando el video se activa */
+  lite-youtube.lyt-activated + .video-overlay {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .mood-comparison {
@@ -423,7 +456,8 @@ const movie = reviews[0]; // Información básica de la película
   }
 
   @keyframes flicker {
-    0%, 100% {
+    0%,
+    100% {
       filter: brightness(0.8) contrast(0.9);
     }
     50% {
@@ -475,6 +509,11 @@ const movie = reviews[0]; // Información básica de la película
     .mood-emoji {
       font-size: 1.5rem;
     }
+
+    .video-overlay {
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+    }
   }
 
   @media screen and (max-width: 480px) {
@@ -500,9 +539,30 @@ const movie = reviews[0]; // Información básica de la película
       gap: 0.75rem;
     }
 
+    .video-preview {
+      max-height: 250px;
+    }
+
     .video-overlay {
-      font-size: 1rem;
-      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+    }
+  }
+
+  /* Fallback para navegadores que no soportan aspect-ratio */
+  @supports not (aspect-ratio: 16 / 9) {
+    .video-preview {
+      height: 0;
+      padding-bottom: 56.25%;
+      position: relative;
+    }
+
+    .video-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
     }
   }
 </style>
