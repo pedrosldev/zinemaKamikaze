@@ -151,9 +151,11 @@ const movie = reviews[0]; // Información básica de la película
 
           <footer class="review-footer">
             <a href={`/reviews/${review.id}`} class="view-full-review">
-              {review.youtube_id
-                ? "▶️ Ver video crítica completa"
-                : "📝 Leer crítica completa"}{" "}
+              {review.youtube_id && review.review
+                ? "🎬 Ver crítica completa (video + texto)"
+                : review.youtube_id
+                  ? "▶️ Ver video crítica completa"
+                  : "📝 Leer crítica completa"}{" "}
               →
             </a>
           </footer>
