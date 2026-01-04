@@ -1194,6 +1194,13 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    // Solo ejecutar si no estamos en periodo de visionado
+    const tokenContainer = document.getElementById("tokenContainer");
+    if (!tokenContainer) {
+      console.log("ℹ️ Modo viewing period activo - script de tokens omitido");
+      return;
+    }
+
     const tokenInput = document.getElementById(
       "tokenInput"
     ) as HTMLInputElement;
@@ -1203,9 +1210,6 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
     const tokenMessage = document.getElementById(
       "tokenMessage"
     ) as HTMLParagraphElement;
-    const tokenContainer = document.getElementById(
-      "tokenContainer"
-    ) as HTMLDivElement;
     const btnLeer = document.getElementById("btnLeer") as HTMLButtonElement;
     const contenidoDiv = document.getElementById("contenido") as HTMLDivElement;
     const surpriseDiv = document.querySelector(".surprise") as HTMLDivElement;
@@ -1218,7 +1222,6 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
       !tokenInput ||
       !validateTokenBtn ||
       !tokenMessage ||
-      !tokenContainer ||
       !btnLeer ||
       !contenidoDiv ||
       !surpriseDiv
