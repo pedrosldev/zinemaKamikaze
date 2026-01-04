@@ -25,6 +25,9 @@ export const POST: APIRoute = async ({ request }) => {
       selected_by = tokenData?.used_by || 'Anónimo';
     }
 
+    // Establecer fecha actual si no se proporciona
+    const watchedDate = body.watched_date || new Date().toISOString().split('T')[0];
+
     await insertReview(
       body.film_id, 
       body.title, 
@@ -36,7 +39,7 @@ export const POST: APIRoute = async ({ request }) => {
       null,  // expectation_mood
       selected_by,  // selected_by
       body.youtube_id || null,  // youtube_id
-      body.watched_date || null  // watched_date
+      watchedDate  // watched_date (automático si no se proporciona)
     );
 
     return new Response(
