@@ -107,23 +107,45 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
         </header>
 
         <!-- Contenedor unificado con fondo de celuloide -->
+        <!-- Pestañas (si hay al menos video o texto) -->
+        {(review.youtube_id || review.review) && (
+          <div class="tabs-container">
+            <button class="tab-btn active" data-tab="text" onclick="switchTab('text')">
+              📝 Reseña Escrita
+            </button>
+            <button class="tab-btn" data-tab="video" onclick="switchTab('video')">
+              🎥 Video Reseña
+            </button>
+          </div>
+        )}
+
         <div class="credits-container">
           <!-- Video crítica (si existe youtube_id) -->
-          {review.youtube_id && (
-            <section class="video-review">
+          <section class="video-review tab-content" id="video-content" style={(review.review || !review.youtube_id) ? "display: none;" : ""}>
+            {review.youtube_id ? (
               <lite-youtube 
                 videoid={review.youtube_id}
                 style={`background-image: url('https://i.ytimg.com/vi/${review.youtube_id}/hqdefault.jpg');`}
               ></lite-youtube>
-            </section>
-          )}
+            ) : (
+              <div class="no-content-message">
+                <p>🎥</p>
+                <p>Esta reseña no tiene video review</p>
+              </div>
+            )}
+          </section>
 
           <!-- Texto de la review (si existe) -->
-          {review.review && (
-            <div id="credits-text" class="credits-text">
-              {review.review.split('\n').map((line: string) => <p>{line}</p>)}
-            </div>
-          )}
+          <div id="credits-text" class="credits-text tab-content" style="display: block;">
+            {review.review ? (
+              review.review.split('\n').map((line: string) => <p>{line}</p>)
+            ) : (
+              <div class="no-content-message static">
+                <p>📝</p>
+                <p>Esta reseña no tiene texto escrito</p>
+              </div>
+            )}
+          </div>
         </div>
 
         {(review.review || review.youtube_id) && (
@@ -157,6 +179,23 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
       ? '/images/play-square-svgrepo-com.svg'
       : '/images/pause-square-svgrepo-com.svg';
   }
+
+  function switchTab(tab) {
+    // Actualizar botones activos
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+    // Mostrar/ocultar contenido
+    if (tab === 'text') {
+      document.getElementById('credits-text').style.display = 'block';
+      document.getElementById('video-content').style.display = 'none';
+    } else {
+      document.getElementById('credits-text').style.display = 'none';
+      document.getElementById('video-content').style.display = 'block';
+    }
+  }
 </script>
       </>
     ) : (
@@ -177,6 +216,91 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
   .multiple-reviews-link:hover {
     background: rgba(245, 215, 66, 0.3);
     border-color: #c9be9c;
+  }
+
+  /* Estilos de pestañas */
+  .tabs-container {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    background-color: #0a0a0a;
+    padding: 0.5rem 0 0;
+    border-top: 2px solid rgba(107, 63, 47, 0.5);
+  }
+
+  .tab-btn {
+    font-family: "Sigmar", sans-serif;
+    background: rgba(26, 84, 250, 0.3);
+    color: #c9be9c;
+    border: none;
+    border-top: 3px solid transparent;
+    border-left: 1px solid rgba(107, 63, 47, 0.5);
+    border-right: 1px solid rgba(107, 63, 47, 0.5);
+    padding: 0.5rem 1.5rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    filter: brightness(0.7);
+  }
+
+  .tab-btn:first-child {
+    border-left: none;
+  }
+
+  .tab-btn:last-child {
+    border-right: none;
+  }
+
+  .tab-btn:hover {
+    background: rgba(26, 84, 250, 0.5);
+    color: #f5d742;
+    filter: brightness(0.9);
+  }
+
+  .tab-btn.active {
+    background: rgba(26, 84, 250, 0.8);
+    color: #f5d742;
+    border-top-color: #f5d742;
+    filter: brightness(1);
+    box-shadow: 0 -3px 10px rgba(245, 215, 66, 0.3);
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  /* Mensaje cuando no hay contenido */
+  .no-content-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 40dvh;
+    color: #f5d742;
+    font-family: "Sigmar", sans-serif;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .no-content-message p:first-child {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+    filter: grayscale(1);
+  }
+
+  .no-content-message p:last-child {
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    text-shadow: 
+      2px 2px 4px rgba(0, 0, 0, 0.8),
+      -1px -1px 2px rgba(0, 0, 0, 0.6),
+      0 0 10px rgba(245, 215, 66, 0.3);
+  }
+
+  .no-content-message.static {
+    animation: none;
   }
 
   /* Estilos para el video dentro del contenedor de celuloide */
