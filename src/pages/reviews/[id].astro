@@ -1,9 +1,10 @@
 ---
-import { getReviewById } from "../../lib/db";
+import { getReviewById, getReviewCountByFilmId } from "../../lib/db";
 import Layout from "../../layouts/Layout.astro";
 export const prerender = false; // Consultar
 // const { params } = Astro;
 const review = await getReviewById(Number(Astro.params.id));
+const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
 ---
 
 <Layout>
@@ -52,7 +53,12 @@ const review = await getReviewById(Number(Astro.params.id));
                 {review.title}{" "}
                 {review.year && review.year !== 0 ? `(${review.year})` : ""}
               </h1>
-              <div style="display: flex; gap: 1rem; justify-content: center;">
+              <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                {reviewCount > 1 && (
+                  <a href={`/movies/${review.film_id}`} class="multiple-reviews-link">
+                    📽️ Ver los {reviewCount} visionados
+                  </a>
+                )}
                 <a href={`/vibe/${review.vibe}`}>Volver a {review.vibe}</a>
                 <a href="/" class="back-link">
                   Volver al listado
@@ -100,21 +106,43 @@ const review = await getReviewById(Number(Astro.params.id));
           </div>
         </header>
 
-        <!-- Contenedor de créditos -->
+        <!-- Contenedor unificado con fondo de celuloide -->
         <div class="credits-container">
-  <div id="credits-text" class="credits-text">
-    {review.review.split('\n').map((line: string) => <p>{line}</p>)}
-  </div>
-</div>
+          <!-- Video crítica (si existe youtube_id) -->
+          {review.youtube_id && (
+            <section class="video-review">
+              <lite-youtube 
+                videoid={review.youtube_id}
+                style={`background-image: url('https://i.ytimg.com/vi/${review.youtube_id}/hqdefault.jpg');`}
+              ></lite-youtube>
+            </section>
+          )}
 
-<div class="toggle-container" style="display: flex; gap: 1rem; justify-content: center;">
-  <img
-    id="toggle-btn"
-    src="/images/pause-square-svgrepo-com.svg"
-    alt="Play/Pause"
-    onclick="toggleAnimation()"
-  />
-</div>
+          <!-- Texto de la review (si existe) -->
+          {review.review && (
+            <div id="credits-text" class="credits-text">
+              {review.review.split('\n').map((line: string) => <p>{line}</p>)}
+            </div>
+          )}
+        </div>
+
+        {(review.review || review.youtube_id) && (
+          <div class="toggle-container" style="display: flex; gap: 1rem; justify-content: center;">
+            <img
+              id="toggle-btn"
+              src="/images/pause-square-svgrepo-com.svg"
+              alt="Play/Pause"
+              onclick="toggleAnimation()"
+            />
+          </div>
+        )}
+
+<script>
+  // Importar lite-youtube dinámicamente solo en el cliente
+  if (typeof window !== 'undefined') {
+    import('@justinribeiro/lite-youtube');
+  }
+</script>
 
 <script is:inline>
   let isPaused = false;
@@ -138,6 +166,47 @@ const review = await getReviewById(Number(Astro.params.id));
 </Layout>
 
 <style>
+  .multiple-reviews-link {
+    background: rgba(245, 215, 66, 0.2);
+    border: 2px solid #f5d742;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+
+  .multiple-reviews-link:hover {
+    background: rgba(245, 215, 66, 0.3);
+    border-color: #c9be9c;
+  }
+
+  /* Estilos para el video dentro del contenedor de celuloide */
+  .video-review {
+    width: 100%;
+    max-width: 900px;
+    margin: 2rem auto 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  lite-youtube {
+    background-color: #000;
+    position: relative;
+    display: block;
+    contain: content;
+    background-position: center center;
+    background-size: cover;
+    cursor: pointer;
+    max-width: 100%;
+    border-radius: 4px;
+  }
+
+  lite-youtube::before {
+    content: '';
+    display: block;
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  }
+
   header {
     background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
@@ -273,12 +342,6 @@ const review = await getReviewById(Number(Astro.params.id));
   }
 
   .credits-container {
-    /* height: 70dvh;
-    overflow: hidden;
-    position: relative;
-    background-color: black;
-    color: white;
-    cursor: pointer;  */
     height: 70dvh;
     overflow: hidden;
     position: relative;
@@ -287,10 +350,14 @@ const review = await getReviewById(Number(Astro.params.id));
     cursor: pointer; 
     background: url("/images/old_celluloid.png") repeat;
     background-size: cover;
-    pointer-events: none;
     mix-blend-mode: lighten;
-    opacity: 0.9; 
- 
+    opacity: 0.9;
+    /* Permitir scroll si hay video */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
   }
 
   .credits-text {
@@ -298,6 +365,7 @@ const review = await getReviewById(Number(Astro.params.id));
     flex-direction: column;
     animation: scroll-up 20s linear infinite;
     animation-play-state: running;
+    width: 100%;
   }
 
   .toggle-container {
