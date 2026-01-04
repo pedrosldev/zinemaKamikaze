@@ -106,7 +106,6 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
           </div>
         </header>
 
-        <!-- Contenedor unificado con fondo de celuloide -->
         <!-- Pestañas (si hay al menos video o texto) -->
         {(review.youtube_id || review.review) && (
           <div class="tabs-container">
@@ -116,6 +115,17 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
             <button class="tab-btn" data-tab="video" onclick="switchTab('video')">
               🎥 Video Reseña
             </button>
+          </div>
+        )}
+
+        {(review.review || review.youtube_id) && (
+          <div class="toggle-container" style="display: flex; gap: 1rem; justify-content: center;">
+            <img
+              id="toggle-btn"
+              src="/images/pause-square-svgrepo-com.svg"
+              alt="Play/Pause"
+              onclick="toggleAnimation()"
+            />
           </div>
         )}
 
@@ -148,16 +158,11 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
           </div>
         </div>
 
-        {(review.review || review.youtube_id) && (
-          <div class="toggle-container" style="display: flex; gap: 1rem; justify-content: center;">
-            <img
-              id="toggle-btn"
-              src="/images/pause-square-svgrepo-com.svg"
-              alt="Play/Pause"
-              onclick="toggleAnimation()"
-            />
+        <footer class="review-footer">
+          <div class="footer-content">
+            <p>ZINEMA KAMIKAZE © 2025</p>
           </div>
-        )}
+        </footer>
 
 <script>
   // Importar lite-youtube dinámicamente solo en el cliente
@@ -181,6 +186,9 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
   }
 
   function switchTab(tab) {
+    const toggleContainer = document.querySelector('.toggle-container');
+    const creditsContainer = document.querySelector('.credits-container');
+    
     // Actualizar botones activos
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.classList.remove('active');
@@ -191,9 +199,17 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
     if (tab === 'text') {
       document.getElementById('credits-text').style.display = 'block';
       document.getElementById('video-content').style.display = 'none';
+      // Mostrar controles play/pause solo para texto
+      if (toggleContainer) toggleContainer.style.display = 'flex';
+      // Restaurar altura original del contenedor
+      if (creditsContainer) creditsContainer.style.height = '60dvh';
     } else {
       document.getElementById('credits-text').style.display = 'none';
       document.getElementById('video-content').style.display = 'block';
+      // Ocultar controles play/pause para video
+      if (toggleContainer) toggleContainer.style.display = 'none';
+      // Expandir el contenedor para ocupar el espacio de los controles
+      if (creditsContainer) creditsContainer.style.height = '68dvh';
     }
   }
 </script>
@@ -335,7 +351,7 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
     background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
     animation: flicker 3s infinite;
-    height: 20dvh;
+    height: 18dvh;
     padding: 1rem;
         background-image:
                 /* Borde izquierdo */
@@ -466,7 +482,7 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
   }
 
   .credits-container {
-    height: 70dvh;
+    height: 60dvh;
     overflow: hidden;
     position: relative;
     background-color: black;
@@ -497,7 +513,7 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
        background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
     animation: flicker 3s infinite;
-    height: 20dvh;
+    height: 8dvh;
         background-image:
                 /* Borde izquierdo */
       linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
@@ -516,6 +532,45 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
     background-size: 100% 100%;
     background-repeat: no-repeat;
     box-sizing: border-box;
+  }
+
+  img {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+  }
+
+  /* Footer */
+  .review-footer {
+    background-color: #1a54fa;
+    filter: brightness(0.8) contrast(0.9);
+    animation: flicker 3s infinite;
+    padding: 1rem;
+    background-image:
+      linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
+      linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
+    background-position: 0 0, 0 0, 100% 0, 0 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    height: 8dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .footer-content {
+    text-align: center;
+  }
+
+  .footer-content p {
+    font-family: "Sigmar", sans-serif;
+    color: #c9be9c;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    margin: 0;
   }
 
   @keyframes scroll-up {
