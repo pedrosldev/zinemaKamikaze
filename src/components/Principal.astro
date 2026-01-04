@@ -1309,10 +1309,14 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
 
     // Función para generar la película
     function generateMovie() {
+      console.log("🎬🎬🎬 GENERATEMOVIE EJECUTÁNDOSE 🎬🎬🎬");
+      console.log("🎬 Token validado guardado:", validatedToken);
+      
       // Mostrar el botón "Y LA ELEGIDA ES..."
       if (btnLeer) {
         try {
           btnLeer.style.display = "block";
+          console.log("✅ Botón mostrado");
         } catch (e) {
           console.error("❌ Error mostrando botón:", e);
         }
@@ -1337,14 +1341,18 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
         controller.abort();
       }, 15000);
 
+      console.log("🌐 Iniciando fetch de /api/titles.json");
+
       fetch("/api/titles.json", { signal: controller.signal })
         .then((response) => {
+          console.log("✅ Respuesta recibida de /api/titles.json");
           clearTimeout(timeoutId);
           if (!response.ok)
             throw new Error("Error al cargar el archivo: " + response.status);
           return response.json();
         })
         .then((data) => {
+          console.log("✅ JSON parseado, datos recibidos:", Array.isArray(data));
           if (!Array.isArray(data))
             throw new Error("El JSON no tiene el formato correcto.");
 
@@ -1357,12 +1365,16 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
           const review = null;
           const vibe = null;
           const title = pelicula.films[film].title;
+          
+          console.log("🎥 Película seleccionada:", title, "ID:", filmId);
 
           // Timeout para el registro de la review (10 segundos)
           const reviewController = new AbortController();
           const reviewTimeoutId = setTimeout(function() {
             reviewController.abort();
           }, 10000);
+
+          console.log("💾 Registrando review en BD...");
 
           fetch("/api/register-review", {
             method: "POST",
@@ -1549,17 +1561,26 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
           }
 
           // Generar la película directamente después de una breve pausa
+          console.log("🚀 PUNTO CRÍTICO: Voy a llamar a generateMovie()");
+          console.log("🚀 validatedToken tiene valor:", validatedToken);
+          console.log("🚀 generateMovie existe:", typeof generateMovie);
+          
           try {
             setTimeout(function() {
+              console.log("🚀 DENTRO DEL SETTIMEOUT - Ejecutando generateMovie()");
               try {
                 generateMovie();
+                console.log("🚀 generateMovie() ejecutado sin errores");
               } catch (genError) {
                 console.error("❌ Error ejecutando generateMovie:", genError);
+                console.error("❌ Stack trace:", genError.stack);
                 alert("Error generando película. Por favor recarga la página.");
               }
             }, 500);
+            console.log("🚀 setTimeout programado correctamente");
           } catch (timeoutError) {
             console.error("❌ Error programando timeout:", timeoutError);
+            console.log("🚀 Fallback: ejecutando generateMovie() directamente");
             generateMovie();
           }
         } else {

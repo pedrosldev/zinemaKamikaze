@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { claimToken } from '../../lib/db';
+import { pool } from '../../lib/db';
 
 export const prerender = false;
 
@@ -15,10 +15,19 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     try {
-        // Una sola operación atómica: valida Y reclama el token
-        const claimed = await claimToken(token, selected_by || 'Anónimo');
+        // PRIMERO: Verificar que el token existe y NO ha sido usado
+        const [rows]: any = await pool.query(
+            'SELECT * FROM trigger_tokens WHERE token = ? AND is_active = true',
+            [token]
+        );
 
-        if (claimed) {
+        if (rows.length > 0) {
+            // Token válido - Guardar el selected_by pero NO marcar como usado todavía
+            await pool.execute(
+                'UPDATE trigger_tokens SET used_by = ? WHERE token = ?',
+                [selected_by || 'Anónimo', token]
+            );
+            
             return new Response(
                 JSON.stringify({
                     valid: true,
