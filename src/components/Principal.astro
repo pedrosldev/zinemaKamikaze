@@ -1234,7 +1234,6 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
     // Solo ejecutar si no estamos en periodo de visionado
     const tokenContainer = document.getElementById("tokenContainer");
     if (!tokenContainer) {
-      console.log("ℹ️ Modo viewing period activo - script de tokens omitido");
       return;
     }
 
@@ -1254,7 +1253,6 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
     // Variable para guardar el token validado
     let validatedToken: string | null = null;
 
-    // Verificar que todos los elementos existen
     if (
       !tokenInput ||
       !validateTokenBtn ||
@@ -1264,19 +1262,84 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
       !surpriseDiv
     ) {
       console.error("❌ Error: No se encontraron algunos elementos del DOM");
+      const missing = [];
+      if (!tokenInput) missing.push("tokenInput");
+      if (!validateTokenBtn) missing.push("validateTokenBtn");
+      if (!tokenMessage) missing.push("tokenMessage");
+      if (!btnLeer) missing.push("btnLeer");
+      if (!contenidoDiv) missing.push("contenidoDiv");
+      if (!surpriseDiv) missing.push("surpriseDiv");
+      console.error("❌ Elementos faltantes:", missing.join(", "));
       return;
+    }
+
+    // Función para verificar la conexión
+    async function checkConnection() {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(function() {
+        controller.abort();
+      }, 3000); // 3 segundos para verificar conexión
+      
+      try {
+        // Intenta hacer fetch a un endpoint ligero
+        const response = await fetch("/api/titles.json?test=1", {
+          method: "HEAD", // Solo headers, no descarga todo el JSON
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (response.ok) {
+          return true;
+        } else {
+          console.warn("⚠️ Respuesta del servidor no OK:", response.status);
+          return false;
+        }
+      } catch (error) {
+        clearTimeout(timeoutId);
+        
+        if (error.name === 'AbortError') {
+          console.error("❌ Timeout verificando conexión (>3s)");
+        } else {
+          console.error("❌ Error verificando conexión:", error);
+        }
+        return false;
+      }
     }
 
     // Función para generar la película
     function generateMovie() {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-      });
+      // Mostrar el botón "Y LA ELEGIDA ES..."
+      if (btnLeer) {
+        try {
+          btnLeer.style.display = "block";
+        } catch (e) {
+          console.error("❌ Error mostrando botón:", e);
+        }
+      }
 
-      fetch("/api/titles.json")
+      // Confetti opcional - no debe detener la ejecución si falla
+      try {
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+          });
+        }
+      } catch (confettiError) {
+        // Ignorar errores de confetti
+      }
+
+      // Crear AbortController para timeout (15 segundos)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(function() {
+        controller.abort();
+      }, 15000);
+
+      fetch("/api/titles.json", { signal: controller.signal })
         .then((response) => {
+          clearTimeout(timeoutId);
           if (!response.ok)
             throw new Error("Error al cargar el archivo: " + response.status);
           return response.json();
@@ -1294,7 +1357,12 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
           const review = null;
           const vibe = null;
           const title = pelicula.films[film].title;
-          console.log(pelicula.films[film].id);
+
+          // Timeout para el registro de la review (10 segundos)
+          const reviewController = new AbortController();
+          const reviewTimeoutId = setTimeout(function() {
+            reviewController.abort();
+          }, 10000);
 
           fetch("/api/register-review", {
             method: "POST",
@@ -1310,8 +1378,10 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
               poster: poster,
               token: validatedToken,  // Enviar el token para asociar el used_by
             }),
+            signal: reviewController.signal
           })
             .then((response) => {
+              clearTimeout(reviewTimeoutId);
               if (!response.ok) {
                 throw new Error(
                   "Error al guardar la review en la base de datos."
@@ -1320,34 +1390,100 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
               return response.json();
             })
             .then((data) => {
-              console.log("✅ Review guardada:", data.message);
+              // Review guardada exitosamente
             })
             .catch((error) => {
-              console.error("❌ Error al guardar la review:", error.message);
+              clearTimeout(reviewTimeoutId);
+              if (error.name === 'AbortError') {
+                console.error("❌ Timeout guardando review. El token puede haberse consumido.");
+                if (contenidoDiv) {
+                  contenidoDiv.innerHTML = "<strong style='color: #ff6b6b;'>Error: Conexión lenta. Verifica si la película se guardó.</strong>";
+                }
+              } else {
+                console.error("❌ Error al guardar la review:", error.message);
+              }
             });
 
-          if (!poster) {
-            surpriseDiv!.style.backgroundImage = `url(/images/noImg.png)`;
-            surpriseDiv!.style.backgroundSize = "100% 100%";
-            surpriseDiv!.style.backgroundPosition = "center";
-            surpriseDiv!.style.backgroundRepeat = "no-repeat";
-            surpriseDiv!.style.filter = "blur(0px)";
-          } else {
-            const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
-            surpriseDiv!.style.backgroundImage = `url(${posterUrl})`;
-            surpriseDiv!.style.backgroundSize = "100% 100%";
-            surpriseDiv!.style.backgroundPosition = "center";
-            surpriseDiv!.style.backgroundRepeat = "no-repeat";
+          // Limpiar el contenido interno del surpriseDiv antes de mostrar el poster
+          try {
+            if (surpriseDiv) {
+              surpriseDiv.innerHTML = "";
+            }
+          } catch (e) {
+            console.error("❌ Error limpiando surpriseDiv:", e);
           }
 
-          contenidoDiv!.innerHTML = `<strong>${title} (${year})</strong>`;
+          // Aplicar el poster
+          try {
+            if (!poster) {
+              if (surpriseDiv) {
+                surpriseDiv.style.backgroundImage = "url(/images/noImg.png)";
+                surpriseDiv.style.backgroundSize = "100% 100%";
+                surpriseDiv.style.backgroundPosition = "center";
+                surpriseDiv.style.backgroundRepeat = "no-repeat";
+                surpriseDiv.style.filter = "blur(0px)";
+              }
+            } else {
+              const posterUrl = "https://image.tmdb.org/t/p/w500" + poster;
+              if (surpriseDiv) {
+                surpriseDiv.style.backgroundImage = "url(" + posterUrl + ")";
+                surpriseDiv.style.backgroundSize = "100% 100%";
+                surpriseDiv.style.backgroundPosition = "center";
+                surpriseDiv.style.backgroundRepeat = "no-repeat";
+              }
+            }
+          } catch (e) {
+            console.error("❌ Error aplicando poster:", e);
+          }
 
-          setTimeout(() => {
-            window.location.reload();
-          }, 3000);
+          // Actualizar contenido
+          try {
+            if (contenidoDiv) {
+              contenidoDiv.innerHTML = "<strong>" + title + " (" + year + ")</strong>";
+            }
+          } catch (e) {
+            console.error("❌ Error actualizando contenido:", e);
+          }
+
+          // Recargar página con try-catch
+          try {
+            setTimeout(function() {
+              try {
+                window.location.reload();
+              } catch (reloadError) {
+                console.error("❌ Error recargando:", reloadError);
+                window.location.href = window.location.href;
+              }
+            }, 3000);
+          } catch (timeoutError) {
+            console.error("❌ Error en setTimeout de recarga:", timeoutError);
+          }
         })
         .catch((error) => {
-          contenidoDiv!.textContent = "Error: " + error.message;
+          clearTimeout(timeoutId);
+          console.error("❌ Error en generateMovie:", error);
+          
+          let errorMessage = "Error desconocido";
+          if (error.name === 'AbortError') {
+            errorMessage = "⏱️ La conexión está muy lenta. Por favor, intenta de nuevo.";
+            console.error("❌ Timeout: La petición tardó más de 15 segundos");
+          } else if (error.message) {
+            errorMessage = "Error: " + error.message;
+          }
+          
+          if (contenidoDiv) {
+            try {
+              contenidoDiv.innerHTML = "<strong style='color: #ff6b6b;'>" + errorMessage + "</strong>";
+            } catch (e) {
+              console.error("❌ No se pudo mostrar el error en contenidoDiv:", e);
+            }
+          }
+          
+          // Reactivar el botón de validación si existe
+          if (validateTokenBtn) {
+            validateTokenBtn.disabled = false;
+            validateTokenBtn.textContent = "VALIDAR CÓDIGO";
+          }
         });
     }
 
@@ -1355,9 +1491,23 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
     async function validateToken(token: string) {
       try {
         validateTokenBtn!.disabled = true;
-        validateTokenBtn!.textContent = "VALIDANDO...";
+        validateTokenBtn!.textContent = "VERIFICANDO CONEXIÓN...";
         tokenMessage!.textContent = "";
         tokenMessage!.className = "token-message";
+
+        // PRIMERO: Verificar que hay buena conexión
+        const hasGoodConnection = await checkConnection();
+        
+        if (!hasGoodConnection) {
+          tokenMessage!.textContent = "⚠️ TU CONEXIÓN ES LENTA. Por favor, conéctate a mejor WiFi antes de validar el código para evitar perderlo.";
+          tokenMessage!.className = "token-message token-error";
+          validateTokenBtn!.disabled = false;
+          validateTokenBtn!.textContent = "VALIDAR CÓDIGO";
+          return; // NO continuar si la conexión es mala
+        }
+
+        // Si llegamos aquí, la conexión es buena
+        validateTokenBtn!.textContent = "VALIDANDO CÓDIGO...";
 
         // Obtener el nombre/usuario opcional
         const selectedByInput = document.getElementById("selectedByInput") as HTMLInputElement;
@@ -1386,16 +1536,32 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
           tokenContainer!.style.display = "none";
 
           // Efecto de confeti para validación exitosa
-          confetti({
-            particleCount: 50,
-            spread: 70,
-            origin: { y: 0.6 },
-          });
+          try {
+            if (typeof confetti === 'function') {
+              confetti({
+                particleCount: 50,
+                spread: 70,
+                origin: { y: 0.6 },
+              });
+            }
+          } catch (confettiError) {
+            // Ignorar errores de confetti
+          }
 
           // Generar la película directamente después de una breve pausa
-          setTimeout(() => {
+          try {
+            setTimeout(function() {
+              try {
+                generateMovie();
+              } catch (genError) {
+                console.error("❌ Error ejecutando generateMovie:", genError);
+                alert("Error generando película. Por favor recarga la página.");
+              }
+            }, 500);
+          } catch (timeoutError) {
+            console.error("❌ Error programando timeout:", timeoutError);
             generateMovie();
-          }, 500);
+          }
         } else {
           // Token inválido
           tokenMessage!.textContent =
@@ -1403,7 +1569,7 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
           tokenMessage!.className = "token-message token-error";
         }
       } catch (error) {
-        console.error("Error al validar el token:", error);
+        console.error("❌ Error al validar el token:", error);
         tokenMessage!.textContent = "ERROR DE CONEXIÓN. Inténtalo más tarde.";
         tokenMessage!.className = "token-message token-error";
       } finally {
