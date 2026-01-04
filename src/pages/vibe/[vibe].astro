@@ -4,7 +4,25 @@ import Layout from "../../layouts/Layout.astro";
 export const prerender = false;
 
 const vibe = Astro.params.vibe;
-const reviews = vibe ? await getReviewsByVibe(vibe) : [];
+const allReviews = vibe ? await getReviewsByVibe(vibe) : [];
+
+// Agrupar películas por film_id y contar las reviews
+const reviewsMap = new Map();
+allReviews.forEach(review => {
+  if (!reviewsMap.has(review.film_id)) {
+    reviewsMap.set(review.film_id, {
+      ...review,
+      count: 1,
+      reviewIds: [review.id]
+    });
+  } else {
+    const existing = reviewsMap.get(review.film_id);
+    existing.count++;
+    existing.reviewIds.push(review.id);
+  }
+});
+
+const reviews = Array.from(reviewsMap.values());
 ---
 
 <head>
@@ -56,6 +74,11 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
                   <span class="review-year">
                     {review.year && review.year !== 0 ? `(${review.year})` : ""}
                   </span>
+                  {review.count > 1 && (
+                    <span class="review-count" title={`Revisada ${review.count} veces con este vibe`}>
+                      ×{review.count}
+                    </span>
+                  )}
                 </a>
               </li>
             ))
@@ -270,6 +293,19 @@ const reviews = vibe ? await getReviewsByVibe(vibe) : [];
   .review-year {
     color: #f5d742;
     font-size: 0.9rem;
+  }
+
+  .review-count {
+    display: inline-block;
+    margin-left: 10px;
+    background-color: #f5d742;
+    color: #1c3b70;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    vertical-align: middle;
+    cursor: help;
   }
 
   .back-link {
