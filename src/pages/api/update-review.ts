@@ -22,12 +22,14 @@ export const POST: APIRoute = async ({ request }) => {
             body.film_id,
             body.title,
             body.year,
-            body.review,
+            body.review || null,
             body.vibe,
             body.poster,
             false, // viewing_period
             body.expectation_mood || null, // expectation_mood
-            body.final_mood || null // final_mood
+            body.final_mood || null, // final_mood
+            body.youtube_id || null, // youtube_id
+            body.watched_date || null // watched_date
         );
 
         return new Response(

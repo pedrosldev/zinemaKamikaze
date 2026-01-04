@@ -19,14 +19,20 @@ interface ReviewRow extends RowDataPacket {
     film_id: number;
     poster: string;
     description: string;
+    youtube_id?: string;
+    review?: string;
+    expectation_mood?: string;
+    final_mood?: string;
+    selected_by?: string;
+    watched_date?: string;
   }
   interface VibeRow extends RowDataPacket {
     vibe: string;
   }
-  export async function insertReview(film_id: number, title: string, year: number, review: string, vibe: string, poster: string, viewing_period: boolean = true, expectation_mood: string | null = null, selected_by: string | null = null  ) {
+  export async function insertReview(film_id: number, title: string, year: number, review: string | null, vibe: string, poster: string, viewing_period: boolean = true, expectation_mood: string | null = null, selected_by: string | null = null, youtube_id: string | null = null, watched_date: string | null = null  ) {
     const [result] = await pool.execute(
-      'INSERT INTO test_reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [film_id, title, year, review, vibe, poster, viewing_period, expectation_mood, selected_by]
+      'INSERT INTO test_reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by, youtube_id, watched_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [film_id, title, year, review, vibe, poster, viewing_period, expectation_mood, selected_by, youtube_id, watched_date]
     );
     return result;
   }
@@ -140,17 +146,19 @@ export async function updateReview(
   film_id: number,
   title: string,
   year: number,
-  review: string,
+  review: string | null,
   vibe: string,
   poster_url: string,
   viewing_period: boolean = false,
   expectation_mood: string | null = null,
-  final_mood: string | null = null
+  final_mood: string | null = null,
+  youtube_id: string | null = null,
+  watched_date: string | null = null
 ) {
   try {
     const [result] = await pool.execute(
-      'UPDATE test_reviews SET film_id = ?, title = ?, year = ?, review = ?, vibe = ?, poster_url = ?, viewing_period=?, expectation_mood=?, final_mood=? WHERE id = ?',
-      [film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, final_mood, id]
+      'UPDATE test_reviews SET film_id = ?, title = ?, year = ?, review = ?, vibe = ?, poster_url = ?, viewing_period=?, expectation_mood=?, final_mood=?, youtube_id=?, watched_date=? WHERE id = ?',
+      [film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, final_mood, youtube_id, watched_date, id]
     );
     return result;
   } catch (error) {
@@ -175,7 +183,7 @@ export async function getReviewForEdit(id: number) {
 
 export async function getLatestMovie() {
   const [rows] = await pool.query<RowDataPacket[]>(
-    "SELECT * FROM test_reviews ORDER BY id DESC LIMIT 1"
+    "SELECT * FROM test_reviews WHERE viewing_period = true ORDER BY id DESC LIMIT 1"
   );
   return rows.length > 0 ? rows[0] : null;
 }
@@ -191,4 +199,41 @@ export async function updateExpectationMood(id: number, expectation_mood: string
     console.error('Error updating expectation mood:', error);
     throw error;
   }
+}
+
+// Obtener todas las reviews de una película específica
+export async function getReviewsByFilmId(filmId: number): Promise<ReviewRow[]> {
+  const [rows] = await pool.query<(ReviewRow & RowDataPacket)[]>(
+    `SELECT * FROM test_reviews 
+     WHERE film_id = ? 
+     ORDER BY id ASC`,
+    [filmId]
+  );
+  return rows;
+}
+
+// Obtener películas con múltiples reviews
+export async function getMoviesWithMultipleReviews() {
+  const [rows] = await pool.query<(RowDataPacket & { 
+    film_id: number; 
+    title: string; 
+    review_count: number;
+    poster_url: string;
+  })[]>(
+    `SELECT film_id, title, poster_url, COUNT(*) as review_count 
+     FROM test_reviews 
+     GROUP BY film_id, title, poster_url 
+     HAVING COUNT(*) > 1
+     ORDER BY review_count DESC`
+  );
+  return rows;
+}
+
+// Contar cuántas reviews tiene una película
+export async function getReviewCountByFilmId(filmId: number): Promise<number> {
+  const [rows] = await pool.query<(RowDataPacket & { count: number })[]>(
+    'SELECT COUNT(*) as count FROM test_reviews WHERE film_id = ?',
+    [filmId]
+  );
+  return rows[0]?.count || 0;
 }
