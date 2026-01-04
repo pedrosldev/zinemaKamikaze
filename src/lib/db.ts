@@ -183,7 +183,7 @@ export async function getReviewForEdit(id: number) {
 
 export async function getLatestMovie() {
   const [rows] = await pool.query<RowDataPacket[]>(
-    "SELECT * FROM test_reviews ORDER BY id DESC LIMIT 1"
+    "SELECT * FROM test_reviews WHERE viewing_period = true ORDER BY id DESC LIMIT 1"
   );
   return rows.length > 0 ? rows[0] : null;
 }
