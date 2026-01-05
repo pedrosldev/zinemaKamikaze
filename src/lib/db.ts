@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import type { RowDataPacket } from 'mysql2';
 dotenv.config();
 
-const pool = createPool({
+export const pool = createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,

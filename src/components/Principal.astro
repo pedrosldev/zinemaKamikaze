@@ -1519,13 +1519,16 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
         }
 
         // Si llegamos aquí, la conexión es buena
-        validateTokenBtn!.textContent = "VALIDANDO CÓDIGO...";
+        validateTokenBtn!.textContent = "VALIDANDO Y SELECCIONANDO...";
 
         // Obtener el nombre/usuario opcional
         const selectedByInput = document.getElementById("selectedByInput") as HTMLInputElement;
         const selectedBy = selectedByInput?.value.trim() || "Anónimo";
 
-        const response = await fetch("/api/validate-tokens", {
+        console.log("🔐 Llamando a validate-and-select (endpoint atómico)");
+
+        // NUEVO: Un solo endpoint que hace todo de forma atómica
+        const response = await fetch("/api/validate-and-select", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -1537,21 +1540,19 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
         });
 
         const result = await response.json();
+        console.log("📡 Respuesta del servidor:", result);
 
-        if (response.ok && result.valid) {
-          // Guardar el token validado
-          validatedToken = token.trim();
-          
-          // Token válido - ocultar contenedor y generar película directamente
-          tokenMessage!.textContent = "¡CÓDIGO VÁLIDO! Generando película...";
+        if (response.ok && result.valid && result.movie) {
+          // ¡TODO HECHO! El servidor ya validó, eligió película y guardó en BD
+          tokenMessage!.textContent = "¡PELÍCULA SELECCIONADA!";
           tokenMessage!.className = "token-message token-success";
           tokenContainer!.style.display = "none";
 
-          // Efecto de confeti para validación exitosa
+          // Efecto de confeti
           try {
             if (typeof confetti === 'function') {
               confetti({
-                particleCount: 50,
+                particleCount: 100,
                 spread: 70,
                 origin: { y: 0.6 },
               });
@@ -1560,33 +1561,47 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
             // Ignorar errores de confetti
           }
 
-          // Generar la película directamente después de una breve pausa
-          console.log("🚀 PUNTO CRÍTICO: Voy a llamar a generateMovie()");
-          console.log("🚀 validatedToken tiene valor:", validatedToken);
-          console.log("🚀 generateMovie existe:", typeof generateMovie);
-          
+          // Mostrar la película en la UI
           try {
-            setTimeout(function() {
-              console.log("🚀 DENTRO DEL SETTIMEOUT - Ejecutando generateMovie()");
-              try {
-                generateMovie();
-                console.log("🚀 generateMovie() ejecutado sin errores");
-              } catch (genError) {
-                console.error("❌ Error ejecutando generateMovie:", genError);
-                console.error("❌ Stack trace:", genError.stack);
-                alert("Error generando película. Por favor recarga la página.");
-              }
-            }, 500);
-            console.log("🚀 setTimeout programado correctamente");
-          } catch (timeoutError) {
-            console.error("❌ Error programando timeout:", timeoutError);
-            console.log("🚀 Fallback: ejecutando generateMovie() directamente");
-            generateMovie();
+            if (surpriseDiv) {
+              const posterUrl = result.movie.poster 
+                ? "https://image.tmdb.org/t/p/w500" + result.movie.poster
+                : "/images/noImg.png";
+              
+              surpriseDiv.style.backgroundImage = "url(" + posterUrl + ")";
+              surpriseDiv.style.backgroundSize = "100% 100%";
+              surpriseDiv.style.backgroundPosition = "center";
+              surpriseDiv.style.backgroundRepeat = "no-repeat";
+              console.log("🖼️ Poster aplicado:", posterUrl);
+            }
+
+            if (contenidoDiv) {
+              contenidoDiv.innerHTML = "<strong>" + result.movie.title + " (" + result.movie.year + ")</strong>";
+              console.log("📝 Título mostrado");
+            }
+
+            if (btnLeer) {
+              btnLeer.style.display = "block";
+              console.log("✅ Botón mostrado");
+            }
+          } catch (displayError) {
+            console.error("❌ Error mostrando película:", displayError);
           }
+
+          // Recargar página después de 3 segundos
+          setTimeout(function() {
+            try {
+              window.location.reload();
+            } catch (reloadError) {
+              console.error("❌ Error recargando:", reloadError);
+              window.location.href = window.location.href;
+            }
+          }, 3000);
+
         } else {
-          // Token inválido
+          // Token inválido o error
           tokenMessage!.textContent =
-            result.message || "CÓDIGO INVÁLIDO. Inténtalo de nuevo.";
+            result.message || "ERROR. Inténtalo de nuevo.";
           tokenMessage!.className = "token-message token-error";
         }
       } catch (error) {
