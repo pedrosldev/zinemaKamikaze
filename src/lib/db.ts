@@ -237,3 +237,31 @@ export async function getReviewCountByFilmId(filmId: number): Promise<number> {
   );
   return rows[0]?.count || 0;
 }
+
+// ============= COMENTARIOS =============
+
+interface CommentRow extends RowDataPacket {
+  id: number;
+  review_id: number;
+  author_name: string;
+  content: string;
+  created_at: string;
+}
+
+// Añadir un comentario a una review
+export async function addComment(reviewId: number, authorName: string, content: string) {
+  const [result] = await pool.execute(
+    'INSERT INTO comments (review_id, author_name, content) VALUES (?, ?, ?)',
+    [reviewId, authorName, content]
+  );
+  return result;
+}
+
+// Obtener todos los comentarios de una review
+export async function getCommentsByReviewId(reviewId: number): Promise<CommentRow[]> {
+  const [rows] = await pool.query<(CommentRow & RowDataPacket)[]>(
+    'SELECT * FROM comments WHERE review_id = ? ORDER BY created_at ASC',
+    [reviewId]
+  );
+  return rows;
+}
