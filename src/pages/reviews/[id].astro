@@ -673,7 +673,7 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
   .credits-text {
     display: flex;
     flex-direction: column;
-    animation: scroll-up 20s linear infinite;
+    animation: scroll-up 30s linear infinite;
     animation-play-state: running;
     width: 100%;
   }
@@ -755,7 +755,7 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
 
   @keyframes scroll-up {
     0% {
-      transform: translateY(100%);
+      transform: translateY(50%);
     }
     100% {
       transform: translateY(-100%);
