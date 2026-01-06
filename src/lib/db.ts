@@ -265,3 +265,31 @@ export async function getCommentsByReviewId(reviewId: number): Promise<CommentRo
   );
   return rows;
 }
+
+// ============= COMENTARIOS DE EXPECTATIVAS =============
+
+interface ExpectationCommentRow extends RowDataPacket {
+  id: number;
+  film_id: number;
+  author_name: string;
+  content: string;
+  created_at: string;
+}
+
+// Añadir un comentario de expectativa sobre una película
+export async function addExpectationComment(filmId: number, authorName: string, content: string) {
+  const [result] = await pool.execute(
+    'INSERT INTO expectation_comments (film_id, author_name, content) VALUES (?, ?, ?)',
+    [filmId, authorName, content]
+  );
+  return result;
+}
+
+// Obtener todos los comentarios de expectativa de una película
+export async function getExpectationCommentsByFilmId(filmId: number): Promise<ExpectationCommentRow[]> {
+  const [rows] = await pool.query<(ExpectationCommentRow & RowDataPacket)[]>(
+    'SELECT * FROM expectation_comments WHERE film_id = ? ORDER BY created_at ASC',
+    [filmId]
+  );
+  return rows;
+}
