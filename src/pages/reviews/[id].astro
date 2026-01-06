@@ -123,13 +123,14 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
         )}
 
         {(review.review || review.youtube_id) && (
-          <div class="toggle-container" style="display: flex; gap: 1rem; justify-content: center;">
+          <div class="toggle-container" style="display: flex; gap: 0.3rem; justify-content: center; flex-direction: column; align-items: center;">
             <img
               id="toggle-btn"
               src="/images/pause-square-svgrepo-com.svg"
               alt="Play/Pause"
               onclick="toggleAnimation()"
             />
+            <span id="toggle-text" class="toggle-text">Pausar crítica</span>
           </div>
         )}
 
@@ -250,6 +251,7 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
 <script is:inline>
   let isPaused = false;
   const toggleBtn = document.getElementById('toggle-btn');
+  const toggleText = document.getElementById('toggle-text');
   const creditsText = document.getElementById('credits-text');
 
   function toggleAnimation() {
@@ -259,6 +261,11 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
     toggleBtn.src = isPaused
       ? '/images/play-square-svgrepo-com.svg'
       : '/images/pause-square-svgrepo-com.svg';
+    
+    // Actualizar texto
+    if (toggleText) {
+      toggleText.textContent = isPaused ? 'Seguir leyendo' : 'Pausar crítica';
+    }
   }
 
   function switchTab(tab) {
@@ -672,11 +679,11 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
   }
 
   .toggle-container {
-    padding: 10px;
+    padding: 15px 10px;
        background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
     animation: flicker 3s infinite;
-    height: 8dvh;
+    height: 10dvh;
         background-image:
                 /* Borde izquierdo */
       linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
@@ -701,6 +708,16 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
     width: 50px;
     height: 50px;
     cursor: pointer;
+  }
+
+  .toggle-text {
+    font-family: "Sigmar", sans-serif;
+    color: #c9be9c;
+    font-size: 0.5rem;
+    margin-top: 0.1rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    transition: color 0.3s ease;
+    white-space: nowrap;
   }
 
   /* Footer */
@@ -895,6 +912,11 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
     width: 40px;
     height: 40px;
   }
+
+  .toggle-text {
+    font-size: 0.45rem;
+    margin-top: 0.05rem;
+  }
 }
 
 /* Móviles (hasta 480px) */
@@ -965,6 +987,11 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
     width: 35px;
     height: 35px;
   }
+
+  .toggle-text {
+    font-size: 0.4rem;
+    margin-top: 0.05rem;
+  }
 }
 
 /* Landscape en móviles */
@@ -1007,12 +1034,17 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
 
   .toggle-container {
     height: 15vh;
-    padding: 5px;
+    padding: 3px;
   }
 
   .toggle-container img {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
+  }
+
+  .toggle-text {
+    font-size: 0.3rem;
+    margin-top: 0;
   }
 }
 
