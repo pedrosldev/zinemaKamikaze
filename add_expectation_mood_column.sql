@@ -1,4 +1,4 @@
--- Script para añadir la columna expectation_mood a la tabla test_reviews
+-- Script para añadir la columna expectation_mood a la tabla reviews
 -- Ejecuta este script en tu base de datos MySQL
 
 USE zinemakamikaze;
@@ -7,4 +7,4 @@ USE zinemakamikaze;
 c
 
 -- Verificar que se añadió correctamente
-DESCRIBE test_reviews;
+DESCRIBE reviews;

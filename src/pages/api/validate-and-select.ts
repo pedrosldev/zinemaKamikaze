@@ -65,7 +65,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // 4. Guardar la review en la base de datos
     await connection.execute(
-      'INSERT INTO test_reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by, youtube_id, watched_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by, youtube_id, watched_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [filmId, title, year, null, null, poster, true, null, selected_by || 'Anónimo', null, watchedDate]
     );
 

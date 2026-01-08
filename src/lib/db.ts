@@ -31,20 +31,20 @@ interface ReviewRow extends RowDataPacket {
   }
   export async function insertReview(film_id: number, title: string, year: number, review: string | null, vibe: string, poster: string, viewing_period: boolean = true, expectation_mood: string | null = null, selected_by: string | null = null, youtube_id: string | null = null, watched_date: string | null = null  ) {
     const [result] = await pool.execute(
-      'INSERT INTO test_reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by, youtube_id, watched_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by, youtube_id, watched_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [film_id, title, year, review, vibe, poster, viewing_period, expectation_mood, selected_by, youtube_id, watched_date]
     );
     return result;
   }
 
 export async function getAllVibes():Promise<string[]>{
-  const [rows] = await pool.query<VibeRow[]>("SELECT DISTINCT vibe FROM test_reviews");
+  const [rows] = await pool.query<VibeRow[]>("SELECT DISTINCT vibe FROM reviews");
   return rows.map((row: any) => row.vibe);
 }
 
 export async function getReviewsByVibe(vibe: string): Promise<Pick<ReviewRow, 'id' |'title' | 'year' | 'film_id' | 'poster'>[]> {
   const [rows] = await pool.query<Array<Pick<ReviewRow, 'id' | 'title' | 'year' | 'film_id' | 'poster'> & RowDataPacket>>(
-    "SELECT id, title, year, film_id, poster_url AS poster FROM test_reviews WHERE vibe = ?",
+    "SELECT id, title, year, film_id, poster_url AS poster FROM reviews WHERE vibe = ?",
     [vibe]
   );
   return rows;
@@ -52,7 +52,7 @@ export async function getReviewsByVibe(vibe: string): Promise<Pick<ReviewRow, 'i
 
 export async function getReviewById(id: number): Promise<ReviewRow | null> {
   const [rows] = await pool.query<(ReviewRow & RowDataPacket)[]>(
-    "SELECT * FROM test_reviews WHERE id = ?",
+    "SELECT * FROM reviews WHERE id = ?",
     [id]
   );
   return rows.length > 0 ? rows[0] : null;
@@ -131,7 +131,7 @@ export async function getActiveTokens(): Promise<TokenRow[]> {
 export async function getReviewsWithNullReview() {
   try {
     const [rows] = await pool.execute(
-      'SELECT id, film_id, title, year, type, vibe, poster_url, expectation_mood FROM test_reviews WHERE review IS NULL'
+      'SELECT id, film_id, title, year, type, vibe, poster_url, expectation_mood FROM reviews WHERE review IS NULL'
     );
     return rows;
   } catch (error) {
@@ -157,7 +157,7 @@ export async function updateReview(
 ) {
   try {
     const [result] = await pool.execute(
-      'UPDATE test_reviews SET film_id = ?, title = ?, year = ?, review = ?, vibe = ?, poster_url = ?, viewing_period=?, expectation_mood=?, final_mood=?, youtube_id=?, watched_date=? WHERE id = ?',
+      'UPDATE reviews SET film_id = ?, title = ?, year = ?, review = ?, vibe = ?, poster_url = ?, viewing_period=?, expectation_mood=?, final_mood=?, youtube_id=?, watched_date=? WHERE id = ?',
       [film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, final_mood, youtube_id, watched_date, id]
     );
     return result;
@@ -171,7 +171,7 @@ export async function updateReview(
 export async function getReviewForEdit(id: number) {
   try {
     const [rows] = await pool.execute(
-      'SELECT id, film_id, title, year, type, vibe, poster_url, review FROM test_reviews WHERE id = ?',
+      'SELECT id, film_id, title, year, type, vibe, poster_url, review FROM reviews WHERE id = ?',
       [id]
     );
     return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
@@ -183,7 +183,7 @@ export async function getReviewForEdit(id: number) {
 
 export async function getLatestMovie() {
   const [rows] = await pool.query<RowDataPacket[]>(
-    "SELECT * FROM test_reviews WHERE viewing_period = true ORDER BY id DESC LIMIT 1"
+    "SELECT * FROM reviews WHERE viewing_period = true ORDER BY id DESC LIMIT 1"
   );
   return rows.length > 0 ? rows[0] : null;
 }
@@ -191,7 +191,7 @@ export async function getLatestMovie() {
 export async function updateExpectationMood(id: number, expectation_mood: string) {
   try {
     const [result] = await pool.execute(
-      'UPDATE test_reviews SET expectation_mood = ? WHERE id = ?',
+      'UPDATE reviews SET expectation_mood = ? WHERE id = ?',
       [expectation_mood, id]
     );
     return result;
@@ -204,7 +204,7 @@ export async function updateExpectationMood(id: number, expectation_mood: string
 // Obtener todas las reviews de una película específica
 export async function getReviewsByFilmId(filmId: number): Promise<ReviewRow[]> {
   const [rows] = await pool.query<(ReviewRow & RowDataPacket)[]>(
-    `SELECT * FROM test_reviews 
+    `SELECT * FROM reviews 
      WHERE film_id = ? 
      ORDER BY id ASC`,
     [filmId]
@@ -221,7 +221,7 @@ export async function getMoviesWithMultipleReviews() {
     poster_url: string;
   })[]>(
     `SELECT film_id, title, poster_url, COUNT(*) as review_count 
-     FROM test_reviews 
+     FROM reviews 
      GROUP BY film_id, title, poster_url 
      HAVING COUNT(*) > 1
      ORDER BY review_count DESC`
@@ -232,7 +232,7 @@ export async function getMoviesWithMultipleReviews() {
 // Contar cuántas reviews tiene una película
 export async function getReviewCountByFilmId(filmId: number): Promise<number> {
   const [rows] = await pool.query<(RowDataPacket & { count: number })[]>(
-    'SELECT COUNT(*) as count FROM test_reviews WHERE film_id = ?',
+    'SELECT COUNT(*) as count FROM reviews WHERE film_id = ?',
     [filmId]
   );
   return rows[0]?.count || 0;
