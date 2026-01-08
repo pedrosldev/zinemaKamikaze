@@ -7,6 +7,6 @@ CREATE TABLE comments (
   author_name VARCHAR(100) NOT NULL,
   content TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (review_id) REFERENCES test_reviews(id) ON DELETE CASCADE,
+  FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE,
   INDEX idx_review_id (review_id)
 );

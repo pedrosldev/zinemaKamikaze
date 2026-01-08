@@ -7,6 +7,6 @@ CREATE TABLE expectation_comments (
   author_name VARCHAR(100) NOT NULL,
   content TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (film_id) REFERENCES test_reviews(film_id) ON DELETE CASCADE,
+  FOREIGN KEY (film_id) REFERENCES reviews(film_id) ON DELETE CASCADE,
   INDEX idx_film_id (film_id)
 );

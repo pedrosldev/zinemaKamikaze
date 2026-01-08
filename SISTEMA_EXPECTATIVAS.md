@@ -7,7 +7,7 @@ Se ha implementado un sistema que permite mostrar diferentes secuencias de flipb
 ## 🎬 Funcionalidades Añadidas
 
 ### 1. **Campo en Base de Datos**
-- Se añadió la columna `expectation_mood` a la tabla `test_reviews`
+- Se añadió la columna `expectation_mood` a la tabla `reviews`
 - Almacena el tipo de expectativa que tienes al saber qué película te tocó
 
 ### 2. **Selector en Panel Admin**
@@ -39,7 +39,7 @@ Ejecuta el siguiente comando SQL en tu base de datos:
 ```sql
 USE zinemakamikaze;
 
-ALTER TABLE test_reviews 
+ALTER TABLE reviews 
 ADD COLUMN expectation_mood VARCHAR(50) NULL DEFAULT NULL 
 AFTER viewing_period;
 ```
@@ -104,7 +104,7 @@ const moodSequences: Record<string, string[]> = {
 
 ### Error de base de datos
 - Asegúrate de ejecutar el script SQL
-- Verifica que la columna se creó: `DESCRIBE test_reviews;`
+- Verifica que la columna se creó: `DESCRIBE reviews;`
 
 ### El selector no aparece
 - Limpia la caché del navegador
