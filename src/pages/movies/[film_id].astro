@@ -1,17 +1,31 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { getReviewsByFilmId } from "../../lib/db";
+import { getAllMovies } from "../../lib/catalogUtils";
 
-export const prerender = false;
+export const prerender = true;
+
+// Generar rutas estáticas para todas las películas del catálogo
+export async function getStaticPaths() {
+  const allMovies = getAllMovies();
+  return allMovies.map(movie => ({
+    params: { film_id: String(movie.id) }
+  }));
+}
 
 const filmId = Number(Astro.params.film_id);
 const reviews = await getReviewsByFilmId(filmId);
 
-if (!reviews || reviews.length === 0) {
+// Buscar info básica de la película en el catálogo
+const allMovies = getAllMovies();
+const movieInfo = allMovies.find(m => m.id === filmId);
+
+if (!movieInfo) {
   return Astro.redirect("/404");
 }
 
-const movie = reviews[0]; // Información básica de la película
+const hasReviews = reviews && reviews.length > 0;
+const movie = hasReviews ? reviews[0] : movieInfo;
 ---
 
 <Layout>
@@ -33,15 +47,19 @@ const movie = reviews[0]; // Información básica de la película
           {movie.title}
           {movie.year && movie.year !== 0 ? `(${movie.year})` : ""}
         </h1>
-        <p class="viewing-count">
-          {
-            reviews.length === 1
-              ? "Has visto esta película 1 vez"
-              : `Has visto esta película ${reviews.length} veces`
-          }
-        </p>
+        {hasReviews ? (
+          <p class="viewing-count">
+            {
+              reviews.length === 1
+                ? "Has visto esta película 1 vez"
+                : `Has visto esta película ${reviews.length} veces`
+            }
+          </p>
+        ) : (
+          <p class="no-reviews">Aún no he visto esta película</p>
+        )}
         <div class="navigation-links">
-          <a href={`/vibe/${movie.vibe}`}>← Volver a {movie.vibe}</a>
+          <a href="/catalog">← Volver al catálogo</a>
           <a href="/">← Volver al inicio</a>
         </div>
       </div>
@@ -49,7 +67,7 @@ const movie = reviews[0]; // Información básica de la película
   </header>
 
   <main class="reviews-timeline">
-    {
+    {hasReviews ? (
       reviews.map((review, index) => (
         <article class="review-card">
           <header class="review-header">
@@ -161,7 +179,12 @@ const movie = reviews[0]; // Información básica de la película
           </footer>
         </article>
       ))
-    }
+    ) : (
+      <div class="no-reviews-message">
+        <p>📽️ Esta película aún no ha sido vista</p>
+        <p class="movie-overview">{movieInfo.overview || "Sin descripción disponible."}</p>
+      </div>
+    )}
   </main>
 </Layout>
 
@@ -235,6 +258,39 @@ const movie = reviews[0]; // Información básica de la película
   .navigation-links a:hover {
     background: rgba(0, 0, 0, 0.5);
     transform: scale(1.05);
+  }
+
+  .no-reviews {
+    color: #f5d742;
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+
+  .no-reviews-message {
+    background: url("/images/old_celluloid.png") repeat;
+    background-size: cover;
+    border: 4px solid rgba(107, 63, 47, 0.8);
+    border-radius: 8px;
+    padding: 3rem 2rem;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .no-reviews-message p:first-child {
+    font-size: 2rem;
+    color: #f5d742;
+    margin-bottom: 1.5rem;
+    font-family: "Sigmar", cursive;
+  }
+
+  .movie-overview {
+    color: #c9be9c;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-top: 1rem;
   }
 
   .reviews-timeline {
