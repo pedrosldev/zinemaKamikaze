@@ -1,0 +1,104 @@
+---
+import { getPosterUrl, type Movie } from '../../lib/catalogUtils';
+
+interface Props {
+  movie: Movie;
+}
+
+const { movie } = Astro.props;
+const posterUrl = getPosterUrl(movie.poster_path);
+---
+
+<li class="movie-card" data-poster-url={posterUrl}>
+  <a href={`/movies/${movie.id}`} class="movie-link">
+    <div class="movie-poster-container">
+      <img
+        src={posterUrl}
+        alt={`Poster de ${movie.title}`}
+        loading="lazy"
+        decoding="async"
+        class="movie-poster"
+      />
+    </div>
+    <div class="movie-info">
+      <h3 class="movie-title">{movie.title}</h3>
+      {movie.year && <span class="movie-year">({movie.year})</span>}
+    </div>
+  </a>
+</li>
+
+<style>
+  .movie-card {
+    list-style: none;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .movie-card:hover {
+    transform: translateY(-4px);
+    z-index: 10;
+  }
+
+  .movie-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+  }
+
+  .movie-poster-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2/3;
+    overflow: hidden;
+    background: #1a1a1a;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .movie-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .movie-card:hover .movie-poster {
+    transform: scale(1.05);
+  }
+
+  .movie-info {
+    padding: 8px 4px;
+    text-align: center;
+  }
+
+  .movie-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .movie-year {
+    font-size: 0.8rem;
+    color: #888;
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .movie-title {
+      font-size: 0.85rem;
+    }
+
+    .movie-year {
+      font-size: 0.75rem;
+    }
+  }
+</style>
