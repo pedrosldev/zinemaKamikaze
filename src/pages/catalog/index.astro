@@ -7,6 +7,14 @@ const totalMovies = 25947; // Aproximado
 ---
 
 <Layout>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
+      rel="stylesheet"
+    />
+  </head>
   <main class="catalog-index">
     <div class="hero">
       <h1>CATÁLOGO COMPLETO</h1>
@@ -57,8 +65,10 @@ const totalMovies = 25947; // Aproximado
     font-family: "Sigmar", cursive;
     font-size: clamp(2.5rem, 10vw, 6rem);
     text-align: center;
-    color: #fff;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    color: #f5d742;
+    text-shadow: 0 0 20px rgba(245, 215, 66, 0.5),
+                 2px 2px 0 #000,
+                 -2px -2px 0 #000;
     z-index: 2;
     margin: 0 0 2rem 0;
   }
@@ -78,8 +88,8 @@ const totalMovies = 25947; // Aproximado
     display: block;
     font-size: 3rem;
     font-weight: bold;
-    color: #fff;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    color: #f5d742;
+    text-shadow: 0 0 10px rgba(245, 215, 66, 0.3);
   }
 
   .stat-label {
@@ -97,37 +107,41 @@ const totalMovies = 25947; // Aproximado
     font-size: 1.2rem;
     font-weight: bold;
     color: #000;
-    background: #fff;
-    border: none;
+    background: #f5d742;
+    border: 2px solid #f5d742;
     border-radius: 4px;
     text-decoration: none;
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 2;
-    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(245, 215, 66, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   .start-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 30px rgba(255, 255, 255, 0.3);
+    background: #000;
+    color: #f5d742;
+    box-shadow: 0 6px 30px rgba(245, 215, 66, 0.5);
   }
 
   .back-link {
     position: absolute;
     top: 2rem;
     left: 2rem;
-    color: #fff;
+    color: #f5d742;
     text-decoration: none;
     font-size: 1rem;
     padding: 0.5rem 1rem;
-    border: 2px solid #fff;
+    border: 2px solid #f5d742;
     border-radius: 4px;
     transition: all 0.3s ease;
     z-index: 10;
   }
 
   .back-link:hover {
-    background: #fff;
+    background: #f5d742;
     color: #000;
   }
 
