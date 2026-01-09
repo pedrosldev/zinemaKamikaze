@@ -3,15 +3,8 @@ import Layout from "../../layouts/Layout.astro";
 import { getReviewsByFilmId } from "../../lib/db";
 import { getAllMovies } from "../../lib/catalogUtils";
 
-export const prerender = true;
-
-// Generar rutas estáticas para todas las películas del catálogo
-export async function getStaticPaths() {
-  const allMovies = getAllMovies();
-  return allMovies.map(movie => ({
-    params: { film_id: String(movie.id) }
-  }));
-}
+// SSR para evitar timeout en Netlify (25,947 páginas exceden el límite de 18 min)
+export const prerender = false;
 
 const filmId = Number(Astro.params.film_id);
 const reviews = await getReviewsByFilmId(filmId);
