@@ -87,7 +87,10 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
 <main>
   <div class="a">
     <h1>ZINEMA KAMIKAZE!!!</h1>
-    <a href="/catalog" class="catalog-link">¿A QUÉ ME TENGO QUE ENFRENTAR?</a>
+    <a href="/catalog" class="catalog-link">
+      <span>¿A QUÉ ME TENGO QUE ENFRENTAR?</span>
+      <small>(listado de películas)</small>
+    </a>
     <div class="film-grain"></div>
     <div class="old-film-scratches"></div>
   </div>
@@ -914,7 +917,10 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
   }
 
   .catalog-link {
-    display: inline-block;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
     margin-top: 15px;
     padding: 8px 16px;
     background: rgba(0, 0, 0, 0.7);
@@ -930,6 +936,13 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
     text-shadow:
       1px 1px 0 #000,
       -1px -1px 0 #000;
+  }
+
+  .catalog-link small {
+    font-size: 0.4rem;
+    opacity: 0.8;
+    text-transform: lowercase;
+    letter-spacing: 0.5px;
   }
 
   .catalog-link:hover {
