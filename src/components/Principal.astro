@@ -351,6 +351,7 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
   .token-input::placeholder {
     color: #666;
     text-transform: none;
+    font-family: "Special Elite", cursive;
   }
 
   .token-input:focus {
@@ -1557,6 +1558,7 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
     margin: 0;
     white-space: pre-wrap;
     word-wrap: break-word;
+    font-family: "Special Elite", cursive;
   }
 
   .expectation-modal .no-comments {
@@ -1610,6 +1612,11 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
     font-family: inherit;
     font-size: 0.95rem;
     transition: all 0.3s ease;
+  }
+
+  .expectation-modal .form-group input::placeholder,
+  .expectation-modal .form-group textarea::placeholder {
+    font-family: "Special Elite", cursive;
   }
 
   .expectation-modal .form-group input:focus,

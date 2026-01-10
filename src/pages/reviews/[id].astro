@@ -1153,7 +1153,7 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: inherit;
+  font-family: "Special Elite", cursive;
 }
 
 .comments-btn:hover {
@@ -1379,6 +1379,11 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
   font-family: inherit;
   font-size: 0.95rem;
   transition: all 0.3s ease;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  font-family: "Special Elite", cursive;
 }
 
 .form-group input:focus,

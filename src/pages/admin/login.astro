@@ -11,6 +11,14 @@ if (authToken === ADMIN_PASSWORD) {
 ---
 
 <Layout>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap"
+      rel="stylesheet"
+    />
+  </head>
   <div class="login-container">
     <a href="/">Inicio</a>
     <h1>ACCESO ADMINISTRATIVO</h1>
@@ -58,6 +66,7 @@ if (authToken === ADMIN_PASSWORD) {
     letter-spacing: 2px;
     text-align: center;
     margin-bottom: 2rem;
+    font-family: "Special Elite", cursive;
   }
 
   .form-group {
@@ -70,6 +79,7 @@ if (authToken === ADMIN_PASSWORD) {
     color: #c9be9c;
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-family: "Special Elite", cursive;
   }
 
   input {
@@ -82,6 +92,10 @@ if (authToken === ADMIN_PASSWORD) {
     font-family: "Special Elite", cursive;
     font-size: 1rem;
     box-sizing: border-box;
+  }
+
+  input::placeholder {
+    font-family: "Special Elite", cursive;
   }
 
   input:focus {
