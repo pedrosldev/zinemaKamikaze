@@ -34,6 +34,69 @@ export function getAllMovies(): Movie[] {
 }
 
 /**
+ * Obtiene todos los años únicos del catálogo (ordenados descendentemente)
+ */
+export function getUniqueYears(): string[] {
+  const allMovies = getAllMovies();
+  const years = new Set<string>();
+  
+  allMovies.forEach(movie => {
+    if (movie.year && movie.year.trim() !== '') {
+      years.add(movie.year);
+    }
+  });
+  
+  return Array.from(years).sort((a, b) => b.localeCompare(a));
+}
+
+/**
+ * Busca películas por título raíz del grupo o título individual
+ * Si coincide con el título raíz, devuelve todas las películas de ese grupo
+ */
+export function searchMovies(query: string, year: string = ''): Movie[] {
+  if (query === '' && year === '') {
+    return getAllMovies();
+  }
+
+  const queryLower = query.toLowerCase();
+  const matchedMovies: Movie[] = [];
+  const seenIds = new Set<number>();
+
+  // Buscar en títulos raíz de grupos
+  for (const entry of allTitlesData) {
+    if (entry.title && entry.title.toLowerCase().includes(queryLower)) {
+      // Si el título raíz coincide, agregar TODAS las películas del grupo
+      if (entry.films && Array.isArray(entry.films)) {
+        entry.films.forEach(movie => {
+          if (!seenIds.has(movie.id)) {
+            const matchYear = year === '' || movie.year === year;
+            if (matchYear) {
+              matchedMovies.push(movie);
+              seenIds.add(movie.id);
+            }
+          }
+        });
+      }
+    } else {
+      // Si no coincide el título raíz, buscar en títulos individuales
+      if (entry.films && Array.isArray(entry.films)) {
+        entry.films.forEach(movie => {
+          if (!seenIds.has(movie.id) && movie.title.toLowerCase().includes(queryLower)) {
+            const matchYear = year === '' || movie.year === year;
+            if (matchYear) {
+              matchedMovies.push(movie);
+              seenIds.add(movie.id);
+            }
+          }
+        });
+      }
+    }
+  }
+
+  return matchedMovies.sort((a, b) => a.title.localeCompare(b.title, 'es'));
+}
+
+/**
  * Obtiene las películas para una página específica
  */
 export function getMoviesForPage(page: number, perPage: number = 100): PaginatedMovies {

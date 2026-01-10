@@ -1,0 +1,431 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getUniqueYears, getAllMovies } from "../../lib/catalogUtils";
+
+export const prerender = false;
+
+// Obtener años únicos para el select
+const years = getUniqueYears();
+
+// SSR: obtener query params para búsqueda inicial si vienen de URL
+const url = new URL(Astro.request.url);
+const initialQuery = url.searchParams.get('q') || '';
+const initialYear = url.searchParams.get('year') || '';
+
+// Solo para meta tags
+const pageTitle = "Buscar películas - Zinema Kamikaze";
+---
+
+<Layout>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sigmar&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="viewport" content="width=device-width" />
+    <title>{pageTitle}</title>
+  </head>
+
+  <div class="search-layout">
+    <!-- Header -->
+    <header class="full-width-header">
+      <h1 class="title">BUSCAR EN EL CATÁLOGO</h1>
+      <a href="/catalog" class="back-link">← Volver al catálogo</a>
+    </header>
+
+    <!-- Search Controls -->
+    <div class="search-controls">
+      <div class="search-input-wrapper">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Buscar por título..."
+          value={initialQuery}
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="filter-wrapper">
+        <select id="yearFilter">
+          <option value="">Todos los años</option>
+          {years.map(year => (
+            <option value={year} selected={year === initialYear}>
+              {year || 'Sin año'}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <button id="clearBtn" class="clear-btn">Limpiar filtros</button>
+    </div>
+
+    <!-- Results info -->
+    <div class="results-info">
+      <p id="resultsCount">Cargando películas...</p>
+    </div>
+
+    <!-- Movies grid -->
+    <div class="movies-grid" id="moviesGrid">
+      <!-- Se llenará dinámicamente con JavaScript -->
+    </div>
+
+    <!-- No results message -->
+    <div class="no-results" id="noResults" style="display: none;">
+      <p>No se encontraron películas con esos criterios</p>
+      <button id="resetBtn" class="reset-btn">Mostrar todas</button>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Cargar todas las películas y datos raíz en el cliente
+  import allTitlesData from '../../data/all_titles_with_id.json';
+  import { getPosterUrl } from '../../lib/catalogUtils';
+  import type { Movie } from '../../lib/catalogUtils';
+
+  const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+  const yearFilter = document.getElementById('yearFilter') as HTMLSelectElement;
+  const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement;
+  const resetBtn = document.getElementById('resetBtn') as HTMLButtonElement;
+  const moviesGrid = document.getElementById('moviesGrid') as HTMLDivElement;
+  const resultsCount = document.getElementById('resultsCount') as HTMLParagraphElement;
+  const noResults = document.getElementById('noResults') as HTMLDivElement;
+
+  // Función para filtrar películas por título raíz o individual
+  function filterMovies() {
+    const query = searchInput.value.trim();
+    const year = yearFilter.value;
+
+    if (query === '' && year === '') {
+      // Mostrar todas las películas
+      const allMovies: Movie[] = [];
+      for (const entry of allTitlesData) {
+        if (entry.films && Array.isArray(entry.films)) {
+          allMovies.push(...entry.films);
+        }
+      }
+      displayMovies(allMovies.sort((a, b) => a.title.localeCompare(b.title, 'es')));
+      updateResultsCount(allMovies.length, query, year);
+      return;
+    }
+
+    const queryLower = query.toLowerCase();
+    const matchedMovies: Movie[] = [];
+    const seenIds = new Set<number>();
+
+    // Buscar en títulos raíz de grupos
+    for (const entry of allTitlesData) {
+      if (entry.title && entry.title.toLowerCase().includes(queryLower)) {
+        // Si el título raíz coincide, agregar TODAS las películas del grupo
+        if (entry.films && Array.isArray(entry.films)) {
+          entry.films.forEach(movie => {
+            if (!seenIds.has(movie.id)) {
+              const matchYear = year === '' || movie.year === year;
+              if (matchYear) {
+                matchedMovies.push(movie);
+                seenIds.add(movie.id);
+              }
+            }
+          });
+        }
+      } else {
+        // Si no coincide el título raíz, buscar en títulos individuales
+        if (entry.films && Array.isArray(entry.films)) {
+          entry.films.forEach(movie => {
+            if (!seenIds.has(movie.id) && movie.title.toLowerCase().includes(queryLower)) {
+              const matchYear = year === '' || movie.year === year;
+              if (matchYear) {
+                matchedMovies.push(movie);
+                seenIds.add(movie.id);
+              }
+            }
+          });
+        }
+      }
+    }
+
+    const sorted = matchedMovies.sort((a, b) => a.title.localeCompare(b.title, 'es'));
+    displayMovies(sorted);
+    updateResultsCount(sorted.length, query, year);
+  }
+
+  // Función para mostrar películas
+  function displayMovies(movies: Movie[]) {
+    if (movies.length === 0) {
+      moviesGrid.style.display = 'none';
+      noResults.style.display = 'block';
+      return;
+    }
+
+    moviesGrid.style.display = 'grid';
+    noResults.style.display = 'none';
+
+    moviesGrid.innerHTML = movies.map(movie => {
+      const posterUrl = getPosterUrl(movie.poster_path);
+      return `
+        <a href="/movies/${movie.id}" class="movie-card">
+          <div class="poster-container">
+            <img 
+              src="${posterUrl}" 
+              alt="${movie.title}"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div class="movie-info">
+            <h3 class="movie-title">${movie.title}</h3>
+            <p class="movie-year">${movie.year || 'Año desconocido'}</p>
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+
+  // Actualizar contador de resultados
+  function updateResultsCount(count: number, query: string, year: string) {
+    let text = `${count.toLocaleString()} película${count !== 1 ? 's' : ''} encontrada${count !== 1 ? 's' : ''}`;
+    
+    if (query || year) {
+      const filters = [];
+      if (query) filters.push(`"${query}"`);
+      if (year) filters.push(`año ${year}`);
+      text += ` con ${filters.join(' y ')}`;
+    }
+    
+    resultsCount.textContent = text;
+  }
+
+  // Función para limpiar filtros
+  function clearFilters() {
+    searchInput.value = '';
+    yearFilter.value = '';
+    filterMovies();
+    searchInput.focus();
+  }
+
+  // Event listeners
+  searchInput.addEventListener('input', filterMovies);
+  yearFilter.addEventListener('change', filterMovies);
+  clearBtn.addEventListener('click', clearFilters);
+  resetBtn.addEventListener('click', clearFilters);
+
+  // Filtrar en carga inicial
+  filterMovies();
+</script>
+
+<style>
+  .search-layout {
+    min-height: 100vh;
+    background: #000;
+    color: #f5d742;
+    font-family: 'Sigmar', cursive;
+  }
+
+  .full-width-header {
+    background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 100%);
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 3px solid #f5d742;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .title {
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    margin: 0 0 1rem 0;
+    text-shadow: 
+      0 0 20px rgba(245, 215, 66, 0.5),
+      2px 2px 0 #000,
+      -2px -2px 0 #000;
+  }
+
+  .back-link {
+    color: #f5d742;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .back-link:hover {
+    text-shadow: 0 0 10px rgba(245, 215, 66, 0.8);
+  }
+
+  .search-controls {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .search-input-wrapper {
+    flex: 1;
+  }
+
+  #searchInput {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.2rem;
+    font-family: 'Sigmar', cursive;
+    background: rgba(245, 215, 66, 0.1);
+    border: 2px solid #f5d742;
+    color: #f5d742;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  #searchInput:focus {
+    outline: none;
+    background: rgba(245, 215, 66, 0.2);
+    box-shadow: 0 0 20px rgba(245, 215, 66, 0.3);
+  }
+
+  #searchInput::placeholder {
+    color: rgba(245, 215, 66, 0.5);
+  }
+
+  .filter-wrapper {
+    flex: 1;
+  }
+
+  #yearFilter {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.2rem;
+    font-family: 'Sigmar', cursive;
+    background: rgba(245, 215, 66, 0.1);
+    border: 2px solid #f5d742;
+    color: #f5d742;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  #yearFilter:focus {
+    outline: none;
+    background: rgba(245, 215, 66, 0.2);
+    box-shadow: 0 0 20px rgba(245, 215, 66, 0.3);
+  }
+
+  #yearFilter option {
+    background: #000;
+    color: #f5d742;
+  }
+
+  .clear-btn, .reset-btn {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-family: 'Sigmar', cursive;
+    background: transparent;
+    border: 2px solid #f5d742;
+    color: #f5d742;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .clear-btn:hover, .reset-btn:hover {
+    background: #f5d742;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 215, 66, 0.4);
+  }
+
+  .results-info {
+    max-width: 1000px;
+    margin: 1rem auto;
+    padding: 0 1rem;
+    text-align: center;
+    font-size: 1.2rem;
+    color: rgba(245, 215, 66, 0.8);
+  }
+
+  .movies-grid {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem 4rem 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 2rem;
+  }
+
+  .movie-card {
+    text-decoration: none;
+    color: #f5d742;
+    transition: transform 0.3s ease;
+  }
+
+  .movie-card:hover {
+    transform: translateY(-4px) scale(1.05);
+  }
+
+  .poster-container {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 2px solid #f5d742;
+    background: rgba(245, 215, 66, 0.1);
+  }
+
+  .poster-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .movie-info {
+    margin-top: 0.5rem;
+  }
+
+  .movie-title {
+    font-size: 0.9rem;
+    margin: 0;
+    text-shadow: 1px 1px 0 #000;
+  }
+
+  .movie-year {
+    font-size: 0.8rem;
+    margin: 0.25rem 0 0 0;
+    color: rgba(245, 215, 66, 0.7);
+  }
+
+  .no-results {
+    max-width: 600px;
+    margin: 4rem auto;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .no-results p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .search-controls {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .search-input-wrapper {
+      flex: 2;
+    }
+
+    .filter-wrapper {
+      flex: 1;
+    }
+
+    .clear-btn {
+      flex-shrink: 0;
+    }
+  }
+</style>
+</Layout>

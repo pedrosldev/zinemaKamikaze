@@ -37,9 +37,12 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
     <div class="full-width-header">
       <h1>CATÁLOGO COMPLETO</h1>
       <p class="catalog-stats">{totalMovies} películas • Página {currentPage} de {totalPages}</p>
+      <div class="header-links">
+        <a href="/catalog/search" class="search-link">🔍 Buscar películas</a>
+        <a href="/" class="back-link">← Volver al inicio</a>
+      </div>
       <div class="film-grain"></div>
       <div class="old-film-scratches"></div>
-      <a href="/" class="back-link">← Volver al inicio</a>
     </div>
 
     <!-- Contenedor principal -->
@@ -157,10 +160,18 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
     z-index: 2;
   }
 
-  .back-link {
+  .header-links {
+    display: flex;
+    gap: 1rem;
     position: absolute;
     top: 2rem;
     left: 2rem;
+    z-index: 10;
+    flex-wrap: wrap;
+  }
+
+  .back-link,
+  .search-link {
     color: #f5d742;
     text-decoration: none;
     font-size: 1rem;
@@ -168,12 +179,14 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
     border: 2px solid #f5d742;
     border-radius: 4px;
     transition: all 0.3s ease;
-    z-index: 10;
   }
 
-  .back-link:hover {
+  .back-link:hover,
+  .search-link:hover {
     background: #f5d742;
     color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 215, 66, 0.4);
   }
 
   /* Efectos de película */
