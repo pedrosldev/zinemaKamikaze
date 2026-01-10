@@ -139,33 +139,44 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
     const matchedMovies: Movie[] = [];
     const seenIds = new Set<number>();
 
+    // Optimización: solo buscar si hay query de texto o filtro de año
+    if (query.length < 2 && !year) {
+      // Para búsquedas muy cortas sin filtro de año, no filtrar aún
+      displayMovies([]);
+      updateResultsCount(0, query, year);
+      return;
+    }
+
     // Buscar en títulos raíz de grupos
     for (const entry of allTitlesData) {
-      if (entry.title && entry.title.toLowerCase().includes(queryLower)) {
+      // Saltar grupos vacíos
+      if (!entry.films || !Array.isArray(entry.films) || entry.films.length === 0) {
+        continue;
+      }
+
+      const rootMatches = entry.title && entry.title.toLowerCase().includes(queryLower);
+      
+      if (rootMatches) {
         // Si el título raíz coincide, agregar TODAS las películas del grupo
-        if (entry.films && Array.isArray(entry.films)) {
-          entry.films.forEach(movie => {
-            if (!seenIds.has(movie.id)) {
-              const matchYear = year === '' || movie.year === year;
-              if (matchYear) {
-                matchedMovies.push(movie);
-                seenIds.add(movie.id);
-              }
+        for (const movie of entry.films) {
+          if (!seenIds.has(movie.id)) {
+            const matchYear = year === '' || movie.year === year;
+            if (matchYear) {
+              matchedMovies.push(movie);
+              seenIds.add(movie.id);
             }
-          });
+          }
         }
       } else {
         // Si no coincide el título raíz, buscar en títulos individuales
-        if (entry.films && Array.isArray(entry.films)) {
-          entry.films.forEach(movie => {
-            if (!seenIds.has(movie.id) && movie.title.toLowerCase().includes(queryLower)) {
-              const matchYear = year === '' || movie.year === year;
-              if (matchYear) {
-                matchedMovies.push(movie);
-                seenIds.add(movie.id);
-              }
+        for (const movie of entry.films) {
+          if (!seenIds.has(movie.id) && movie.title.toLowerCase().includes(queryLower)) {
+            const matchYear = year === '' || movie.year === year;
+            if (matchYear) {
+              matchedMovies.push(movie);
+              seenIds.add(movie.id);
             }
-          });
+          }
         }
       }
     }
@@ -225,8 +236,18 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
     searchInput.focus();
   }
 
-  // Event listeners
-  searchInput.addEventListener('input', filterMovies);
+  // Debounce para optimizar la búsqueda
+  let debounceTimer: number;
+  function debounce(func: Function, delay: number) {
+    return function(...args: any[]) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => func.apply(null, args), delay);
+    };
+  }
+
+  // Event listeners con debounce para el input
+  const debouncedFilter = debounce(filterMovies, 300);
+  searchInput.addEventListener('input', debouncedFilter);
   yearFilter.addEventListener('change', filterMovies);
   clearBtn.addEventListener('click', clearFilters);
   resetBtn.addEventListener('click', clearFilters);
