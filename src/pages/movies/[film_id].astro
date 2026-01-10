@@ -271,6 +271,20 @@ const movie = hasReviews ? reviews[0] : movieInfo;
     text-align: center;
     max-width: 800px;
     margin: 0 auto;
+    /* Overlay oscuro para mejorar contraste */
+    position: relative;
+  }
+
+  .no-reviews-message::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 4px;
+    z-index: 0;
   }
 
   .no-reviews-message p:first-child {
@@ -278,14 +292,20 @@ const movie = hasReviews ? reviews[0] : movieInfo;
     color: #f5d742;
     margin-bottom: 1.5rem;
     font-family: "Special Elite", cursive;
+    position: relative;
+    z-index: 1;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   }
 
   .movie-overview {
     font-family: "Special Elite", cursive;
-    color: #c9be9c;
+    color: #ffffff;
     font-size: 1.1rem;
     line-height: 1.6;
     margin-top: 1rem;
+    position: relative;
+    z-index: 1;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
   }
 
   .reviews-timeline {
