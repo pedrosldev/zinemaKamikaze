@@ -33,6 +33,7 @@ const movie = hasReviews ? reviews[0] : movieInfo;
     />
   </head>
 
+  <div class="movie-page-wrapper" data-has-poster={movieInfo.poster_path ? 'true' : 'false'} style={movieInfo.poster_path ? `--poster-url: url(https://image.tmdb.org/t/p/w780${movieInfo.poster_path})` : ''}>
   <header class="movie-header">
     <div class="header-content">
       <div class="movie-info">
@@ -179,6 +180,7 @@ const movie = hasReviews ? reviews[0] : movieInfo;
       </div>
     )}
   </main>
+  </div>
 </Layout>
 
 <script>
@@ -189,6 +191,59 @@ const movie = hasReviews ? reviews[0] : movieInfo;
 </script>
 
 <style>
+  /* Wrapper con fondo de poster o textura de celuloide */
+  .movie-page-wrapper {
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Fondo con poster difuminado */
+  .movie-page-wrapper[data-has-poster="true"]::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: var(--poster-url);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(20px);
+    transform: scale(1.1);
+    z-index: -2;
+  }
+
+  /* Overlay oscuro para el poster */
+  .movie-page-wrapper[data-has-poster="true"]::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: -1;
+  }
+
+  /* Fallback: textura de celuloide cuando no hay poster */
+  .movie-page-wrapper[data-has-poster="false"] {
+    background: url("/images/old_celluloid.png") repeat;
+    background-size: 400px 400px;
+  }
+
+  .movie-page-wrapper[data-has-poster="false"]::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    pointer-events: none;
+    z-index: -1;
+  }
+
   .movie-header {
     background-color: #1a54fa;
     filter: brightness(0.8) contrast(0.9);
