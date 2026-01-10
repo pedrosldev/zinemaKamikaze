@@ -124,6 +124,9 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
     min-height: 100vh;
     background-color: #000;
     color: #fff;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
   }
 
   /* Header pantalla completa */
@@ -224,6 +227,9 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
     display: flex;
     min-height: 100vh;
     background-color: #000;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 
   .wide-sidebar {
@@ -242,7 +248,9 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
     padding: 2rem;
     position: relative;
     overflow-y: auto;
+    overflow-x: hidden;
     max-height: 100vh;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -257,7 +265,8 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
     margin: 0 auto 3rem auto;
     list-style: none;
     width: 100%;
-    max-width: 1000px;
+    max-width: min(1000px, 100%);
+    box-sizing: border-box;
   }
 
   /* Paginación */
@@ -344,6 +353,39 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
   }
 
   @media (max-width: 768px) {
+    .full-width-header {
+      height: auto;
+      min-height: 180px;
+      padding: 1rem;
+    }
+
+    .full-width-header h1 {
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
+      margin-top: 3rem;
+      padding: 0 10px;
+    }
+
+    .catalog-stats {
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    .header-links {
+      position: relative;
+      top: auto;
+      left: auto;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: 1rem;
+      gap: 0.5rem;
+    }
+
+    .back-link,
+    .search-link {
+      font-size: 0.85rem;
+      padding: 0.4rem 0.8rem;
+    }
+
     .wide-sidebar {
       display: none;
     }
