@@ -1,11 +1,16 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { getUniqueYears, getAllMovies } from "../../lib/catalogUtils";
+import MovieCard from '../../components/catalog/MovieCard.astro';
+import allTitlesData from '../../data/all_titles_with_id.json';
 
 export const prerender = false;
 
 // Obtener años únicos para el select
 const years = getUniqueYears();
+
+// Obtener todas las películas
+const allMovies = getAllMovies();
 
 // SSR: obtener query params para búsqueda inicial si vienen de URL
 const url = new URL(Astro.request.url);
@@ -31,53 +36,70 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
   </head>
 
   <div class="search-layout">
-    <!-- Header -->
-    <header class="full-width-header">
-      <h1 class="title">BUSCAR EN EL CATÁLOGO</h1>
-      <a href="/catalog" class="back-link">← Volver al catálogo</a>
-    </header>
+    <main class="catalog-layout">
+      <!-- Header pantalla completa -->
+      <div class="full-width-header">
+        <h1>BUSCAR EN EL CATÁLOGO</h1>
+        
+        <!-- Search Controls -->
+        <div class="search-controls">
+          <div class="search-input-wrapper">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Buscar por título..."
+              value={initialQuery}
+              autocomplete="off"
+            />
+          </div>
 
-    <!-- Search Controls -->
-    <div class="search-controls">
-      <div class="search-input-wrapper">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Buscar por título..."
-          value={initialQuery}
-          autocomplete="off"
-        />
+          <div class="filter-wrapper">
+            <select id="yearFilter">
+              <option value="">Todos los años</option>
+              {years.map(year => (
+                <option value={year} selected={year === initialYear}>
+                  {year || 'Sin año'}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button id="clearBtn" class="clear-btn">Limpiar filtros</button>
+        </div>
+
+        <a href="/catalog" class="back-link">← Volver al catálogo</a>
+        <div class="film-grain"></div>
+        <div class="old-film-scratches"></div>
       </div>
 
-      <div class="filter-wrapper">
-        <select id="yearFilter">
-          <option value="">Todos los años</option>
-          {years.map(year => (
-            <option value={year} selected={year === initialYear}>
-              {year || 'Sin año'}
-            </option>
-          ))}
-        </select>
+      <!-- Contenedor principal -->
+      <div class="main-container">
+        <!-- Sidebar -->
+        <div class="wide-sidebar">
+          <div class="film-grain"></div>
+          <div class="old-film-scratches"></div>
+        </div>
+
+        <!-- Área de contenido -->
+        <div class="content-scrollable">
+          <!-- Results info -->
+          <p id="resultsCount" class="results-info"></p>
+
+          <!-- Grid de películas -->
+          <ul class="movies-grid" id="moviesGrid">
+            {allMovies.map((movie) => (
+              <MovieCard movie={movie} />
+            ))}
+          </ul>
+
+          <!-- No results message -->
+          <div class="no-results" id="noResults" style="display: none;">
+            <p>No se encontraron películas con esos criterios</p>
+            <button id="resetBtn" class="reset-btn">Mostrar todas</button>
+          </div>
+        </div>
       </div>
-
-      <button id="clearBtn" class="clear-btn">Limpiar filtros</button>
-    </div>
-
-    <!-- Results info -->
-    <div class="results-info">
-      <p id="resultsCount">Cargando películas...</p>
-    </div>
-
-    <!-- Movies grid -->
-    <div class="movies-grid" id="moviesGrid">
-      <!-- Se llenará dinámicamente con JavaScript -->
-    </div>
-
-    <!-- No results message -->
-    <div class="no-results" id="noResults" style="display: none;">
-      <p>No se encontraron películas con esos criterios</p>
-      <button id="resetBtn" class="reset-btn">Mostrar todas</button>
-    </div>
+    </main>
   </div>
 </Layout>
 
@@ -155,34 +177,30 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
 
   // Función para mostrar películas
   function displayMovies(movies: Movie[]) {
+    const movieCards = Array.from(document.querySelectorAll('.movie-card')) as HTMLElement[];
+    const movieIds = new Set(movies.map(m => m.id));
+    
     if (movies.length === 0) {
-      moviesGrid.style.display = 'none';
+      movieCards.forEach(card => card.style.display = 'none');
       noResults.style.display = 'block';
       return;
     }
 
-    moviesGrid.style.display = 'grid';
     noResults.style.display = 'none';
-
-    moviesGrid.innerHTML = movies.map(movie => {
-      const posterUrl = getPosterUrl(movie.poster_path);
-      return `
-        <a href="/movies/${movie.id}" class="movie-card">
-          <div class="poster-container">
-            <img 
-              src="${posterUrl}" 
-              alt="${movie.title}"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-          <div class="movie-info">
-            <h3 class="movie-title">${movie.title}</h3>
-            <p class="movie-year">${movie.year || 'Año desconocido'}</p>
-          </div>
-        </a>
-      `;
-    }).join('');
+    
+    // Mostrar/ocultar tarjetas según el filtro
+    movieCards.forEach(card => {
+      const movieId = parseInt(card.getAttribute('data-poster-url')?.split('/').pop()?.split('.')[0] || '0');
+      const link = card.querySelector('a');
+      const href = link?.getAttribute('href') || '';
+      const id = parseInt(href.replace('/movies/', ''));
+      
+      if (movieIds.has(id)) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
   }
 
   // Actualizar contador de resultados
@@ -218,51 +236,146 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
 </script>
 
 <style>
+  /* Layout principal */
   .search-layout {
     min-height: 100vh;
-    background: #000;
-    color: #f5d742;
-    font-family: 'Sigmar', cursive;
+    background-color: #000;
   }
 
+  /* Estilos del catálogo */
+  .catalog-layout {
+    min-height: 100vh;
+    background-color: #000;
+    color: #fff;
+  }
+
+  /* Header pantalla completa */
   .full-width-header {
-    background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 100%);
-    padding: 2rem;
-    text-align: center;
-    border-bottom: 3px solid #f5d742;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(10px);
+    position: relative;
+    width: 100%;
+    height: 25vh;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+    overflow: hidden;
   }
 
-  .title {
-    font-size: clamp(1.5rem, 5vw, 3rem);
-    margin: 0 0 1rem 0;
-    text-shadow: 
-      0 0 20px rgba(245, 215, 66, 0.5),
-      2px 2px 0 #000,
-      -2px -2px 0 #000;
+  .full-width-header h1 {
+    font-family: "Sigmar", cursive;
+    font-size: clamp(2rem, 8vw, 5rem);
+    text-align: center;
+    color: #f5d742;
+    text-shadow: 0 0 20px rgba(245, 215, 66, 0.5),
+                 2px 2px 0 #000,
+                 -2px -2px 0 #000;
+    z-index: 2;
+    margin: 0;
+    padding: 0 20px;
   }
 
   .back-link {
     color: #f5d742;
     text-decoration: none;
     font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border: 2px solid #f5d742;
+    border-radius: 4px;
     transition: all 0.3s ease;
+    z-index: 2;
+    margin-top: 1rem;
   }
 
   .back-link:hover {
-    text-shadow: 0 0 10px rgba(245, 215, 66, 0.8);
+    background: #f5d742;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 215, 66, 0.4);
   }
 
+  /* Efectos de película */
+  .film-grain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .old-film-scratches {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(255, 255, 255, 0.02) 50%
+    );
+    background-size: 100% 4px;
+    opacity: 0.1;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Container principal */
+  .main-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #000;
+  }
+
+  .wide-sidebar {
+    position: sticky;
+    top: 0;
+    width: 15vw;
+    min-width: 150px;
+    height: 100vh;
+    background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .content-scrollable {
+    flex: 1;
+    padding: 2rem;
+    position: relative;
+    overflow-y: auto;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Grid de películas */
+  .movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 200px));
+    gap: 1.5rem;
+    padding: 0;
+    margin: 0 auto 3rem auto;
+    list-style: none;
+    width: 100%;
+    max-width: 1000px;
+    justify-content: center;
+  }
+
+  /* Search controls dentro del header */
   .search-controls {
     max-width: 800px;
-    margin: 2rem auto;
+    margin: 1rem auto;
     padding: 0 1rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    z-index: 2;
   }
 
   .search-input-wrapper {
@@ -271,13 +384,13 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
 
   #searchInput {
     width: 100%;
-    padding: 1rem;
-    font-size: 1.2rem;
+    padding: 0.75rem;
+    font-size: 1rem;
     font-family: 'Sigmar', cursive;
     background: rgba(245, 215, 66, 0.1);
     border: 2px solid #f5d742;
     color: #f5d742;
-    border-radius: 8px;
+    border-radius: 4px;
     transition: all 0.3s ease;
   }
 
@@ -297,13 +410,13 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
 
   #yearFilter {
     width: 100%;
-    padding: 1rem;
-    font-size: 1.2rem;
+    padding: 0.75rem;
+    font-size: 1rem;
     font-family: 'Sigmar', cursive;
     background: rgba(245, 215, 66, 0.1);
     border: 2px solid #f5d742;
     color: #f5d742;
-    border-radius: 8px;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s ease;
   }
@@ -320,13 +433,13 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
   }
 
   .clear-btn, .reset-btn {
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.5rem;
     font-size: 1rem;
     font-family: 'Sigmar', cursive;
     background: transparent;
     border: 2px solid #f5d742;
     color: #f5d742;
-    border-radius: 8px;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s ease;
   }
@@ -339,72 +452,10 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
   }
 
   .results-info {
-    max-width: 1000px;
-    margin: 1rem auto;
-    padding: 0 1rem;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: rgba(245, 215, 66, 0.8);
-  }
-
-  .movies-grid {
-    max-width: 1400px;
-    margin: 2rem auto;
-    padding: 0 2rem 4rem 2rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 3rem;
-  }
-
-  .movie-card {
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    color: #f5d742;
-    transition: transform 0.3s ease;
-    width: 100%;
-    height: 100%;
-  }
-
-  .movie-card:hover {
-    transform: translateY(-4px) scale(1.02);
-  }
-
-  .poster-container {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 2 / 3;
-    overflow: hidden;
-    border-radius: 8px;
-    border: 2px solid #f5d742;
-    background: rgba(245, 215, 66, 0.1);
-    flex-shrink: 0;
-  }
-
-  .poster-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .movie-info {
-    margin-top: 0.75rem;
-    padding: 0 0.25rem;
-  }
-
-  .movie-title {
-    font-size: 0.85rem;
-    margin: 0;
-    text-shadow: 1px 1px 0 #000;
-    line-height: 1.3;
-    word-wrap: break-word;
-  }
-
-  .movie-year {
-    font-size: 0.75rem;
-    margin: 0.5rem 0 0 0;
-    color: rgba(245, 215, 66, 0.7);
+    margin-bottom: 2rem;
   }
 
   .no-results {
@@ -419,6 +470,7 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
     margin-bottom: 2rem;
   }
 
+  /* Responsive */
   @media (min-width: 768px) {
     .search-controls {
       flex-direction: row;
