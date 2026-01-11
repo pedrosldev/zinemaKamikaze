@@ -89,6 +89,7 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
                     {review.final_mood === 'boredom' && '😴'}
                     {review.final_mood === 'satisfaction' && '😌'}
                     {review.final_mood === 'disappointment' && '😞'}
+                    {review.final_mood === 'indifference' && '🤷'}
                     {review.final_mood === 'love' && '😍'}
                     {review.final_mood === 'hate' && '🤬'}
                   </span>
@@ -102,6 +103,7 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
                   {review.final_mood === 'boredom' && 'Aburrimiento'}
                   {review.final_mood === 'satisfaction' && 'Satisfacción'}
                   {review.final_mood === 'disappointment' && 'Decepción'}
+                  {review.final_mood === 'indifference' && 'Indiferencia'}
                   {review.final_mood === 'love' && 'Amor'}
                   {review.final_mood === 'hate' && 'Odio'}
                 </small>
