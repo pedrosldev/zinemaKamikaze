@@ -1,0 +1,31 @@
+---
+/**
+ * Componente de entrada de token
+ * Formulario para validar códigos de acceso y seleccionar películas
+ */
+---
+
+<div class="token-input-container" id="tokenContainer">
+  <h3>INTRODUCE TU CÓDIGO DE ACCESO:</h3>
+  <input
+    type="text"
+    id="tokenInput"
+    placeholder="Ingresa el código aquí..."
+    class="token-input"
+  />
+  <div class="selected-by-container">
+    <label for="selectedByInput">¿Quieres firmar tu elección? (Opcional)</label>
+    <input
+      type="text"
+      id="selectedByInput"
+      placeholder="Anónimo, @usuario, tu nombre..."
+      maxlength="100"
+      class="selected-by-input"
+    />
+    <small>Si lo dejas vacío, serás anónimo</small>
+  </div>
+  <button id="validateToken" class="token-btn">
+    VALIDAR CÓDIGO
+  </button>
+  <p id="tokenMessage" class="token-message" />
+</div>

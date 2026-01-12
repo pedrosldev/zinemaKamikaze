@@ -1,0 +1,38 @@
+---
+/**
+ * Componente de póster de película
+ * Muestra el póster de la película actual o un placeholder
+ */
+interface Props {
+  isViewingPeriod: boolean;
+  latestMovie?: {
+    title: string;
+    poster_url: string | null;
+  } | null;
+  expectationCommentsCount: number;
+}
+
+const { isViewingPeriod, latestMovie, expectationCommentsCount } = Astro.props;
+---
+
+{isViewingPeriod && latestMovie ? (
+  <div class="current-poster">
+    <img
+      src={
+        latestMovie.poster_url
+          ? `https://image.tmdb.org/t/p/w500${latestMovie.poster_url}`
+          : "/images/noImg.png"
+      }
+      alt={latestMovie.title}
+      class="poster-image-active"
+    />
+    <button id="open-expectation-comments-btn" class="expectation-comments-btn" onclick="openExpectationCommentsModal()">
+      💬 ¿Qué esperas? ({expectationCommentsCount})
+    </button>
+  </div>
+) : (
+  <!-- Contenido alternativo cuando NO hay periodo de visionado -->
+  <div class="no-movie-placeholder">
+    <p>Próxima película por seleccionar</p>
+  </div>
+)}

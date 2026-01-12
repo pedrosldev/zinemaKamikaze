@@ -1,0 +1,96 @@
+---
+/**
+ * Modal de comentarios de expectativas
+ * Permite ver y añadir comentarios sobre expectativas de una película
+ */
+interface Comment {
+  author_name: string;
+  created_at: string;
+  content: string;
+}
+
+interface Props {
+  isViewingPeriod: boolean;
+  latestMovie?: {
+    title: string;
+    film_id: number;
+  } | null;
+  expectationComments: Comment[];
+}
+
+const { isViewingPeriod, latestMovie, expectationComments } = Astro.props;
+---
+
+{isViewingPeriod && latestMovie && (
+  <div id="expectation-comments-modal" class="expectation-modal">
+    <div class="modal-overlay" onclick="closeExpectationCommentsModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="comments-title">💬 ¿Qué esperas de "{latestMovie.title}"? ({expectationComments.length})</h2>
+        <button class="close-modal-btn" onclick="closeExpectationCommentsModal()" aria-label="Cerrar">
+          ✕
+        </button>
+      </div>
+      
+      <!-- Lista de comentarios -->
+      <div class="comments-list">
+        {expectationComments.length > 0 ? (
+          expectationComments.map((comment) => (
+            <div class="comment-item">
+              <div class="comment-header">
+                <strong class="comment-author">{comment.author_name}</strong>
+                <span class="comment-date">
+                  {new Date(comment.created_at).toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </span>
+              </div>
+              <p class="comment-content">{comment.content}</p>
+            </div>
+          ))
+        ) : (
+          <p class="no-comments">Sé el primero en comentar qué esperas de esta peli</p>
+        )}
+      </div>
+
+      <!-- Formulario para añadir comentario -->
+      <div class="comment-form-container">
+        <h3 class="form-title">Comparte tus expectativas</h3>
+        <form id="expectation-comment-form" class="comment-form">
+          <input type="hidden" id="expectation-film-id" value={latestMovie.film_id} />
+          <div class="form-group">
+            <label for="expectation-author-name">Tu nombre:</label>
+            <input 
+              type="text" 
+              id="expectation-author-name" 
+              name="author_name" 
+              maxlength="100" 
+              required 
+              placeholder="Escribe tu nombre..."
+            />
+          </div>
+          <div class="form-group">
+            <label for="expectation-comment-content">Comentario:</label>
+            <textarea 
+              id="expectation-comment-content" 
+              name="content" 
+              maxlength="2000" 
+              rows="4" 
+              required 
+              placeholder="¿Qué esperas de esta película? ¿La conoces? ¿Qué opinas?"
+            ></textarea>
+            <small class="char-counter">
+              <span id="expectation-char-count">0</span>/2000 caracteres
+            </small>
+          </div>
+          <button type="submit" class="submit-btn">Enviar comentario</button>
+        </form>
+        <div id="expectation-form-message" class="form-message"></div>
+      </div>
+    </div>
+  </div>
+)}
