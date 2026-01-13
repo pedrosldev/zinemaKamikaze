@@ -128,10 +128,10 @@ export async function getActiveTokens(): Promise<TokenRow[]> {
   return rows;
 }
 
-export async function getReviewsWithNullReview() {
+export async function getReviewsWithNullReview(): Promise<Pick<ReviewRow, 'id' | 'film_id' | 'title' | 'year' | 'vibe' | 'expectation_mood'>[]> {
   try {
-    const [rows] = await pool.execute(
-      'SELECT id, film_id, title, year, type, vibe, poster_url, expectation_mood FROM reviews WHERE review IS NULL'
+    const [rows] = await pool.execute<Array<Pick<ReviewRow, 'id' | 'film_id' | 'title' | 'year' | 'vibe' | 'expectation_mood'> & RowDataPacket>>(
+      'SELECT id, film_id, title, year, vibe, expectation_mood FROM reviews WHERE review IS NULL'
     );
     return rows;
   } catch (error) {
