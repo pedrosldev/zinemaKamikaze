@@ -790,8 +790,13 @@ const reviews = Array.from(reviewsMap.values());
 
     // 1. Función para actualizar la imagen (Reutilizable)
     const updateSidebar = (poster) => {
-      if (!poster || !sidebar) return;
-      const posterUrl = `https://image.tmdb.org/t/p/w500${poster}`;
+      if (!sidebar) return;
+      
+      // Si no hay poster, usar imagen por defecto
+      const posterUrl = poster 
+        ? `https://image.tmdb.org/t/p/w500${poster}`
+        : '/images/noImg.png';
+      
       sidebar.style.backgroundImage = `url(${posterUrl})`;
       sidebar.style.backgroundSize = "cover";
       sidebar.style.backgroundPosition = "center";
