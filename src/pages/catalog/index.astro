@@ -1,9 +1,9 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import { getTotalPages } from '../../lib/catalogUtils';
+import Layout from "../../layouts/Layout.astro";
+import { getTotalPages } from "../../lib/catalogUtils";
 
 const totalPages = getTotalPages(100);
-const totalMovies = 25947; // Aproximado
+const totalMovies = 18266; // Aproximado
 ---
 
 <Layout>
@@ -28,10 +28,8 @@ const totalMovies = 25947; // Aproximado
           <span class="stat-label">Páginas</span>
         </p>
       </div>
-      
-      <a href="/catalog/1" class="start-button">
-        Explorar Catálogo →
-      </a>
+
+      <a href="/catalog/1" class="start-button"> Explorar Catálogo → </a>
 
       <a href="/" class="back-link">← Volver al inicio</a>
 
@@ -66,9 +64,10 @@ const totalMovies = 25947; // Aproximado
     font-size: clamp(2.5rem, 10vw, 6rem);
     text-align: center;
     color: #f5d742;
-    text-shadow: 0 0 20px rgba(245, 215, 66, 0.5),
-                 2px 2px 0 #000,
-                 -2px -2px 0 #000;
+    text-shadow:
+      0 0 20px rgba(245, 215, 66, 0.5),
+      2px 2px 0 #000,
+      -2px -2px 0 #000;
     z-index: 2;
     margin: 0 0 2rem 0;
   }

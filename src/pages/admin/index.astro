@@ -41,7 +41,7 @@ if (authToken !== ADMIN_PASSWORD) {
         {
           activeTokens.length > 0 ? (
             <div class="tokens-list">
-              {activeTokens.map((token) => (
+              {activeTokens.map((token: any) => (
                 <div class="token-item">
                   <div class="token-code">
                     <strong>CÓDIGO:</strong>
@@ -77,7 +77,7 @@ if (authToken !== ADMIN_PASSWORD) {
               <label for="selectReview">SELECCIONAR CRÍTICA A COMPLETAR:</label>
               <select id="selectReview" class="review-select">
                 <option value="">-- Selecciona una crítica pendiente --</option>
-                {pendingReviews.map((review) => (
+                {pendingReviews.map((review: any) => (
                   <option
                     value={review.id}
                     data-review={JSON.stringify(review)}
