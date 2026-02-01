@@ -1,0 +1,88 @@
+---
+interface Comment {
+  id: number;
+  author_name: string;
+  content: string;
+  created_at: string;
+}
+
+interface Props {
+  reviewId: number;
+  comments: Comment[];
+}
+
+const { reviewId, comments } = Astro.props;
+---
+
+<!-- Modal de Comentarios -->
+<div id="comments-modal" class="comments-modal">
+  <div class="modal-overlay"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="comments-title">💬 Comentarios ({comments.length})</h2>
+      <button class="close-modal-btn" aria-label="Cerrar">
+        ✕
+      </button>
+    </div>
+  
+    <!-- Lista de comentarios -->
+    <div class="comments-list">
+      {comments.length > 0 ? (
+        comments.map((comment) => (
+          <div class="comment-item">
+            <div class="comment-header">
+              <strong class="comment-author">{comment.author_name}</strong>
+              <span class="comment-date">
+                {new Date(comment.created_at).toLocaleDateString('es-ES', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </span>
+            </div>
+            <p class="comment-content">{comment.content}</p>
+          </div>
+        ))
+      ) : (
+        <p class="no-comments">Sé el primero en comentar esta reseña</p>
+      )}
+    </div>
+
+    <!-- Formulario para añadir comentario -->
+    <div class="comment-form-container">
+      <h3 class="form-title">Deja tu comentario</h3>
+      <form id="comment-form" class="comment-form">
+        <input type="hidden" name="review_id" value={reviewId} />
+        <div class="form-group">
+          <label for="author-name">Tu nombre:</label>
+          <input 
+            type="text" 
+            id="author-name" 
+            name="author_name" 
+            maxlength="100" 
+            required 
+            placeholder="Escribe tu nombre..."
+          />
+        </div>
+        <div class="form-group">
+          <label for="comment-content">Comentario:</label>
+          <textarea 
+            id="comment-content" 
+            name="content" 
+            maxlength="2000" 
+            rows="4" 
+            required 
+            placeholder="Comparte tu opinión sobre esta reseña..."
+          ></textarea>
+          <small class="char-counter">
+            <span id="char-count">0</span>/2000 caracteres
+          </small>
+        </div>
+        <button type="submit" class="submit-btn">Enviar comentario</button>
+      </form>
+      <div id="form-message" class="form-message"></div>
+    </div>
+  </div>
+</div>

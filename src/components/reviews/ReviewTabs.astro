@@ -1,0 +1,64 @@
+---
+interface Props {
+  hasVideo: boolean;
+  hasText: boolean;
+  youtubeId: string | null;
+  reviewText: string | null;
+}
+
+const { hasVideo, hasText, youtubeId, reviewText } = Astro.props;
+const showTabs = hasVideo || hasText;
+---
+
+{showTabs && (
+  <>
+    <!-- Pestañas (si hay al menos video o texto) -->
+    <div class="tabs-container">
+      <button class="tab-btn active" data-tab="text-content">
+        📝 Reseña Escrita
+      </button>
+      <button class="tab-btn" data-tab="video-content">
+        🎥 Video Reseña
+      </button>
+    </div>
+
+    <!-- Toggle de animación -->
+    <div class="toggle-container" style="display: flex; gap: 0.3rem; justify-content: center; flex-direction: column; align-items: center;">
+      <img
+        id="toggle-animation"
+        src="/images/pause-square-svgrepo-com.svg"
+        alt="Play/Pause"
+      />
+      <span class="toggle-text">Pausar crítica</span>
+    </div>
+
+    <div class="credits-container">
+      <!-- Video crítica (si existe youtube_id) -->
+      <section class="video-review tab-content" id="video-content" style={(hasText || !hasVideo) ? "display: none;" : ""}>
+        {youtubeId ? (
+          <lite-youtube 
+            videoid={youtubeId}
+            style={`background-image: url('https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg');`}
+          ></lite-youtube>
+        ) : (
+          <div class="no-content-message">
+            <p>🎥</p>
+            <p>Esta reseña no tiene video review</p>
+          </div>
+        )}
+      </section>
+
+      <!-- Texto de la review (si existe) -->
+      <div id="text-content" class="credits-text tab-content" style="display: flex;">
+        {reviewText ? (
+          reviewText.split('\n').map((line: string) => <p>{line}</p>)
+        ) : (
+          <div class="no-content-message static">
+            <p>📝</p>
+            <p>Esta reseña no tiene texto escrito</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </>
+)}

@@ -1,0 +1,92 @@
+---
+import MoodBadge from "../shared/MoodBadge.astro";
+import { getMoodConfig } from "../../lib/moodMapper";
+
+interface Props {
+  title: string;
+  year: number | null;
+  filmId: number;
+  vibe: string;
+  expectationMood: string | null;
+  finalMood: string | null;
+  selectedBy: string | null;
+  reviewCount: number;
+  commentsCount: number;
+}
+
+const {
+  title,
+  year,
+  filmId,
+  vibe,
+  expectationMood,
+  finalMood,
+  selectedBy,
+  reviewCount,
+  commentsCount
+} = Astro.props;
+---
+
+<header>
+  <div class="header-content">
+    <!-- Icono expectativa inicial (izquierda) -->
+    {expectationMood && (
+      <div class="mood-container">
+        <p class="mood-title" style="font-family: 'Special Elite', cursive;">
+          Mi expectativa antes de verla
+        </p>
+        <MoodBadge 
+          mood={expectationMood} 
+          type="expectation" 
+          variant="initial" 
+          showLabel={false}
+        />
+        <small class="mood-label">
+          {getMoodConfig(expectationMood, 'expectation')?.label}
+        </small>
+      </div>
+    )}
+    
+    <div class="header-center">
+      <h1>
+        {title}{" "}
+        {year && year !== 0 ? `(${year})` : ""}
+      </h1>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        {reviewCount > 1 && (
+          <a href={`/movies/${filmId}`} class="multiple-reviews-link">
+            📽️ Ver los {reviewCount} visionados
+          </a>
+        )}
+        <a href={`/vibe/${vibe}`}>Volver a {vibe}</a>
+        <a href="/" class="back-link">
+          Volver al listado
+        </a>
+        <button class="comments-btn">
+          💬 Comentarios ({commentsCount})
+        </button>
+      </div>
+      {selectedBy && (
+        <p class="selected-by-credit">
+          🎲 Seleccionada por: <strong>{selectedBy}</strong>
+        </p>
+      )}
+    </div>
+    
+    <!-- Icono mood final (derecha) -->
+    {finalMood && (
+      <div class="mood-container">
+        <p class="mood-title">Mi expectativa después de verla</p>
+        <MoodBadge 
+          mood={finalMood} 
+          type="final" 
+          variant="final" 
+          showLabel={false}
+        />
+        <small class="mood-label">
+          {getMoodConfig(finalMood, 'final')?.label}
+        </small>
+      </div>
+    )}
+  </div>
+</header>

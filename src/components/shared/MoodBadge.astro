@@ -19,21 +19,18 @@ const {
   className = ''
 } = Astro.props;
 
-// Si no hay mood, no renderizar nada
-if (!mood) return null;
-
-const moodConfig = getMoodConfig(mood, type);
-if (!moodConfig) return null;
-
+const moodConfig = mood ? getMoodConfig(mood, type) : null;
 const badgeTitle = title || (variant === 'initial' ? 'Cuando me enteré' : 'Después de verla');
 ---
 
-<div class={`mood-badge ${variant} ${className}`} title={badgeTitle}>
-  <span class="mood-emoji">{moodConfig.emoji}</span>
-  {showLabel && (
-    <span class="mood-name">{moodConfig.label}</span>
-  )}
-</div>
+{moodConfig && (
+  <div class={`mood-badge ${variant} ${className}`} title={badgeTitle}>
+    <span class="mood-emoji">{moodConfig.emoji}</span>
+    {showLabel && (
+      <span class="mood-name">{moodConfig.label}</span>
+    )}
+  </div>
+)}
 
 <style>
   .mood-badge {
