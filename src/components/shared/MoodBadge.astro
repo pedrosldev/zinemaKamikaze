@@ -1,0 +1,99 @@
+---
+import { getMoodConfig } from '../../lib/moodMapper';
+
+interface Props {
+  mood: string | null | undefined;
+  type?: 'expectation' | 'final';
+  variant?: 'initial' | 'final';
+  showLabel?: boolean;
+  title?: string;
+  className?: string;
+}
+
+const { 
+  mood, 
+  type = 'expectation', 
+  variant = 'initial',
+  showLabel = true,
+  title,
+  className = ''
+} = Astro.props;
+
+// Si no hay mood, no renderizar nada
+if (!mood) return null;
+
+const moodConfig = getMoodConfig(mood, type);
+if (!moodConfig) return null;
+
+const badgeTitle = title || (variant === 'initial' ? 'Cuando me enteré' : 'Después de verla');
+---
+
+<div class={`mood-badge ${variant} ${className}`} title={badgeTitle}>
+  <span class="mood-emoji">{moodConfig.emoji}</span>
+  {showLabel && (
+    <span class="mood-name">{moodConfig.label}</span>
+  )}
+</div>
+
+<style>
+  .mood-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 50%;
+    background: rgba(245, 215, 66, 0.2);
+    border: 2px solid #f5d742;
+    min-width: 60px;
+    min-height: 60px;
+    transition: all 0.3s ease;
+  }
+
+  .mood-badge:hover {
+    transform: scale(1.1);
+    background: rgba(245, 215, 66, 0.3);
+  }
+
+  .mood-badge.final {
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.2);
+  }
+
+  .mood-badge.final:hover {
+    background: rgba(74, 222, 128, 0.3);
+  }
+
+  .mood-emoji {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .mood-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #f5d742;
+    font-family: 'Special Elite', cursive;
+    white-space: nowrap;
+  }
+
+  .mood-badge.final .mood-name {
+    color: #4ade80;
+  }
+
+  @media (max-width: 768px) {
+    .mood-badge {
+      min-width: 50px;
+      min-height: 50px;
+      padding: 0.5rem;
+    }
+
+    .mood-emoji {
+      font-size: 1.5rem;
+    }
+
+    .mood-name {
+      font-size: 0.75rem;
+    }
+  }
+</style>

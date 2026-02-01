@@ -2,6 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import { getReviewsByFilmId } from "../../lib/db";
 import { getAllMovies } from "../../lib/catalogUtils";
+import MoodBadge from "../../components/shared/MoodBadge.astro";
 
 // SSR para evitar timeout en Netlify (25,947 páginas exceden el límite de 18 min)
 export const prerender = false;
@@ -100,56 +101,24 @@ const movie = hasReviews ? reviews[0] : movieInfo;
             {review.expectation_mood && (
               <div class="mood-item">
                 <span class="mood-label">Expectativa inicial</span>
-                <div class="mood-badge">
-                  <span class="mood-emoji">
-                    {review.expectation_mood === "excitement" && "🎉"}
-                    {review.expectation_mood === "fear" && "😱"}
-                    {review.expectation_mood === "curiosity" && "🤔"}
-                    {review.expectation_mood === "dread" && "😩"}
-                    {review.expectation_mood === "surprise" && "😲"}
-                    {review.expectation_mood === "boredom" && "😴"}
-                  </span>
-                  <span class="mood-name">
-                    {review.expectation_mood === "excitement" && "Emoción"}
-                    {review.expectation_mood === "fear" && "Miedo"}
-                    {review.expectation_mood === "curiosity" && "Curiosidad"}
-                    {review.expectation_mood === "dread" && "Horror"}
-                    {review.expectation_mood === "surprise" && "Sorpresa"}
-                    {review.expectation_mood === "boredom" && "Aburrimiento"}
-                  </span>
-                </div>
+                <MoodBadge 
+                  mood={review.expectation_mood} 
+                  type="expectation" 
+                  variant="initial" 
+                  showLabel={true}
+                />
               </div>
             )}
 
             {review.final_mood && (
               <div class="mood-item">
                 <span class="mood-label">Después de verla</span>
-                <div class="mood-badge final">
-                  <span class="mood-emoji">
-                    {review.final_mood === "excitement" && "🎉"}
-                    {review.final_mood === "fear" && "😱"}
-                    {review.final_mood === "curiosity" && "🤔"}
-                    {review.final_mood === "dread" && "😩"}
-                    {review.final_mood === "surprise" && "😲"}
-                    {review.final_mood === "boredom" && "😴"}
-                    {review.final_mood === "satisfaction" && "😌"}
-                    {review.final_mood === "disappointment" && "😞"}
-                    {review.final_mood === "love" && "😍"}
-                    {review.final_mood === "hate" && "🤬"}
-                  </span>
-                  <span class="mood-name">
-                    {review.final_mood === "excitement" && "Emoción"}
-                    {review.final_mood === "fear" && "Miedo"}
-                    {review.final_mood === "curiosity" && "Curiosidad"}
-                    {review.final_mood === "dread" && "Horror"}
-                    {review.final_mood === "surprise" && "Sorpresa"}
-                    {review.final_mood === "boredom" && "Aburrimiento"}
-                    {review.final_mood === "satisfaction" && "Satisfacción"}
-                    {review.final_mood === "disappointment" && "Decepción"}
-                    {review.final_mood === "love" && "Amor"}
-                    {review.final_mood === "hate" && "Odio"}
-                  </span>
-                </div>
+                <MoodBadge 
+                  mood={review.final_mood} 
+                  type="final" 
+                  variant="final" 
+                  showLabel={true}
+                />
               </div>
             )}
           </div>

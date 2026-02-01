@@ -1,6 +1,8 @@
 ---
 import { getReviewById, getReviewCountByFilmId, getCommentsByReviewId } from "../../lib/db";
 import Layout from "../../layouts/Layout.astro";
+import MoodBadge from "../../components/shared/MoodBadge.astro";
+import { getMoodConfig } from "../../lib/moodMapper";
 export const prerender = false; // Consultar
 // const { params} = Astro;
 const review = await getReviewById(Number(Astro.params.id));
@@ -29,23 +31,14 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
             {review.expectation_mood && (
               <div class="mood-container">
                 <p class="mood-title" style="font-family: 'Special Elite', cursive;">Mi expectativa antes de verla</p>
-                <div class="mood-badge initial" title="Cuando me enteré">
-                  <span class="mood-emoji">
-                    {review.expectation_mood === 'excitement' && '🎉'}
-                    {review.expectation_mood === 'fear' && '😱'}
-                    {review.expectation_mood === 'curiosity' && '🤔'}
-                    {review.expectation_mood === 'dread' && '😩'}
-                    {review.expectation_mood === 'surprise' && '😲'}
-                    {review.expectation_mood === 'boredom' && '😴'}
-                  </span>
-                </div>
+                <MoodBadge 
+                  mood={review.expectation_mood} 
+                  type="expectation" 
+                  variant="initial" 
+                  showLabel={false}
+                />
                 <small class="mood-label">
-                  {review.expectation_mood === 'excitement' && 'Emoción'}
-                  {review.expectation_mood === 'fear' && 'Miedo'}
-                  {review.expectation_mood === 'curiosity' && 'Curiosidad'}
-                  {review.expectation_mood === 'dread' && 'Horror'}
-                  {review.expectation_mood === 'surprise' && 'Sorpresa'}
-                  {review.expectation_mood === 'boredom' && 'Aburrimiento'}
+                  {getMoodConfig(review.expectation_mood, 'expectation')?.label}
                 </small>
               </div>
             )}
@@ -80,33 +73,14 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
             {review.final_mood && (
               <div class="mood-container">
                 <p class="mood-title">Mi expectativa después de verla</p>
-                <div class="mood-badge final" title="Después de verla">
-                  <span class="mood-emoji">
-                    {review.final_mood === 'excitement' && '🎉'}
-                    {review.final_mood === 'fear' && '😱'}
-                    {review.final_mood === 'curiosity' && '🤔'}
-                    {review.final_mood === 'dread' && '😩'}
-                    {review.final_mood === 'surprise' && '😲'}
-                    {review.final_mood === 'boredom' && '😴'}
-                    {review.final_mood === 'satisfaction' && '😌'}
-                    {review.final_mood === 'disappointment' && '😞'}
-                    {review.final_mood === 'indifference' && '🤷'}
-                    {review.final_mood === 'love' && '😍'}
-                    {review.final_mood === 'hate' && '🤬'}
-                  </span>
-                </div>
+                <MoodBadge 
+                  mood={review.final_mood} 
+                  type="final" 
+                  variant="final" 
+                  showLabel={false}
+                />
                 <small class="mood-label">
-                  {review.final_mood === 'excitement' && 'Emoción'}
-                  {review.final_mood === 'fear' && 'Miedo'}
-                  {review.final_mood === 'curiosity' && 'Curiosidad'}
-                  {review.final_mood === 'dread' && 'Horror'}
-                  {review.final_mood === 'surprise' && 'Sorpresa'}
-                  {review.final_mood === 'boredom' && 'Aburrimiento'}
-                  {review.final_mood === 'satisfaction' && 'Satisfacción'}
-                  {review.final_mood === 'disappointment' && 'Decepción'}
-                  {review.final_mood === 'indifference' && 'Indiferencia'}
-                  {review.final_mood === 'love' && 'Amor'}
-                  {review.final_mood === 'hate' && 'Odio'}
+                  {getMoodConfig(review.final_mood, 'final')?.label}
                 </small>
               </div>
             )}
