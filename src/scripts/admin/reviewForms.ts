@@ -5,7 +5,7 @@ interface ReviewData {
   film_id: number;
   title: string;
   year: number;
-  poster_url?: string;
+  poster?: string;
   youtube_id?: string;
   vibe?: string;
   expectation_mood?: string;
@@ -25,7 +25,7 @@ function fillFormWithReviewData(reviewData: ReviewData) {
   (document.getElementById("film_id") as HTMLInputElement).value = String(reviewData.film_id);
   (document.getElementById("title") as HTMLInputElement).value = reviewData.title || "";
   (document.getElementById("year") as HTMLInputElement).value = String(reviewData.year || "");
-  (document.getElementById("poster") as HTMLInputElement).value = reviewData.poster_url || "";
+  (document.getElementById("poster") as HTMLInputElement).value = reviewData.poster || "";
   (document.getElementById("youtube_id") as HTMLInputElement).value = reviewData.youtube_id || "";
   (document.getElementById("vibe") as HTMLSelectElement).value = reviewData.vibe || "pasable";
   
