@@ -1,0 +1,38 @@
+---
+interface PendingReview {
+  id: number;
+  title: string;
+  year: number;
+  film_id: number;
+}
+
+interface Props {
+  pendingReviews: PendingReview[];
+}
+
+const { pendingReviews } = Astro.props;
+---
+
+<div class="pending-reviews">
+  <h2>CRÍTICAS PENDIENTES DE COMPLETAR</h2>
+  {pendingReviews.length > 0 ? (
+    <div class="reviews-list">
+      <div class="form-group">
+        <label for="selectReview">SELECCIONAR CRÍTICA A COMPLETAR:</label>
+        <select id="selectReview" class="review-select">
+          <option value="">-- Selecciona una crítica pendiente --</option>
+          {pendingReviews.map((review) => (
+            <option
+              value={review.id}
+              data-review={JSON.stringify(review)}
+            >
+              {review.title} ({review.year}) - ID: {review.film_id}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  ) : (
+    <p>No hay críticas pendientes de completar</p>
+  )}
+</div>

@@ -1,0 +1,105 @@
+---
+// Componente para el formulario de completar/actualizar críticas
+---
+
+<div class="review-form" id="updateReviewForm" style="display: none;">
+  <h2>COMPLETAR CRÍTICA</h2>
+  <form id="reviewForm">
+    <input type="hidden" id="review_id" name="id" />
+
+    <div class="form-group">
+      <label for="film_id">FILM ID:</label>
+      <input type="number" id="film_id" name="film_id" required readonly />
+    </div>
+
+    <div class="form-group">
+      <label for="title">TÍTULO:</label>
+      <input type="text" id="title" name="title" required readonly />
+    </div>
+
+    <div class="form-group">
+      <label for="year">AÑO:</label>
+      <input type="number" id="year" name="year" required readonly />
+    </div>
+
+    <div class="form-group">
+      <label for="poster">URL DEL PÓSTER:</label>
+      <input type="text" id="poster" name="poster" required readonly />
+    </div>
+
+    <div class="form-group">
+      <label for="youtube_id">ID DEL VIDEO DE YOUTUBE:</label>
+      <input 
+        type="text" 
+        id="youtube_id" 
+        name="youtube_id" 
+        placeholder="Ej: dQw4w9WgXcQ (11 caracteres)"
+        maxlength="20"
+      />
+      <small style="color: #999; font-size: 0.9em; display: block; margin-top: 4px;">
+        Opcional. Extrae el ID de la URL: youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong>
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label for="expectation_mood">MI EXPECTATIVA AL ENTERARME:</label>
+      <select name="expectation_mood" id="expectation_mood">
+        <option value="">-- Sin definir (neutra) --</option>
+        <option value="excitement">🎉 EMOCIÓN - ¡Genial! Tenía ganas de verla</option>
+        <option value="fear">😱 MIEDO - Esto va a ser duro...</option>
+        <option value="curiosity">🤔 CURIOSIDAD - ¿Qué será esto?</option>
+        <option value="dread">😩 HORROR - No puede ser...</option>
+        <option value="surprise">😲 SORPRESA - ¡Vaya! No me lo esperaba</option>
+        <option value="boredom">😴 ABURRIMIENTO - Uf, qué pereza...</option>
+      </select>
+      <small id="expectation_mood_help" style="color: #999; font-size: 0.8rem; margin-top: 0.5rem; display: block;">
+        <!-- Texto dinámico controlado por JavaScript -->
+      </small>
+      <button type="button" id="updateMoodOnly" class="mood-btn" style="margin-top: 10px;">
+        ACTUALIZAR SOLO EXPECTATIVA (sin completar crítica)
+      </button>
+    </div>
+
+    <div class="form-group">
+      <label for="vibe">VIBE:</label>
+      <select name="vibe" id="vibe" required>
+        <option value="eutanasia">EUTANASIA</option>
+        <option value="vomito">VOMITO</option>
+        <option value="aburrida">ABURRIDA</option>
+        <option value="pasable">PASABLE</option>
+        <option value="disfrutable">DISFRUTABLE</option>
+        <option value="entretenida">ENTRETENIDA</option>
+        <option value="mola">MOLA</option>
+        <option value="obra maestra">OBRA MAESTRA</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="review">CRÍTICA:</label>
+      <textarea id="review" name="review" rows="10" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="final_mood">MI SENSACIÓN DESPUÉS DE VERLA:</label>
+      <select name="final_mood" id="final_mood">
+        <option value="">-- Sin definir --</option>
+        <option value="excitement">🎉 EMOCIÓN - ¡Me encantó!</option>
+        <option value="fear">😱 MIEDO - Fue perturbador</option>
+        <option value="curiosity">🤔 CURIOSIDAD - Me dejó pensando</option>
+        <option value="dread">😩 HORROR - Fue terrible</option>
+        <option value="surprise">😲 SORPRESA - No me lo esperaba</option>
+        <option value="boredom">😴 ABURRIMIENTO - Fue aburrida</option>
+        <option value="satisfaction">😌 SATISFACCIÓN - Cumplió mis expectativas</option>
+        <option value="disappointment">😞 DECEPCIÓN - No cumplió mis expectativas</option>
+        <option value="indifference">🤷 INDIFERENCIA - Sin más</option>
+        <option value="love">😍 AMOR - La amé completamente</option>
+        <option value="hate">🤬 ODIO - La odié completamente</option>
+      </select>
+      <small style="color: #999; font-size: 0.8rem; margin-top: 0.5rem; display: block;">
+        Este será el sentimiento final que se mostrará en la comparación
+      </small>
+    </div>
+
+    <button type="submit">ACTUALIZAR CRÍTICA</button>
+  </form>
+</div>

@@ -1,0 +1,48 @@
+---
+interface Token {
+  token: string;
+  created_at: string;
+  is_active: boolean;
+}
+
+interface Props {
+  activeTokens: Token[];
+}
+
+const { activeTokens } = Astro.props;
+---
+
+<div class="tokens-section">
+  <h2>GENERAR NUEVO CÓDIGO</h2>
+  <button id="generateToken" class="generate-btn">
+    GENERAR NUEVO CÓDIGO
+  </button>
+
+  <div class="active-tokens">
+    <h3>CÓDIGOS ACTIVOS:</h3>
+    {activeTokens.length > 0 ? (
+      <div class="tokens-list">
+        {activeTokens.map((token) => (
+          <div class="token-item">
+            <div class="token-code">
+              <strong>CÓDIGO:</strong>
+              <code>{token.token}</code>
+            </div>
+            <div class="token-info">
+              <strong>CREADO:</strong>{" "}
+              {new Date(token.created_at).toLocaleString()}
+            </div>
+            <div class="token-instructions">
+              <em>
+                Comparte este código con el ganador para que pueda generar
+                una crítica
+              </em>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p>No hay códigos activos</p>
+    )}
+  </div>
+</div>
