@@ -1,0 +1,50 @@
+---
+interface Review {
+  id: number;
+  title: string;
+  year?: number;
+  poster?: string;
+  film_id: number;
+  count: number;
+  reviewIds: number[];
+}
+
+interface Props {
+  reviews: Review[];
+}
+
+const { reviews } = Astro.props;
+---
+
+<div class="content-scrollable">
+  <img
+    src="/images/caret-circle-up-svgrepo-com.svg"
+    alt="Scroll Up"
+    class="scroll-arrow scroll-up"
+  />
+  <ul class="reviews-list">
+    {reviews.map((review, index) => (
+      <li
+        class={`review-item ${index % 2 === 0 ? "even" : "odd"}`}
+        data-poster-url={review.poster}
+      >
+        <a href={`/reviews/${review.id}`}>
+          {review.title}{" "}
+          <span class="review-year">
+            {review.year && review.year !== 0 ? `(${review.year})` : ""}
+          </span>
+          {review.count > 1 && (
+            <span class="review-count" title={`Revisada ${review.count} veces con este vibe`}>
+              ×{review.count}
+            </span>
+          )}
+        </a>
+      </li>
+    ))}
+  </ul>
+  <img
+    src="/images/caret-circle-down-svgrepo-com.svg"
+    alt="Scroll Down"
+    class="scroll-arrow scroll-down"
+  />
+</div>

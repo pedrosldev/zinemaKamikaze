@@ -1,0 +1,14 @@
+---
+interface Props {
+  vibe: string;
+}
+
+const { vibe } = Astro.props;
+---
+
+<div class="full-width-header">
+  <h1>ZINEMA KAMIKAZE: {vibe}</h1>
+  <div class="film-grain"></div>
+  <div class="old-film-scratches"></div>
+  <a href="/" class="back-link">Volver al listado</a>
+</div>
