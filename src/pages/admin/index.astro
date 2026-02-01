@@ -5,6 +5,8 @@ import { getActiveTokens, getReviewsWithNullReview } from "../../lib/db";
 import TokenManagement from "../../components/admin/TokenManagement.astro";
 import PendingReviewsSelector from "../../components/admin/PendingReviewsSelector.astro";
 import ReviewForm from "../../components/admin/ReviewForm.astro";
+import MoodSelect from "../../components/shared/MoodSelect.astro";
+import VibeSelect from "../../components/shared/VibeSelect.astro";
 
 const authToken = Astro.cookies.get("admin_auth")?.value;
 const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || "tu-password-segura";
@@ -79,16 +81,7 @@ if (authToken !== ADMIN_PASSWORD) {
 
         <div class="form-group">
           <label for="new_vibe">VIBE:</label>
-          <select name="vibe" id="new_vibe" required>
-            <option value="eutanasia">EUTANASIA</option>
-            <option value="vomito">VOMITO</option>
-            <option value="aburrida">ABURRIDA</option>
-            <option value="pasable">PASABLE</option>
-            <option value="disfrutable">DISFRUTABLE</option>
-            <option value="entretenida">ENTRETENIDA</option>
-            <option value="mola">MOLA</option>
-            <option value="obra maestra">OBRA MAESTRA</option>
-          </select>
+          <VibeSelect name="vibe" id="new_vibe" required />
         </div>
 
         <div class="form-group">

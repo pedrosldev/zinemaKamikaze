@@ -1,0 +1,32 @@
+---
+import { EXPECTATION_MOODS, FINAL_MOODS } from '../../lib/moodMapper';
+
+interface Props {
+  name: string;
+  id: string;
+  type: 'expectation' | 'final';
+  required?: boolean;
+  includeEmpty?: boolean;
+  emptyLabel?: string;
+}
+
+const { 
+  name, 
+  id, 
+  type, 
+  required = false,
+  includeEmpty = true,
+  emptyLabel = "-- Sin definir --"
+} = Astro.props;
+
+const moods = type === 'expectation' ? EXPECTATION_MOODS : FINAL_MOODS;
+---
+
+<select name={name} id={id} required={required}>
+  {includeEmpty && <option value="">{emptyLabel}</option>}
+  {Object.entries(moods).map(([key, config]) => (
+    <option value={key}>
+      {config.emoji} {config.label.toUpperCase()}{config.description ? ` - ${config.description}` : ''}
+    </option>
+  ))}
+</select>
