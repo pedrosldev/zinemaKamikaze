@@ -32,9 +32,9 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
           year={review.year}
           filmId={review.film_id}
           vibe={review.vibe}
-          expectationMood={review.expectation_mood}
-          finalMood={review.final_mood}
-          selectedBy={review.selected_by}
+          expectationMood={review.expectation_mood ?? null}
+          finalMood={review.final_mood ?? null}
+          selectedBy={review.selected_by ?? null}
           reviewCount={reviewCount}
           commentsCount={comments.length}
         />
@@ -42,8 +42,8 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
         <ReviewTabs
           hasVideo={!!review.youtube_id}
           hasText={!!review.review}
-          youtubeId={review.youtube_id}
-          reviewText={review.review}
+          youtubeId={review.youtube_id ?? null}
+          reviewText={review.review ?? null}
         />
 
         <CommentsModal
