@@ -5,3 +5,36 @@
 <div id="mobile-tip" class="mobile-toast">
   Pulsa otra vez para leer la crítica
 </div>
+
+<style>
+  .mobile-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(150px);
+    background: #f5d742;
+    color: #1c3b70;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-family: "Special Elite", cursive;
+    font-weight: bold;
+    z-index: 2000;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    display: none;
+  }
+
+  .mobile-toast.visible {
+    transform: translateX(-50%) translateY(0);
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .mobile-toast {
+      display: block;
+    }
+  }
+</style>
