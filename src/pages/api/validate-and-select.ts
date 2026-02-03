@@ -5,6 +5,37 @@ import { join } from 'path';
 
 export const prerender = false;
 
+/**
+ * Función auxiliar para seleccionar una película válida con retry automático
+ */
+function selectRandomValidFilm(titlesData: any[], maxAttempts = 5): { success: boolean; film: any | null } {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const randomIndex = Math.floor(Math.random() * titlesData.length);
+    const pelicula = titlesData[randomIndex];
+    
+    // Validar que tenga films
+    if (!pelicula?.films || pelicula.films.length === 0) {
+      continue; // Intentar con otra película
+    }
+    
+    const filmIndex = Math.floor(Math.random() * pelicula.films.length);
+    const selectedFilm = pelicula.films[filmIndex];
+    
+    // Validar que el film tenga los datos necesarios
+    if (selectedFilm?.id && selectedFilm?.title) {
+      return {
+        success: true,
+        film: selectedFilm
+      };
+    }
+  }
+  
+  return {
+    success: false,
+    film: null
+  };
+}
+
 export const POST: APIRoute = async ({ request }) => {
   const body = await request.json();
   const { token, selected_by } = body;
@@ -51,12 +82,37 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // 3. Seleccionar película aleatoria
-    const randomIndex = Math.floor(Math.random() * titlesData.length);
-    const pelicula = titlesData[randomIndex];
-    const film = Math.floor(Math.random() * pelicula.films.length);
-    const selectedFilm = pelicula.films[film];
+    // Filtrar películas con datos válidos
+    const validMovies = titlesData.filter(movie => 
+      movie?.films && 
+      Array.isArray(movie.films) && 
+      movie.films.length > 0 &&
+      movie.films.some((f: any) => f?.id && f?.title)
+    );
 
+    if (validMovies.length === 0) {
+      await connection.rollback();
+      return new Response(
+        JSON.stringify({ valid: false, message: 'No hay películas disponibles con datos válidos' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 3. Seleccionar película aleatoria con validación
+    const selection = selectRandomValidFilm(validMovies);
+
+    if (!selection.success || !selection.film) {
+      await connection.rollback();
+      return new Response(
+        JSON.stringify({ 
+          valid: false, 
+          message: 'No se pudo seleccionar una película válida. Por favor intenta de nuevo.' 
+        }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const selectedFilm = selection.film;
     const filmId = selectedFilm.id;
     const title = selectedFilm.title;
     const year = selectedFilm.year || 'Unknown';
@@ -96,11 +152,20 @@ export const POST: APIRoute = async ({ request }) => {
   } catch (error) {
     // Si algo falla, revertir TODO
     await connection.rollback();
-    console.error('Error en validate-and-select:', error);
+    
+    // Logging estructurado para debugging
+    console.error('Error en validate-and-select:', {
+      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      token: token?.substring(0, 8) + '...', // Solo primeros chars por seguridad
+      selected_by
+    });
+    
     return new Response(
       JSON.stringify({ 
         valid: false, 
-        message: 'Error al procesar la selección' 
+        message: 'Error al procesar la selección. Por favor intenta de nuevo.' 
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
