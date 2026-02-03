@@ -1,0 +1,20 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  totalMovies: number;
+}
+
+const { currentPage, totalPages, totalMovies } = Astro.props;
+---
+
+<div class="full-width-header">
+  <h1>CATÁLOGO COMPLETO</h1>
+  <p class="catalog-stats">{totalMovies} películas • Página {currentPage} de {totalPages}</p>
+  <div class="header-links">
+    <a href="/catalog/search" class="search-link">🔍 Buscar películas</a>
+    <a href="/" class="back-link">← Volver al inicio</a>
+  </div>
+  <div class="film-grain"></div>
+  <div class="old-film-scratches"></div>
+</div>

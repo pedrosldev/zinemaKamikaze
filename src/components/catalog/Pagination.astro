@@ -1,0 +1,52 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  nearbyPages: number[];
+}
+
+const { currentPage, totalPages, nearbyPages } = Astro.props;
+---
+
+<nav class="pagination" aria-label="Paginación del catálogo">
+  <!-- Primera página -->
+  {currentPage > 1 && (
+    <a href="/catalog/1" class="pagination-link">
+      ⏮ Primera
+    </a>
+  )}
+
+  <!-- Página anterior -->
+  {currentPage > 1 && (
+    <a href={`/catalog/${currentPage - 1}`} class="pagination-link">
+      ← Anterior
+    </a>
+  )}
+
+  <!-- Páginas cercanas -->
+  <div class="pagination-numbers">
+    {nearbyPages.map((pageNum) => 
+      pageNum === currentPage ? (
+        <span class="pagination-current">{pageNum}</span>
+      ) : (
+        <a href={`/catalog/${pageNum}`} class="pagination-link">
+          {pageNum}
+        </a>
+      )
+    )}
+  </div>
+
+  <!-- Página siguiente -->
+  {currentPage < totalPages && (
+    <a href={`/catalog/${currentPage + 1}`} class="pagination-link">
+      Siguiente →
+    </a>
+  )}
+
+  <!-- Última página -->
+  {currentPage < totalPages && (
+    <a href={`/catalog/${totalPages}`} class="pagination-link">
+      Última ⏭
+    </a>
+  )}
+</nav>

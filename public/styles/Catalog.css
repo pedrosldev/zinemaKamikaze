@@ -376,3 +376,194 @@
     font-size: 1rem;
   }
 }
+
+/* ============= CATALOG PAGE (PAGINATION) ============= */
+
+.wide-sidebar {
+  position: fixed;
+  top: 0;
+  width: 15vw;
+  min-width: 150px;
+  height: 100vh;
+  background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.wide-sidebar-left {
+  left: 0;
+}
+
+.wide-sidebar-right {
+  right: 0;
+  background: linear-gradient(225deg, #1a1a1a 0%, #000 100%);
+}
+
+.catalog-stats {
+  font-size: 1.2rem;
+  color: #888;
+  margin-top: 1rem;
+  z-index: 2;
+  font-family: "Special Elite", cursive;
+}
+
+.header-links {
+  display: flex;
+  gap: 1rem;
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  z-index: 10;
+  flex-wrap: wrap;
+}
+
+.search-link {
+  color: #f5d742;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid #f5d742;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-family: "Special Elite", cursive;
+}
+
+.search-link:hover {
+  background: #f5d742;
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 215, 66, 0.4);
+}
+
+/* ============= PAGINATION ============= */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.pagination-link {
+  color: #f5d742;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #f5d742;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-family: "Special Elite", cursive;
+}
+
+.pagination-link:hover {
+  background: #f5d742;
+  color: #000;
+}
+
+.pagination-numbers {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pagination-current {
+  padding: 0.5rem 1rem;
+  background: #f5d742;
+  color: #000;
+  border-radius: 4px;
+  font-family: "Special Elite", cursive;
+  font-weight: bold;
+}
+
+/* ============= SCROLL ARROWS ============= */
+
+.scroll-arrow {
+  position: fixed;
+  right: 2rem;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+  z-index: 100;
+}
+
+.scroll-arrow:hover {
+  opacity: 1;
+}
+
+.scroll-up {
+  top: 2rem;
+}
+
+.scroll-down {
+  bottom: 2rem;
+}
+
+.scroll-arrow img {
+  width: 100%;
+  height: 100%;
+  filter: invert(1);
+}
+
+/* ============= CATALOG PAGE RESPONSIVE ============= */
+
+@media (max-width: 1024px) {
+  .wide-sidebar {
+    width: 10vw;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .full-width-header {
+    height: auto;
+    min-height: 180px;
+    padding: 1rem;
+  }
+
+  .full-width-header h1 {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    margin-top: 3rem;
+    padding: 0 10px;
+  }
+
+  .catalog-stats {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  .header-links {
+    position: relative;
+    top: auto;
+    left: auto;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+  }
+
+  .back-link,
+  .search-link {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .wide-sidebar {
+    display: none;
+  }
+
+  .pagination {
+    font-size: 0.9rem;
+    gap: 0.5rem;
+  }
+
+  .pagination-link {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}

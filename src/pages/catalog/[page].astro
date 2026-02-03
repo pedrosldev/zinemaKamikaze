@@ -1,6 +1,8 @@
 ---
 import { generateCatalogPaths, getMoviesForPage } from '../../lib/catalogUtils';
-import Layout from '../../layouts/Layout.astro';
+import CatalogLayout from '../../layouts/CatalogLayout.astro';
+import CatalogPageHeader from '../../components/catalog/CatalogPageHeader.astro';
+import Pagination from '../../components/catalog/Pagination.astro';
 import MovieCard from '../../components/catalog/MovieCard.astro';
 
 export const prerender = true;
@@ -23,27 +25,13 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
 }).filter(Boolean);
 ---
 
-<Layout>
-  <head>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap"
-      rel="stylesheet"
-    />
-  </head>
+<CatalogLayout title={`Catálogo - Página ${currentPage} - Zinema Kamikaze`}>
   <main class="catalog-layout">
-    <!-- Header pantalla completa -->
-    <div class="full-width-header">
-      <h1>CATÁLOGO COMPLETO</h1>
-      <p class="catalog-stats">{totalMovies} películas • Página {currentPage} de {totalPages}</p>
-      <div class="header-links">
-        <a href="/catalog/search" class="search-link">🔍 Buscar películas</a>
-        <a href="/" class="back-link">← Volver al inicio</a>
-      </div>
-      <div class="film-grain"></div>
-      <div class="old-film-scratches"></div>
-    </div>
+    <CatalogPageHeader 
+      currentPage={currentPage} 
+      totalPages={totalPages} 
+      totalMovies={totalMovies} 
+    />
 
     <!-- Contenedor principal -->
     <div class="main-container">
@@ -72,49 +60,11 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
           ))}
         </ul>
 
-        <!-- Paginación -->
-        <nav class="pagination" aria-label="Paginación del catálogo">
-          <!-- Primera página -->
-          {currentPage > 1 && (
-            <a href="/catalog/1" class="pagination-link">
-              ⏮ Primera
-            </a>
-          )}
-
-          <!-- Página anterior -->
-          {currentPage > 1 && (
-            <a href={`/catalog/${currentPage - 1}`} class="pagination-link">
-              ← Anterior
-            </a>
-          )}
-
-          <!-- Páginas cercanas -->
-          <div class="pagination-numbers">
-            {nearbyPages.map((pageNum) => 
-              pageNum === currentPage ? (
-                <span class="pagination-current">{pageNum}</span>
-              ) : (
-                <a href={`/catalog/${pageNum}`} class="pagination-link">
-                  {pageNum}
-                </a>
-              )
-            )}
-          </div>
-
-          <!-- Página siguiente -->
-          {currentPage < totalPages && (
-            <a href={`/catalog/${currentPage + 1}`} class="pagination-link">
-              Siguiente →
-            </a>
-          )}
-
-          <!-- Última página -->
-          {currentPage < totalPages && (
-            <a href={`/catalog/${totalPages}`} class="pagination-link">
-              Última ⏭
-            </a>
-          )}
-        </nav>
+        <Pagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          nearbyPages={nearbyPages} 
+        />
 
         <div class="scroll-arrow scroll-down">
           <img src="/images/caret-circle-down-svgrepo-com.svg" alt="Scroll Down" />
@@ -122,330 +72,12 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
       </div>
     </div>
   </main>
-</Layout>
-
-<style>
-  /* Reutilizar estilos de vibe/[vibe].astro */
-  .catalog-layout {
-    min-height: 100vh;
-    background-color: #000;
-    color: #fff;
-    overflow-x: hidden;
-    width: 100%;
-    max-width: 100vw;
-  }
-
-  /* Header pantalla completa */
-  .full-width-header {
-    position: relative;
-    width: 100%;
-    height: 25vh;
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
-    overflow: hidden;
-    z-index: 10;
-  }
-
-  .full-width-header h1 {
-    font-family: "Special Elite", cursive;
-    font-size: clamp(2rem, 8vw, 5rem);
-    text-align: center;
-    color: #f5d742;
-    text-shadow: 0 0 20px rgba(245, 215, 66, 0.5),
-                 2px 2px 0 #000,
-                 -2px -2px 0 #000;
-    z-index: 2;
-    margin: 0;
-    padding: 0 20px;
-  }
-
-  .catalog-stats {
-    font-size: 1.2rem;
-    color: #888;
-    margin-top: 1rem;
-    z-index: 2;
-    font-family: "Special Elite", cursive;
-  }
-
-  .header-links {
-    display: flex;
-    gap: 1rem;
-    position: absolute;
-    top: 2rem;
-    left: 2rem;
-    z-index: 10;
-    flex-wrap: wrap;
-  }
-
-  .back-link,
-  .search-link {
-    color: #f5d742;
-    text-decoration: none;
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    border: 2px solid #f5d742;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    font-family: "Special Elite", cursive;
-  }
-
-  .back-link:hover,
-  .search-link:hover {
-    background: #f5d742;
-    color: #000;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(245, 215, 66, 0.4);
-  }
-
-  /* Efectos de película */
-  .film-grain {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.03;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .old-film-scratches {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: linear-gradient(
-      to bottom,
-      transparent 50%,
-      rgba(255, 255, 255, 0.02) 50%
-    );
-    background-size: 100% 4px;
-    opacity: 0.1;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  /* Container principal */
-  .main-container {
-    position: relative;
-    min-height: 100vh;
-    background-color: #000;
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
-  }
-
-  .wide-sidebar {
-    position: fixed;
-    top: 0;
-    width: 15vw;
-    min-width: 150px;
-    height: 100vh;
-    background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
-    overflow: hidden;
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .wide-sidebar-left {
-    left: 0;
-  }
-
-  .wide-sidebar-right {
-    right: 0;
-    background: linear-gradient(225deg, #1a1a1a 0%, #000 100%);
-  }
-
-  .content-scrollable {
-    width: 100%;
-    padding: 2rem;
-    position: relative;
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-sizing: border-box;
-    z-index: 2;
-  }
-
-  /* Grid de películas */
-  .movies-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1.5rem;
-    padding: 0;
-    margin: 0 auto 3rem auto;
-    list-style: none;
-    width: 100%;
-    max-width: min(1000px, 100%);
-    box-sizing: border-box;
-  }
-
-  /* Paginación */
-  .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    padding: 2rem 0;
-    flex-wrap: wrap;
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-
-  .pagination-link {
-    color: #f5d742;
-    text-decoration: none;
-    padding: 0.5rem 1rem;
-    border: 1px solid #f5d742;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    font-family: "Special Elite", cursive;
-  }
-
-  .pagination-link:hover {
-    background: #f5d742;
-    color: #000;
-  }
-
-  .pagination-numbers {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .pagination-current {
-    padding: 0.5rem 1rem;
-    background: #f5d742;
-    color: #000;
-    border-radius: 4px;
-    font-family: "Special Elite", cursive;
-    font-weight: bold;
-  }
-
-  /* Flechas de scroll */
-  .scroll-arrow {
-    position: fixed;
-    right: 2rem;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.3s ease;
-    z-index: 100;
-  }
-
-  .scroll-arrow:hover {
-    opacity: 1;
-  }
-
-  .scroll-up {
-    top: 2rem;
-  }
-
-  .scroll-down {
-    bottom: 2rem;
-  }
-
-  .scroll-arrow img {
-    width: 100%;
-    height: 100%;
-    filter: invert(1);
-  }
-
-  /* Responsive */
-  @media (max-width: 1024px) {
-    .movies-grid {
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 1rem;
-    }
-
-    .wide-sidebar {
-      width: 10vw;
-      min-width: 100px;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .full-width-header {
-      height: auto;
-      min-height: 180px;
-      padding: 1rem;
-    }
-
-    .full-width-header h1 {
-      font-size: clamp(1.5rem, 5vw, 2.5rem);
-      margin-top: 3rem;
-      padding: 0 10px;
-    }
-
-    .catalog-stats {
-      font-size: 0.9rem;
-      margin-top: 0.5rem;
-    }
-
-    .header-links {
-      position: relative;
-      top: auto;
-      left: auto;
-      justify-content: center;
-      width: 100%;
-      margin-bottom: 1rem;
-      gap: 0.5rem;
-    }
-
-    .back-link,
-    .search-link {
-      font-size: 0.85rem;
-      padding: 0.4rem 0.8rem;
-    }
-
-    .wide-sidebar {
-      display: none;
-    }
-
-    .content-scrollable {
-      padding: 1rem;
-    }
-
-    .movies-grid {
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 0.8rem;
-    }
-
-    .pagination {
-      font-size: 0.9rem;
-      gap: 0.5rem;
-    }
-
-    .pagination-link {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.85rem;
-    }
-  }
-</style>
+</CatalogLayout>
 
 <script>
-  // Script para las flechas de scroll
-  document.querySelector('.scroll-up')?.addEventListener('click', () => {
-    document.querySelector('.content-scrollable')?.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  });
-
-  document.querySelector('.scroll-down')?.addEventListener('click', () => {
-    document.querySelector('.content-scrollable')?.scrollTo({
-      top: document.querySelector('.content-scrollable')?.scrollHeight,
-      behavior: 'smooth'
-    });
+  import { initCatalogScroll } from '../../scripts/catalog/catalogScroll';
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    initCatalogScroll();
   });
 </script>
