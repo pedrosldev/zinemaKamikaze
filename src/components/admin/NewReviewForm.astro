@@ -1,0 +1,55 @@
+---
+import MoodSelect from "../shared/MoodSelect.astro";
+import VibeSelect from "../shared/VibeSelect.astro";
+---
+
+<div class="review-form">
+  <h2>NUEVA CRÍTICA MANUAL</h2>
+  <form id="newReviewForm">
+    <div class="form-group">
+      <label for="new_film_id">FILM ID:</label>
+      <input type="number" id="new_film_id" name="film_id" required />
+    </div>
+
+    <div class="form-group">
+      <label for="new_title">TÍTULO:</label>
+      <input type="text" id="new_title" name="title" required />
+    </div>
+
+    <div class="form-group">
+      <label for="new_year">AÑO:</label>
+      <input type="number" id="new_year" name="year" required />
+    </div>
+
+    <div class="form-group">
+      <label for="new_poster">URL DEL PÓSTER:</label>
+      <input type="text" id="new_poster" name="poster" />
+    </div>
+
+    <div class="form-group">
+      <label for="new_youtube_id">ID DEL VIDEO DE YOUTUBE:</label>
+      <input 
+        type="text" 
+        id="new_youtube_id" 
+        name="youtube_id" 
+        placeholder="Ej: dQw4w9WgXcQ (11 caracteres)"
+        maxlength="20"
+      />
+      <small style="color: #999; font-size: 0.9em; display: block; margin-top: 4px;">
+        Opcional. Extrae el ID de la URL: youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong>
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label for="new_vibe">VIBE:</label>
+      <VibeSelect name="vibe" id="new_vibe" required />
+    </div>
+
+    <div class="form-group">
+      <label for="new_review">CRÍTICA:</label>
+      <textarea id="new_review" name="review" rows="10" required></textarea>
+    </div>
+
+    <button type="submit">GUARDAR NUEVA CRÍTICA</button>
+  </form>
+</div>
