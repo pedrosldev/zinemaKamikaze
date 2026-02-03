@@ -1,0 +1,98 @@
+---
+import MoodBadge from "../shared/MoodBadge.astro";
+
+interface Props {
+  review: {
+    id: number;
+    title: string;
+    year: number;
+    youtube_id: string | null;
+    review: string | null;
+    expectation_mood: string | null;
+    final_mood: string | null;
+    watched_date: string | null;
+    selected_by: string | null;
+  };
+  index: number;
+}
+
+const { review, index } = Astro.props;
+---
+
+<article class="review-card">
+  <header class="review-header">
+    <h2>📽️ Visionado #{index + 1}</h2>
+    {review.watched_date && (
+      <p class="watch-date">
+        {new Date(review.watched_date).toLocaleDateString("es-ES", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+      </p>
+    )}
+    {review.selected_by && (
+      <p class="selector">
+        🎲 Seleccionada por: <strong>{review.selected_by}</strong>
+      </p>
+    )}
+  </header>
+
+  {/* Preview del video si existe */}
+  {review.youtube_id && (
+    <div class="video-preview">
+      <div class="video-wrapper">
+        <lite-youtube
+          videoid={review.youtube_id}
+          style={`background-image: url('https://i.ytimg.com/vi/${review.youtube_id}/hqdefault.jpg');`}
+        />
+      </div>
+      <div class="video-overlay">▶️ Video crítica</div>
+    </div>
+  )}
+
+  {/* Comparación de moods */}
+  <div class="mood-comparison">
+    {review.expectation_mood && (
+      <div class="mood-item">
+        <span class="mood-label">Expectativa inicial</span>
+        <MoodBadge 
+          mood={review.expectation_mood} 
+          type="expectation" 
+          variant="initial" 
+          showLabel={true}
+        />
+      </div>
+    )}
+
+    {review.final_mood && (
+      <div class="mood-item">
+        <span class="mood-label">Después de verla</span>
+        <MoodBadge 
+          mood={review.final_mood} 
+          type="final" 
+          variant="final" 
+          showLabel={true}
+        />
+      </div>
+    )}
+  </div>
+
+  {/* Preview del texto si no hay video */}
+  {!review.youtube_id && review.review && (
+    <div class="text-preview">
+      <Fragment set:html={review.review.substring(0, 300) + "..."} />
+    </div>
+  )}
+
+  <footer class="review-footer">
+    <a href={`/reviews/${review.id}`} class="view-full-review">
+      {review.youtube_id && review.review
+        ? "🎬 Ver crítica completa (video + texto)"
+        : review.youtube_id
+          ? "▶️ Ver video crítica completa"
+          : "📝 Leer crítica completa"}{" "}
+      →
+    </a>
+  </footer>
+</article>

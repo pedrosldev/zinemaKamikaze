@@ -1,0 +1,36 @@
+---
+interface Props {
+  title: string;
+  year: number;
+  viewingCount: number;
+  hasReviews: boolean;
+}
+
+const { title, year, viewingCount, hasReviews } = Astro.props;
+---
+
+<header class="movie-header">
+  <div class="header-content">
+    <div class="movie-info">
+      <h1>
+        {title}
+        {year && year !== 0 ? `(${year})` : ""}
+      </h1>
+      {hasReviews ? (
+        <p class="viewing-count">
+          {
+            viewingCount === 1
+              ? "Has visto esta película 1 vez"
+              : `Has visto esta película ${viewingCount} veces`
+          }
+        </p>
+      ) : (
+        <p class="no-reviews">Aún no he visto esta película</p>
+      )}
+      <div class="navigation-links">
+        <a href="/catalog">← Volver al catálogo</a>
+        <a href="/">← Volver al inicio</a>
+      </div>
+    </div>
+  </div>
+</header>
