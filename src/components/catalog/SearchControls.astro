@@ -1,0 +1,42 @@
+---
+interface Props {
+  years: (string | number)[];
+  initialQuery?: string;
+  initialYear?: string;
+}
+
+const { years, initialQuery = '', initialYear = '' } = Astro.props;
+---
+
+<div class="full-width-header">
+  <h1>BUSCAR EN EL CATÁLOGO</h1>
+  
+  <div class="search-controls">
+    <div class="search-input-wrapper">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Buscar por título..."
+        value={initialQuery}
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="filter-wrapper">
+      <select id="yearFilter">
+        <option value="">Todos los años</option>
+        {years.map(year => (
+          <option value={year} selected={year.toString() === initialYear}>
+            {year || 'Sin año'}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <button id="clearBtn" class="clear-btn">Limpiar filtros</button>
+  </div>
+
+  <a href="/catalog" class="back-link">← Volver al catálogo</a>
+  <div class="film-grain"></div>
+  <div class="old-film-scratches"></div>
+</div>

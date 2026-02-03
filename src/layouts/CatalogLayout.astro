@@ -1,0 +1,28 @@
+---
+import Layout from "./Layout.astro";
+
+interface Props {
+  title?: string;
+}
+
+const { title = "Catálogo - ZinemaKamikaze" } = Astro.props;
+---
+
+<Layout>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/Catalog.css" />
+    <title>{title}</title>
+  </head>
+
+  <div class="catalog-layout">
+    <slot />
+  </div>
+
+  <!-- Efectos de película reutilizables -->
+  <div class="film-grain"></div>
+  <div class="old-film-scratches"></div>
+</Layout>
