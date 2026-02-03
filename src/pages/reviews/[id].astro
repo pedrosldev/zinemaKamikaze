@@ -1,9 +1,10 @@
 ---
 import { getReviewById, getReviewCountByFilmId, getCommentsByReviewId } from "../../lib/db";
-import Layout from "../../layouts/Layout.astro";
+import ReviewLayout from "../../layouts/ReviewLayout.astro";
 import ReviewHeader from "../../components/reviews/ReviewHeader.astro";
 import ReviewTabs from "../../components/reviews/ReviewTabs.astro";
 import CommentsModal from "../../components/reviews/CommentsModal.astro";
+import ReviewFooter from "../../components/reviews/ReviewFooter.astro";
 
 export const prerender = false;
 
@@ -12,21 +13,10 @@ const reviewCount = review ? await getReviewCountByFilmId(review.film_id) : 0;
 const comments = review ? await getCommentsByReviewId(review.id) : [];
 ---
 
-<Layout>
+<ReviewLayout title={review ? `${review.title} - ZinemaKamikaze` : "Review no encontrada"}>
   {
     review ? (
       <>
-        <head>
-          <meta charset="utf-8" />
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-          <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap"
-            rel="stylesheet"
-          />
-          <link rel="stylesheet" href="/styles/ReviewDetail.css" />
-        </head>
         <ReviewHeader
           title={review.title}
           year={review.year}
@@ -51,33 +41,10 @@ const comments = review ? await getCommentsByReviewId(review.id) : [];
           comments={comments}
         />
 
-        <footer class="review-footer">
-          <div class="footer-content">
-            <p>ZINEMA KAMIKAZE © {new Date().getFullYear()}</p>
-          </div>
-        </footer>
-
-<script>
-  // Importar lite-youtube dinámicamente solo en el cliente
-  if (typeof window !== 'undefined') {
-    import('@justinribeiro/lite-youtube');
-  }
-
-  // Importar módulos de funcionalidad
-  import { initToggleAnimation, initTabSwitch } from '../../scripts/review/toggleControls';
-  import { initCommentsModal, initCommentForm } from '../../scripts/review/commentsModal';
-
-  // Inicializar funcionalidades cuando el DOM esté listo
-  document.addEventListener('DOMContentLoaded', () => {
-    initToggleAnimation();
-    initTabSwitch();
-    initCommentsModal();
-    initCommentForm();
-  });
-</script>
+        <ReviewFooter />
       </>
     ) : (
       <p>Review no encontrada</p>
     )
   }
-</Layout>
+</ReviewLayout>

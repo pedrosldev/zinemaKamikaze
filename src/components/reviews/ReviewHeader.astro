@@ -32,7 +32,7 @@ const {
     <!-- Icono expectativa inicial (izquierda) -->
     {expectationMood && (
       <div class="mood-container">
-        <p class="mood-title" style="font-family: 'Special Elite', cursive;">
+        <p class="mood-title">
           Mi expectativa antes de verla
         </p>
         <MoodBadge 
@@ -52,7 +52,7 @@ const {
         {title}{" "}
         {year && year !== 0 ? `(${year})` : ""}
       </h1>
-      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <div class="header-links">
         {reviewCount > 1 && (
           <a href={`/movies/${filmId}`} class="multiple-reviews-link">
             📽️ Ver los {reviewCount} visionados

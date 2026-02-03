@@ -184,6 +184,14 @@ header {
   line-height: 1.2;
 }
 
+/* Enlaces del header */
+.header-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .mood-badge {
   background: rgba(0, 0, 0, 0.4);
   border: 2px solid rgba(245, 215, 66, 0.6);
@@ -292,6 +300,11 @@ img {
   filter: brightness(0.8) contrast(0.9);
   animation: flicker 3s infinite;
   height: 10dvh;
+  display: flex;
+  gap: 0.3rem;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   background-image:
     /* Borde izquierdo */
     linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
