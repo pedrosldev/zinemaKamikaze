@@ -259,3 +259,120 @@
     flex-shrink: 0;
   }
 }
+
+/* ============= CATALOG INDEX (LANDING) ============= */
+
+.catalog-index {
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+}
+
+.catalog-hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+  overflow: hidden;
+  padding: 2rem;
+}
+
+.catalog-hero h1 {
+  font-family: "Special Elite", cursive;
+  font-size: clamp(2.5rem, 10vw, 6rem);
+  text-align: center;
+  color: #f5d742;
+  text-shadow:
+    0 0 20px rgba(245, 215, 66, 0.5),
+    2px 2px 0 #000,
+    -2px -2px 0 #000;
+  z-index: 2;
+  margin: 0 0 2rem 0;
+}
+
+.catalog-stats {
+  display: flex;
+  gap: 4rem;
+  margin: 2rem 0;
+  z-index: 2;
+}
+
+.stat-item {
+  font-family: "Special Elite", cursive;
+  text-align: center;
+}
+
+.stat-number {
+  font-family: "Special Elite", cursive;
+  display: block;
+  font-size: 3rem;
+  font-weight: bold;
+  color: #f5d742;
+  text-shadow: 0 0 10px rgba(245, 215, 66, 0.3);
+}
+
+.stat-label {
+  font-family: "Special Elite", cursive;
+  display: block;
+  font-size: 1rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 0.5rem;
+}
+
+.start-button {
+  font-family: "Special Elite", cursive;
+  margin-top: 3rem;
+  padding: 1rem 3rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #000;
+  background: #f5d742;
+  border: 2px solid #f5d742;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2;
+  box-shadow: 0 4px 20px rgba(245, 215, 66, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
+  background: #000;
+  color: #f5d742;
+  box-shadow: 0 6px 30px rgba(245, 215, 66, 0.5);
+}
+
+.catalog-hero .back-link {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  z-index: 10;
+}
+
+@media (max-width: 768px) {
+  .catalog-stats {
+    gap: 2rem;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+  }
+
+  .start-button {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+  }
+}

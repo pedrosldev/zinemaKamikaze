@@ -1,24 +1,17 @@
 ---
-import Layout from "../../layouts/Layout.astro";
+import CatalogLayout from "../../layouts/CatalogLayout.astro";
 import { getTotalPages } from "../../lib/catalogUtils";
 
 const totalPages = getTotalPages(100);
 const totalMovies = 18266; // Aproximado
 ---
 
-<Layout>
-  <head>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap"
-      rel="stylesheet"
-    />
-  </head>
+<CatalogLayout title="Catálogo Completo - Zinema Kamikaze">
   <main class="catalog-index">
-    <div class="hero">
+    <div class="catalog-hero">
       <h1>CATÁLOGO COMPLETO</h1>
-      <div class="stats">
+      
+      <div class="catalog-stats">
         <p class="stat-item">
           <span class="stat-number">{totalMovies}</span>
           <span class="stat-label">Películas</span>
@@ -29,7 +22,7 @@ const totalMovies = 18266; // Aproximado
         </p>
       </div>
 
-      <a href="/catalog/1" class="start-button"> Explorar Catálogo → </a>
+      <a href="/catalog/1" class="start-button">Explorar Catálogo →</a>
 
       <a href="/" class="back-link">← Volver al inicio</a>
 
@@ -37,163 +30,4 @@ const totalMovies = 18266; // Aproximado
       <div class="old-film-scratches"></div>
     </div>
   </main>
-</Layout>
-
-<style>
-  .catalog-index {
-    min-height: 100vh;
-    background: #000;
-    color: #fff;
-  }
-
-  .hero {
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
-    overflow: hidden;
-    padding: 2rem;
-  }
-
-  h1 {
-    font-family: "Special Elite", cursive;
-    font-size: clamp(2.5rem, 10vw, 6rem);
-    text-align: center;
-    color: #f5d742;
-    text-shadow:
-      0 0 20px rgba(245, 215, 66, 0.5),
-      2px 2px 0 #000,
-      -2px -2px 0 #000;
-    z-index: 2;
-    margin: 0 0 2rem 0;
-  }
-
-  .stats {
-    display: flex;
-    gap: 4rem;
-    margin: 2rem 0;
-    z-index: 2;
-  }
-
-  .stat-item {
-    font-family: "Special Elite", cursive;
-    text-align: center;
-  }
-
-  .stat-number {
-    font-family: "Special Elite", cursive;
-    display: block;
-    font-size: 3rem;
-    font-weight: bold;
-    color: #f5d742;
-    text-shadow: 0 0 10px rgba(245, 215, 66, 0.3);
-  }
-
-  .stat-label {
-    font-family: "Special Elite", cursive;
-    display: block;
-    font-size: 1rem;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-top: 0.5rem;
-  }
-
-  .start-button {
-    font-family: "Special Elite", cursive;
-    margin-top: 3rem;
-    padding: 1rem 3rem;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #000;
-    background: #f5d742;
-    border: 2px solid #f5d742;
-    border-radius: 4px;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 2;
-    box-shadow: 0 4px 20px rgba(245, 215, 66, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .start-button:hover {
-    transform: translateY(-2px);
-    background: #000;
-    color: #f5d742;
-    box-shadow: 0 6px 30px rgba(245, 215, 66, 0.5);
-  }
-
-  .back-link {
-    font-family: "Special Elite", cursive;
-    position: absolute;
-    top: 2rem;
-    left: 2rem;
-    color: #f5d742;
-    text-decoration: none;
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    border: 2px solid #f5d742;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    z-index: 10;
-  }
-
-  .back-link:hover {
-    background: #f5d742;
-    color: #000;
-  }
-
-  .film-grain {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.03;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .old-film-scratches {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: linear-gradient(
-      to bottom,
-      transparent 50%,
-      rgba(255, 255, 255, 0.02) 50%
-    );
-    background-size: 100% 4px;
-    opacity: 0.1;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  @media (max-width: 768px) {
-    .stats {
-      gap: 2rem;
-    }
-
-    .stat-number {
-      font-size: 2rem;
-    }
-
-    .stat-label {
-      font-size: 0.85rem;
-    }
-
-    .start-button {
-      padding: 0.8rem 2rem;
-      font-size: 1rem;
-    }
-  }
-</style>
+</CatalogLayout>
