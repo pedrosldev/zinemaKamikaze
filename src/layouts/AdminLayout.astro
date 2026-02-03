@@ -1,0 +1,22 @@
+---
+import Layout from "./Layout.astro";
+
+interface Props {
+  title?: string;
+}
+
+const { title = "Admin - ZinemaKamikaze" } = Astro.props;
+---
+
+<Layout>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/Admin.css" />
+    <title>{title}</title>
+  </head>
+
+  <slot />
+</Layout>

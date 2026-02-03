@@ -1,0 +1,24 @@
+---
+// Componente de formulario de login reutilizable
+---
+
+<div class="login-container">
+  <a href="/">Inicio</a>
+  <h1>ACCESO ADMINISTRATIVO</h1>
+
+  <form id="loginForm">
+    <div class="form-group">
+      <label for="password">CONTRASEÑA:</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        required
+        autocomplete="current-password"
+      />
+    </div>
+
+    <button type="submit">ENTRAR</button>
+    <p id="errorMessage" class="error-message"></p>
+  </form>
+</div>
