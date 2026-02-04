@@ -22,7 +22,7 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
     return pageNum;
   }
   return null;
-}).filter(Boolean);
+}).filter((p): p is number => p !== null);
 ---
 
 <CatalogLayout title={`Catálogo - Página ${currentPage} - Zinema Kamikaze`}>
