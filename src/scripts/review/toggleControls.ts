@@ -9,7 +9,7 @@
 export function initToggleAnimation(): void {
   const creditsText = document.querySelector<HTMLDivElement>(".credits-text");
   const toggleBtn = document.getElementById("toggle-animation") as HTMLImageElement | null;
-  const toggleText = toggleBtn?.querySelector<HTMLSpanElement>(".toggle-text");
+  const toggleText = document.querySelector<HTMLSpanElement>(".toggle-text");
 
   if (!creditsText || !toggleBtn || !toggleText) {
     console.warn("Toggle animation elements not found");
