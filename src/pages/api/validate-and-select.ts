@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { pool } from '../../lib/db';
+import { pool, getSelectionMode } from '../../lib/db';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -34,6 +34,34 @@ function selectRandomValidFilm(titlesData: any[], maxAttempts = 5): { success: b
     success: false,
     film: null
   };
+}
+
+/**
+ * Función para seleccionar múltiples películas únicas
+ */
+function selectMultipleRandomFilms(titlesData: any[], count: number): any[] {
+  const selectedFilms: any[] = [];
+  const selectedIds = new Set<number>();
+  let attempts = 0;
+  const maxAttempts = count * 10; // Intentos máximos para evitar bucle infinito
+
+  while (selectedFilms.length < count && attempts < maxAttempts) {
+    attempts++;
+    
+    const selection = selectRandomValidFilm(titlesData);
+    
+    if (selection.success && selection.film) {
+      const filmId = selection.film.id;
+      
+      // Solo añadir si no está duplicada
+      if (!selectedIds.has(filmId)) {
+        selectedIds.add(filmId);
+        selectedFilms.push(selection.film);
+      }
+    }
+  }
+  
+  return selectedFilms;
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -98,55 +126,122 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // 3. Seleccionar película aleatoria con validación
-    const selection = selectRandomValidFilm(validMovies);
+    // 3. Obtener el modo de selección actual
+    const selectionMode = await getSelectionMode();
 
-    if (!selection.success || !selection.film) {
-      await connection.rollback();
+    // ===== MODO NORMAL: Seleccionar 1 película y registrar directamente =====
+    if (selectionMode === 'normal') {
+      const selection = selectRandomValidFilm(validMovies);
+
+      if (!selection.success || !selection.film) {
+        await connection.rollback();
+        return new Response(
+          JSON.stringify({ 
+            valid: false, 
+            message: 'No se pudo seleccionar una película válida. Por favor intenta de nuevo.' 
+          }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const selectedFilm = selection.film;
+      const filmId = selectedFilm.id;
+      const title = selectedFilm.title;
+      const year = selectedFilm.year || 'Unknown';
+      const poster = selectedFilm.poster_path || '';
+      const watchedDate = new Date().toISOString().split('T')[0];
+
+      // Guardar la review en la base de datos
+      await connection.execute(
+        'INSERT INTO reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by, youtube_id, watched_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [filmId, title, year, null, null, poster, true, null, selected_by || 'Anónimo', null, watchedDate]
+      );
+
+      // Marcar el token como usado
+      await connection.execute(
+        'UPDATE trigger_tokens SET is_active = false, used_by = ? WHERE token = ?',
+        [selected_by || 'Anónimo', token]
+      );
+
+      // Confirmar transacción
+      await connection.commit();
+
+      // Devolver la película seleccionada
       return new Response(
-        JSON.stringify({ 
-          valid: false, 
-          message: 'No se pudo seleccionar una película válida. Por favor intenta de nuevo.' 
+        JSON.stringify({
+          valid: true,
+          mode: 'normal',
+          message: 'Película seleccionada exitosamente',
+          movie: {
+            film_id: filmId,
+            title: title,
+            year: year,
+            poster: poster
+          }
         }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    const selectedFilm = selection.film;
-    const filmId = selectedFilm.id;
-    const title = selectedFilm.title;
-    const year = selectedFilm.year || 'Unknown';
-    const poster = selectedFilm.poster_path || '';
-    const watchedDate = new Date().toISOString().split('T')[0];
+    // ===== MODO TRIPLE CHOICE: Devolver 3 opciones sin registrar =====
+    if (selectionMode === 'triple_choice') {
+      const selectedFilms = selectMultipleRandomFilms(validMovies, 3);
 
-    // 4. Guardar la review en la base de datos
-    await connection.execute(
-      'INSERT INTO reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by, youtube_id, watched_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [filmId, title, year, null, null, poster, true, null, selected_by || 'Anónimo', null, watchedDate]
-    );
+      if (selectedFilms.length < 3) {
+        await connection.rollback();
+        return new Response(
+          JSON.stringify({ 
+            valid: false, 
+            message: 'No se pudieron seleccionar 3 películas únicas. Intenta de nuevo.' 
+          }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
 
-    // 5. Marcar el token como usado
-    await connection.execute(
-      'UPDATE trigger_tokens SET is_active = false, used_by = ? WHERE token = ?',
-      [selected_by || 'Anónimo', token]
-    );
+      // NO marcamos el token como usado todavía
+      // NO insertamos película en BD todavía
+      // El usuario elegirá y confirm-selection hará eso
+      
+      await connection.commit();
 
-    // Confirmar transacción
-    await connection.commit();
+      // Devolver las 3 opciones
+      return new Response(
+        JSON.stringify({
+          valid: true,
+          mode: 'triple_choice',
+          message: 'Elige una de estas 3 películas',
+          token: token, // Devolver token para confirm-selection
+          movies: selectedFilms.map(film => ({
+            film_id: film.id,
+            title: film.title,
+            year: film.year || 'Unknown',
+            poster: film.poster_path || ''
+          }))
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
-    // 6. Devolver la película seleccionada
+    // ===== MODO CATALOG: Redirigir al catálogo =====
+    if (selectionMode === 'catalog') {
+      await connection.commit();
+      
+      return new Response(
+        JSON.stringify({
+          valid: true,
+          mode: 'catalog',
+          message: 'Redirigiendo al catálogo completo',
+          token: token
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Fallback (no debería llegar aquí)
+    await connection.rollback();
     return new Response(
-      JSON.stringify({
-        valid: true,
-        message: 'Película seleccionada exitosamente',
-        movie: {
-          film_id: filmId,
-          title: title,
-          year: year,
-          poster: poster
-        }
-      }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ valid: false, message: 'Modo de selección desconocido' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {

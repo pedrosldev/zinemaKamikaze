@@ -293,3 +293,70 @@ export async function getExpectationCommentsByFilmId(filmId: number): Promise<Ex
   );
   return rows;
 }
+
+// ============= CONFIGURACIÓN DE LA APLICACIÓN =============
+
+interface AppSettingRow extends RowDataPacket {
+  setting_key: string;
+  setting_value: string;
+  description: string | null;
+  updated_at: string;
+}
+
+/**
+ * Obtiene el valor de un setting de configuración
+ * @param key - Clave del setting
+ * @param defaultValue - Valor por defecto si no existe
+ * @returns El valor del setting o el valor por defecto
+ */
+export async function getSetting(key: string, defaultValue: string = ''): Promise<string> {
+  const [rows] = await pool.query<(AppSettingRow & RowDataPacket)[]>(
+    'SELECT setting_value FROM app_settings WHERE setting_key = ?',
+    [key]
+  );
+  
+  return rows.length > 0 ? rows[0].setting_value : defaultValue;
+}
+
+/**
+ * Actualiza o crea un setting de configuración
+ * @param key - Clave del setting
+ * @param value - Nuevo valor
+ * @param description - Descripción opcional (solo para nuevos settings)
+ */
+export async function setSetting(key: string, value: string, description: string | null = null): Promise<void> {
+  await pool.execute(
+    `INSERT INTO app_settings (setting_key, setting_value, description) 
+     VALUES (?, ?, ?) 
+     ON DUPLICATE KEY UPDATE setting_value = ?, updated_at = NOW()`,
+    [key, value, description, value]
+  );
+}
+
+/**
+ * Obtiene todos los settings de configuración
+ * @returns Array con todos los settings
+ */
+export async function getAllSettings(): Promise<AppSettingRow[]> {
+  const [rows] = await pool.query<(AppSettingRow & RowDataPacket)[]>(
+    'SELECT * FROM app_settings ORDER BY setting_key'
+  );
+  return rows;
+}
+
+/**
+ * Obtiene el modo de selección de películas actual
+ * @returns 'normal' | 'triple_choice' | 'catalog'
+ */
+export async function getSelectionMode(): Promise<'normal' | 'triple_choice' | 'catalog'> {
+  const mode = await getSetting('selection_mode', 'normal');
+  return mode as 'normal' | 'triple_choice' | 'catalog';
+}
+
+/**
+ * Actualiza el modo de selección de películas
+ * @param mode - 'normal' | 'triple_choice' | 'catalog'
+ */
+export async function setSelectionMode(mode: 'normal' | 'triple_choice' | 'catalog'): Promise<void> {
+  await setSetting('selection_mode', mode);
+}
