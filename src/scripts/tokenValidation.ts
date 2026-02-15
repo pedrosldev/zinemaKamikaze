@@ -15,11 +15,20 @@ interface MovieData {
 
 interface MovieResult {
   valid: boolean;
+  mode?: 'normal' | 'triple_choice' | 'catalog';
   movie?: {
+    film_id?: number;
     title: string;
     year: string | number;
     poster: string | null;
   };
+  movies?: Array<{
+    film_id: number;
+    title: string;
+    year: string | number;
+    poster: string | null;
+  }>;
+  token?: string;
   message?: string;
 }
 
@@ -313,61 +322,91 @@ async function validateToken(token: string): Promise<void> {
     const result: MovieResult = await response.json();
     console.log("📡 Respuesta del servidor:", result);
 
-    if (response.ok && result.valid && result.movie) {
-      // ¡TODO HECHO! El servidor ya validó, eligió película y guardó en BD
-      tokenMessage!.textContent = "¡PELÍCULA SELECCIONADA!";
-      tokenMessage!.className = "token-message token-success";
-      tokenContainer!.style.display = "none";
+    if (response.ok && result.valid) {
+      // ==== MODO NORMAL: 1 película seleccionada directamente ====
+      if (result.mode === 'normal' && result.movie) {
+        tokenMessage!.textContent = "¡PELÍCULA SELECCIONADA!";
+        tokenMessage!.className = "token-message token-success";
+        tokenContainer!.style.display = "none";
 
-      // Efecto de confeti
-      try {
-        if (typeof (window as any).confetti === 'function') {
-          (window as any).confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 },
-          });
-        }
-      } catch (confettiError) {
-        // Ignorar errores de confetti
-      }
-
-      // Mostrar la película en la UI
-      try {
-        if (surpriseDiv) {
-          const posterUrl = result.movie.poster 
-            ? "https://image.tmdb.org/t/p/w500" + result.movie.poster
-            : "/images/noImg.png";
-          
-          surpriseDiv.style.backgroundImage = "url(" + posterUrl + ")";
-          surpriseDiv.style.backgroundSize = "100% 100%";
-          surpriseDiv.style.backgroundPosition = "center";
-          surpriseDiv.style.backgroundRepeat = "no-repeat";
-          console.log("🖼️ Poster aplicado:", posterUrl);
-        }
-
-        if (contenidoDiv) {
-          contenidoDiv.innerHTML = "<strong>" + result.movie.title + " (" + result.movie.year + ")</strong>";
-          console.log("📝 Título mostrado");
-        }
-
-        if (btnLeer) {
-          btnLeer.style.display = "block";
-          console.log("✅ Botón mostrado");
-        }
-      } catch (displayError) {
-        console.error("❌ Error mostrando película:", displayError);
-      }
-
-      // Recargar página después de 3 segundos
-      setTimeout(() => {
+        // Efecto de confeti
         try {
-          window.location.reload();
-        } catch (reloadError) {
-          console.error("❌ Error recargando:", reloadError);
-          window.location.href = window.location.href;
+          if (typeof (window as any).confetti === 'function') {
+            (window as any).confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 },
+            });
+          }
+        } catch (confettiError) {
+          // Ignorar errores de confetti
         }
-      }, 3000);
+
+        // Mostrar la película en la UI
+        try {
+          if (surpriseDiv) {
+            const posterUrl = result.movie.poster 
+              ? "https://image.tmdb.org/t/p/w500" + result.movie.poster
+              : "/images/noImg.png";
+            
+            surpriseDiv.style.backgroundImage = "url(" + posterUrl + ")";
+            surpriseDiv.style.backgroundSize = "100% 100%";
+            surpriseDiv.style.backgroundPosition = "center";
+            surpriseDiv.style.backgroundRepeat = "no-repeat";
+            console.log("🖼️ Poster aplicado:", posterUrl);
+          }
+
+          if (contenidoDiv) {
+            contenidoDiv.innerHTML = "<strong>" + result.movie.title + " (" + result.movie.year + ")</strong>";
+            console.log("📝 Título mostrado");
+          }
+
+          if (btnLeer) {
+            btnLeer.style.display = "block";
+            console.log("✅ Botón mostrado");
+          }
+        } catch (displayError) {
+          console.error("❌ Error mostrando película:", displayError);
+        }
+
+        // Recargar página después de 3 segundos
+        setTimeout(() => {
+          try {
+            window.location.reload();
+          } catch (reloadError) {
+            console.error("❌ Error recargando:", reloadError);
+            window.location.href = window.location.href;
+          }
+        }, 3000);
+      }
+      
+      // ==== MODO TRIPLE CHOICE: Elegir entre 3 opciones ====
+      else if (result.mode === 'triple_choice' && result.movies) {
+        console.log("🎯 Modo Triple Choice - Mostrando 3 opciones");
+        
+        tokenMessage!.textContent = "¡TOKEN VÁLIDO! Elige tu película";
+        tokenMessage!.className = "token-message token-success";
+        tokenContainer!.style.display = "none";
+
+        // Mostrar el selector de películas
+        showMovieSelector(result.movies, result.token || '', selectedBy);
+      }
+      
+      // ==== MODO CATALOG: Redirigir al catálogo ====
+      else if (result.mode === 'catalog') {
+        console.log("📚 Modo Catálogo - Redirigiendo...");
+        
+        tokenMessage!.textContent = "Redirigiendo al catálogo...";
+        tokenMessage!.className = "token-message token-success";
+        
+        // Guardar token en sessionStorage y redirigir
+        sessionStorage.setItem('catalogToken', result.token || '');
+        sessionStorage.setItem('catalogSelectedBy', selectedBy);
+        
+        setTimeout(() => {
+          window.location.href = '/catalog';
+        }, 1500);
+      }
 
     } else {
       // Token inválido o error
@@ -451,4 +490,125 @@ export function initTokenValidation(): void {
   btnLeer.addEventListener("click", () => {
     generateMovie(validatedToken);
   });
+}
+
+/**
+ * Muestra el selector de películas en modo triple_choice
+ * @param movies - Array con las 3 películas para elegir
+ * @param token - Token válido para usar en confirm-selection
+ * @param selectedBy - Nombre del usuario que selecciona
+ */
+function showMovieSelector(
+  movies: Array<{ film_id: number; title: string; year: string | number; poster: string | null }>,
+  token: string,
+  selectedBy: string
+): void {
+  const selectorContainer = document.getElementById('movieSelector');
+  const moviesGrid = document.getElementById('moviesGrid');
+  const selectorMessage = document.getElementById('selectorMessage');
+
+  if (!selectorContainer || !moviesGrid || !selectorMessage) {
+    console.error('❌ No se encontró el contenedor del selector de películas');
+    return;
+  }
+
+  // Limpiar grid
+  moviesGrid.innerHTML = '';
+
+  // Crear tarjetas de películas
+  movies.forEach((movie) => {
+    const posterUrl = movie.poster 
+      ? `https://image.tmdb.org/t/p/w500${movie.poster}`
+      : '/images/noImg.png';
+
+    const card = document.createElement('div');
+    card.className = 'movie-card';
+    card.innerHTML = `
+      <img 
+        src="${posterUrl}" 
+        alt="${movie.title}" 
+        class="movie-poster"
+        onerror="this.src='/images/noImg.png'"
+      />
+      <div class="movie-info">
+        <h3 class="movie-title">${movie.title}</h3>
+        <p class="movie-year">${movie.year}</p>
+        <button class="choose-btn" data-film-id="${movie.film_id}">
+          ELEGIR ESTA
+        </button>
+      </div>
+    `;
+
+    // Event listener para el botón
+    const chooseBtn = card.querySelector('.choose-btn') as HTMLButtonElement;
+    chooseBtn.addEventListener('click', () => {
+      confirmSelection(movie, token, selectedBy, selectorMessage);
+    });
+
+    moviesGrid.appendChild(card);
+  });
+
+  // Mostrar el selector
+  selectorContainer.classList.add('active');
+  selectorContainer.style.display = 'flex';
+}
+
+/**
+ * Confirma la selección de una película y la registra en BD
+ */
+async function confirmSelection(
+  movie: { film_id: number; title: string; year: string | number; poster: string | null },
+  token: string,
+  selectedBy: string,
+  messageDiv: HTMLElement
+): void {
+  try {
+    messageDiv.textContent = '⏳ Registrando película...';
+    messageDiv.className = 'selector-message loading';
+
+    const response = await fetch('/api/confirm-selection', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token,
+        film_id: movie.film_id,
+        title: movie.title,
+        year: movie.year,
+        poster: movie.poster,
+        selected_by: selectedBy
+      })
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      messageDiv.textContent = `✅ ${result.message}`;
+      messageDiv.className = 'selector-message success';
+
+      // Confetti
+      try {
+        if (typeof (window as any).confetti === 'function') {
+          (window as any).confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 },
+          });
+        }
+      } catch (e) { /* ignorar */ }
+
+      // Recargar página después de 2 segundos
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+
+    } else {
+      messageDiv.textContent = `❌ ${result.message || 'Error al confirmar selección'}`;
+      messageDiv.className = 'selector-message error';
+    }
+
+  } catch (error) {
+    console.error('Error al confirmar selección:', error);
+    messageDiv.textContent = '❌ Error de conexión. Intenta de nuevo.';
+    messageDiv.className = 'selector-message error';
+  }
 }

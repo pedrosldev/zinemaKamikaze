@@ -4,6 +4,7 @@ import Vibrarcodion from "./Vibrarcodion.astro";
 import TokenInput from "./TokenInput.astro";
 import MoviePoster from "./MoviePoster.astro";
 import ExpectationModal from "./ExpectationModal.astro";
+import MovieSelector from "./MovieSelector.astro";
 import { moodSequences, defaultSequence } from "../config/moodSequences";
 
 const vibes = await getAllVibes();
@@ -112,6 +113,9 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
   latestMovie={latestMovie as { title: string; film_id: number } | null}
   expectationComments={expectationComments}
 />
+
+<!-- Selector de Películas (MODO TRIPLE CHOICE) -->
+<MovieSelector movies={[]} token="" selectedBy="" />
 
 <script>
   import { initTokenValidation } from '../scripts/tokenValidation';

@@ -3,6 +3,7 @@
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { getActiveTokens, getReviewsWithNullReview } from "../../lib/db";
 import TokenManagement from "../../components/admin/TokenManagement.astro";
+import SelectionModeToggle from "../../components/admin/SelectionModeToggle.astro";
 import PendingReviewsSelector from "../../components/admin/PendingReviewsSelector.astro";
 import ReviewForm from "../../components/admin/ReviewForm.astro";
 import NewReviewForm from "../../components/admin/NewReviewForm.astro";
@@ -24,6 +25,8 @@ if (authToken !== ADMIN_PASSWORD) {
       <button id="logoutBtn" class="logout-btn">CERRAR SESIÓN</button>
     </div>
     <h1>ZONA DE ADMINISTRACIÓN - TOKENS</h1>
+
+    <SelectionModeToggle />
 
     <TokenManagement activeTokens={activeTokens} />
 
