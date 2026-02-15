@@ -31,3 +31,12 @@ const totalMovies = 18266; // Aproximado
     </div>
   </main>
 </CatalogLayout>
+
+<script>
+  import { hasCatalogToken } from '../../scripts/catalog/catalogSelection';
+  
+  // Si hay un token activo, redirigir directamente a la página 1
+  if (hasCatalogToken()) {
+    window.location.href = '/catalog/1';
+  }
+</script>

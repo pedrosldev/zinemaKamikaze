@@ -76,8 +76,10 @@ const nearbyPages = Array.from({ length: 5 }, (_, i) => {
 
 <script>
   import { initCatalogScroll } from '../../scripts/catalog/catalogScroll';
+  import { initCatalogSelection } from '../../scripts/catalog/catalogSelection';
   
   document.addEventListener('DOMContentLoaded', () => {
     initCatalogScroll();
+    initCatalogSelection();
   });
 </script>
