@@ -1,0 +1,316 @@
+/* ============= MOVIE SELECTOR MODAL (Triple Choice) ============= */
+
+.movie-selector-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Special Elite', cursive;
+}
+
+.movie-selector-container.active {
+  display: flex;
+}
+
+.selector-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.selector-content {
+  position: relative;
+  background: linear-gradient(135deg, rgba(26, 84, 250, 0.2) 0%, rgba(10, 10, 10, 0.95) 100%);
+  border: 3px solid rgba(245, 215, 66, 0.6);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 95%;
+  width: 1200px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(245, 215, 66, 0.4);
+  animation: selectorAppear 0.5s ease-out;
+}
+
+@keyframes selectorAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.selector-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.selector-header h2 {
+  color: #f5d742;
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.selector-header p {
+  color: #c9be9c;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.movie-selector-container .movie-card {
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid rgba(245, 215, 66, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  list-style: none;
+}
+
+.movie-selector-container .movie-card:hover {
+  border-color: #f5d742;
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(245, 215, 66, 0.5);
+}
+
+.movie-selector-container .movie-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.9) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.movie-selector-container .movie-card:hover::before {
+  opacity: 1;
+}
+
+.movie-selector-container .movie-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  display: block;
+  background: linear-gradient(135deg, #1a54fa 0%, #0a0a0a 100%);
+}
+
+.movie-selector-container .movie-info {
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.85);
+  border-top: 1px solid rgba(245, 215, 66, 0.2);
+}
+
+.movie-selector-container .movie-title {
+  color: #f5d742;
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: bold;
+  line-height: 1.3;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+  font-family: 'Special Elite', cursive;
+}
+
+.movie-selector-container .movie-year {
+  color: #c9be9c;
+  font-size: 0.9rem;
+  margin: 0;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
+  font-family: 'Special Elite', cursive;
+}
+
+.movie-selector-container .choose-btn {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f5d742;
+  color: #000;
+  border: none;
+  padding: 12px 24px;
+  font-family: 'Special Elite', cursive;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  z-index: 3;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.movie-selector-container .movie-card:hover .choose-btn {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+  box-shadow: 0 8px 20px rgba(245, 215, 66, 0.6);
+}
+
+.movie-selector-container .choose-btn:hover {
+  background: #d4b82a;
+  box-shadow: 0 10px 30px rgba(245, 215, 66, 0.8);
+  transform: translateX(-50%) scale(1.05) translateY(-4px);
+}
+
+.movie-selector-container .choose-btn:active {
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.selector-message {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  min-height: 20px;
+}
+
+.selector-message.success {
+  background: rgba(34, 197, 94, 0.2);
+  border: 2px solid #22c55e;
+  color: #4ade80;
+}
+
+.selector-message.error {
+  background: rgba(239, 68, 68, 0.2);
+  border: 2px solid #ef4444;
+  color: #f87171;
+}
+
+.selector-message.loading {
+  background: rgba(245, 215, 66, 0.2);
+  border: 2px solid #f5d742;
+  color: #ffd700;
+}
+
+/* ============= RESPONSIVE ============= */
+
+/* Tablets */
+@media (max-width: 992px) {
+  .movies-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+  .selector-content {
+    padding: 1rem;
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .selector-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .selector-header p {
+    font-size: 0.9rem;
+  }
+
+  .movies-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .movie-selector-container .movie-card {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .movie-selector-container .movie-info {
+    padding: 1rem;
+  }
+
+  .movie-selector-container .movie-title {
+    font-size: 1rem;
+  }
+
+  .movie-selector-container .movie-year {
+    font-size: 0.85rem;
+  }
+
+  .movie-selector-container .choose-btn {
+    opacity: 1;
+    bottom: 1rem;
+    font-size: 0.9rem;
+    padding: 10px 20px;
+    position: static;
+    transform: none;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .movie-selector-container .movie-card:hover .choose-btn {
+    transform: none;
+  }
+
+  .movie-selector-container .choose-btn:hover {
+    transform: scale(1.05);
+  }
+
+  .movie-selector-container .choose-btn:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  .selector-content {
+    padding: 0.75rem;
+  }
+
+  .selector-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .selector-header p {
+    font-size: 0.85rem;
+  }
+
+  .movie-selector-container .movie-card {
+    max-width: 250px;
+  }
+
+  .movie-selector-container .movie-title {
+    font-size: 0.95rem;
+  }
+
+  .movie-selector-container .movie-year {
+    font-size: 0.8rem;
+  }
+
+  .movie-selector-container .choose-btn {
+    font-size: 0.85rem;
+    padding: 8px 16px;
+  }
+}

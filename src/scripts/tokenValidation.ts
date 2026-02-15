@@ -532,11 +532,11 @@ function showMovieSelector(
       />
       <div class="movie-info">
         <h3 class="movie-title">${movie.title}</h3>
-        <p class="movie-year">${movie.year}</p>
-        <button class="choose-btn" data-film-id="${movie.film_id}">
-          ELEGIR ESTA
-        </button>
+        <p class="movie-year">(${movie.year})</p>
       </div>
+      <button class="choose-btn" data-film-id="${movie.film_id}">
+        🎬 ELEGIR ESTA
+      </button>
     `;
 
     // Event listener para el botón
