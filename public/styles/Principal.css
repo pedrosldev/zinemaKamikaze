@@ -1199,7 +1199,6 @@ main>div:not(.film-grain):not(.old-film-scratches) {
 
   .pointing-hand {
     max-width: 60px;
-    transform: rotate(90deg);
   }
 }
 
@@ -1277,6 +1276,11 @@ main>div:not(.film-grain):not(.old-film-scratches) {
 
   .poster-image-active {
     max-height: 200px;
+  }
+
+  .pointing-hand {
+    max-width: 55px;
+    transform: rotate(90deg);
   }
 
   .c p {
@@ -1444,14 +1448,14 @@ main>div:not(.film-grain):not(.old-film-scratches) {
     min-height: 100%;
   }
 
+  .pointing-hand {
+    max-width: 55px;
+    transform: none;
+  }
+
   .d {
     overflow-y: auto;
     font-size: 0.7rem;
-  }
-
-  .pointing-hand {
-    max-width: 55px;
-    transform: rotate(90deg);
   }
 
   .d .token-input-container h3 {
