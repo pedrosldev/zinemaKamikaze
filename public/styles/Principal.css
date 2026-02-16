@@ -17,7 +17,7 @@ main {
   font-family: "Special Elite", cursive;
 }
 
-main > div:not(.film-grain):not(.old-film-scratches) {
+main>div:not(.film-grain):not(.old-film-scratches) {
   background-color: #1a54fa;
   filter: brightness(0.8) contrast(0.9);
   display: flex;
@@ -26,11 +26,9 @@ main > div:not(.film-grain):not(.old-film-scratches) {
   animation: flicker 3s infinite;
   position: relative;
   overflow: hidden;
-  background-image: linear-gradient(
-      to right,
+  background-image: linear-gradient(to right,
       rgba(107, 63, 47, 0.8) 6px,
-      transparent 6px
-    ),
+      transparent 6px),
     linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
     linear-gradient(to left, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
     linear-gradient(to top, rgba(107, 63, 47, 0.8) 6px, transparent 6px);
@@ -208,13 +206,11 @@ main > div:not(.film-grain):not(.old-film-scratches) {
   left: 0;
   width: 200%;
   height: 100%;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 6px,
-    rgba(201, 190, 156, 0.2) 6px,
-    rgba(201, 190, 156, 0.2) 12px
-  );
+  background: repeating-linear-gradient(90deg,
+      transparent,
+      transparent 6px,
+      rgba(201, 190, 156, 0.2) 6px,
+      rgba(201, 190, 156, 0.2) 12px);
   animation: stripedBorder 8s linear infinite;
   pointer-events: none;
   z-index: 1;
@@ -227,14 +223,12 @@ main > div:not(.film-grain):not(.old-film-scratches) {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    transparent 0%,
-    transparent 45%,
-    rgba(201, 190, 156, 0.2) 45%,
-    rgba(201, 190, 156, 0.2) 55%,
-    transparent 55%,
-    transparent 100%
-  );
+  background: linear-gradient(transparent 0%,
+      transparent 45%,
+      rgba(201, 190, 156, 0.2) 45%,
+      rgba(201, 190, 156, 0.2) 55%,
+      transparent 55%,
+      transparent 100%);
   animation: horizontalStripedBorder 3s linear infinite;
   pointer-events: none;
   z-index: 2;
@@ -244,6 +238,7 @@ main > div:not(.film-grain):not(.old-film-scratches) {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -253,6 +248,7 @@ main > div:not(.film-grain):not(.old-film-scratches) {
   0% {
     background-position: 0 0;
   }
+
   100% {
     background-position: 0 100px;
   }
@@ -265,16 +261,12 @@ main > div:not(.film-grain):not(.old-film-scratches) {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: radial-gradient(
-      circle at 8px 50%,
+  background-image: radial-gradient(circle at 8px 50%,
       rgba(0, 0, 0, 0.2) 3px,
-      transparent 4px
-    ),
-    radial-gradient(
-      circle at calc(100% - 8px) 50%,
+      transparent 4px),
+    radial-gradient(circle at calc(100% - 8px) 50%,
       rgba(0, 0, 0, 0.2) 3px,
-      transparent 4px
-    );
+      transparent 4px);
   background-size: 16px 16px;
   background-repeat: repeat-y;
   pointer-events: none;
@@ -361,24 +353,31 @@ main > div:not(.film-grain):not(.old-film-scratches) {
   0% {
     filter: grayscale(100%) contrast(1.4) brightness(0.85) sepia(40%) blur(0px);
   }
+
   15% {
     filter: grayscale(100%) contrast(1.5) brightness(0.9) sepia(35%) blur(1px);
   }
+
   25% {
     filter: grayscale(100%) contrast(1.3) brightness(0.8) sepia(45%) blur(4px);
   }
+
   35% {
     filter: grayscale(100%) contrast(1.4) brightness(0.85) sepia(40%) blur(3px);
   }
+
   50% {
     filter: grayscale(100%) contrast(1.5) brightness(0.9) sepia(35%) blur(0.5px);
   }
+
   65% {
     filter: grayscale(100%) contrast(1.3) brightness(0.8) sepia(45%) blur(5px);
   }
+
   80% {
     filter: grayscale(100%) contrast(1.4) brightness(0.85) sepia(40%) blur(2px);
   }
+
   100% {
     filter: grayscale(100%) contrast(1.4) brightness(0.85) sepia(40%) blur(0px);
   }
@@ -391,7 +390,7 @@ main > div:not(.film-grain):not(.old-film-scratches) {
   left: 0;
   width: 100%;
   height: 200%;
-  background-image: 
+  background-image:
     linear-gradient(180deg, transparent 0%, transparent 48%, rgba(255, 255, 255, 0.4) 49%, rgba(255, 255, 255, 0.4) 50%, transparent 51%, transparent 100%),
     linear-gradient(180deg, transparent 0%, transparent 23%, rgba(0, 0, 0, 0.5) 24%, rgba(0, 0, 0, 0.5) 25%, transparent 26%, transparent 100%),
     linear-gradient(180deg, transparent 0%, transparent 73%, rgba(255, 255, 255, 0.3) 74%, rgba(255, 255, 255, 0.3) 75%, transparent 76%, transparent 100%);
@@ -404,7 +403,7 @@ main > div:not(.film-grain):not(.old-film-scratches) {
 
 .movie {
   color: #FFD700;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes scratchesMoving {
@@ -412,9 +411,11 @@ main > div:not(.film-grain):not(.old-film-scratches) {
     transform: translateY(0);
     opacity: 0.6;
   }
+
   50% {
     opacity: 0.8;
   }
+
   100% {
     transform: translateY(-50%);
     opacity: 0.6;
@@ -465,15 +466,19 @@ main > div:not(.film-grain):not(.old-film-scratches) {
 .flipbook-image:nth-child(1) {
   animation-delay: 0s;
 }
+
 .flipbook-image:nth-child(2) {
   animation-delay: 0.4s;
 }
+
 .flipbook-image:nth-child(3) {
   animation-delay: 0.8s;
 }
+
 .flipbook-image:nth-child(4) {
   animation-delay: 1.2s;
 }
+
 .flipbook-image:nth-child(5) {
   animation-delay: 1.6s;
 }
@@ -483,18 +488,22 @@ main > div:not(.film-grain):not(.old-film-scratches) {
     opacity: 0;
     transform: scale(1);
   }
+
   12% {
     opacity: 1;
     transform: scale(1.02);
   }
+
   35% {
     opacity: 1;
     transform: scale(1);
   }
+
   45% {
     opacity: 0;
     transform: scale(0.98);
   }
+
   100% {
     opacity: 0;
     transform: scale(1);
@@ -508,27 +517,29 @@ main > div:not(.film-grain):not(.old-film-scratches) {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 30%,
-    rgba(0, 0, 0, 0.3) 100%
-  );
+  background: radial-gradient(ellipse at center,
+      transparent 30%,
+      rgba(0, 0, 0, 0.3) 100%);
   pointer-events: none;
   z-index: 5;
   animation: projectorFlicker 1s ease-in-out infinite;
 }
 
 @keyframes projectorFlicker {
+
   0%,
   100% {
     opacity: 0.7;
   }
+
   25% {
     opacity: 0.5;
   }
+
   50% {
     opacity: 0.8;
   }
+
   75% {
     opacity: 0.6;
   }
@@ -568,7 +579,7 @@ main > div:not(.film-grain):not(.old-film-scratches) {
   grid-area: c;
   background-color: #1a54fa;
   filter: brightness(0.8) contrast(0.9);
-  background-image: 
+  background-image:
     linear-gradient(rgba(26, 84, 250, 0.5), rgba(26, 84, 250, 0.5)),
     linear-gradient(to right, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
     linear-gradient(to bottom, rgba(107, 63, 47, 0.8) 6px, transparent 6px),
@@ -672,6 +683,14 @@ main > div:not(.film-grain):not(.old-film-scratches) {
   align-items: center;
 }
 
+.pointing-hand {
+  max-width: 70px;
+  height: auto;
+  margin: 8px 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  transition: transform 0.3s ease;
+}
+
 .e {
   grid-area: e;
 }
@@ -684,20 +703,23 @@ main > div:not(.film-grain):not(.old-film-scratches) {
    ANIMACIONES Y EFECTOS
    ============================================ */
 @keyframes flicker {
+
   0%,
   100% {
     filter: brightness(0.8) contrast(0.9);
   }
+
   50% {
     filter: brightness(0.9) contrast(1);
   }
+
   75% {
     filter: brightness(0.85) contrast(1.05);
   }
 }
 
-.b > .film-grain,
-.f > .film-grain {
+.b>.film-grain,
+.f>.film-grain {
   position: absolute;
   top: 0;
   left: 0;
@@ -711,8 +733,8 @@ main > div:not(.film-grain):not(.old-film-scratches) {
   animation: flickerGrain 10s infinite steps(60);
 }
 
-.a > .old-film-scratches,
-.f > .old-film-scratches {
+.a>.old-film-scratches,
+.f>.old-film-scratches {
   position: absolute;
   top: 0;
   left: 0;
@@ -732,18 +754,22 @@ main > div:not(.film-grain):not(.old-film-scratches) {
     opacity: 0.1;
     transform: translate(0px, 0px);
   }
+
   25% {
     opacity: 0.2;
     transform: translate(1px, -1px);
   }
+
   50% {
     opacity: 0.05;
     transform: translate(-1px, 1px);
   }
+
   75% {
     opacity: 0.15;
     transform: translate(2px, -2px);
   }
+
   100% {
     opacity: 0.1;
     transform: translate(0px, 0px);
@@ -755,18 +781,22 @@ main > div:not(.film-grain):not(.old-film-scratches) {
     opacity: 0.1;
     transform: translate(0, 0) scale(1);
   }
+
   25% {
     opacity: 0.2;
     transform: translateY(-2px) scale(1.01);
   }
+
   50% {
     opacity: 0.05;
     transform: translateX(1px) scale(0.99);
   }
+
   75% {
     opacity: 0.15;
     transform: translate(-2px, 1px) scale(1.02);
   }
+
   100% {
     opacity: 0.1;
     transform: translate(0, 0) scale(1);
@@ -1140,31 +1170,35 @@ main > div:not(.film-grain):not(.old-film-scratches) {
 
   /* Animaciones menos intensas en móviles */
   @keyframes flicker {
+
     0%,
     100% {
       filter: brightness(0.85) contrast(0.95);
     }
+
     50% {
       filter: brightness(0.9) contrast(1);
     }
   }
 
-  .b > .film-grain,
-  .f > .film-grain,
-  .a > .old-film-scratches,
-  .f > .old-film-scratches {
+  .b>.film-grain,
+  .f>.film-grain,
+  .a>.old-film-scratches,
+  .f>.old-film-scratches {
     opacity: 0.1;
   }
 
-  main > div:not(.film-grain):not(.old-film-scratches) {
-    background-image: linear-gradient(
-        to right,
+  main>div:not(.film-grain):not(.old-film-scratches) {
+    background-image: linear-gradient(to right,
         rgba(107, 63, 47, 0.6) 4px,
-        transparent 4px
-      ),
+        transparent 4px),
       linear-gradient(to bottom, rgba(107, 63, 47, 0.6) 4px, transparent 4px),
       linear-gradient(to left, rgba(107, 63, 47, 0.6) 4px, transparent 4px),
       linear-gradient(to top, rgba(107, 63, 47, 0.6) 4px, transparent 4px);
+  }
+
+  .pointing-hand {
+    max-width: 60px;
   }
 }
 
@@ -1183,7 +1217,7 @@ main > div:not(.film-grain):not(.old-film-scratches) {
     padding: 0;
   }
 
-  main > div:not(.film-grain):not(.old-film-scratches) {
+  main>div:not(.film-grain):not(.old-film-scratches) {
     min-height: 80px;
     padding: 1rem;
   }
@@ -1242,6 +1276,11 @@ main > div:not(.film-grain):not(.old-film-scratches) {
 
   .poster-image-active {
     max-height: 200px;
+  }
+
+  .pointing-hand {
+    max-width: 55px;
+    transform: rotate(90deg);
   }
 
   .c p {
@@ -1323,6 +1362,11 @@ main > div:not(.film-grain):not(.old-film-scratches) {
     padding: 1rem 0.5rem;
   }
 
+  .pointing-hand {
+    max-width: 50px;
+    transform: rotate(90deg);
+  }
+
   .e {
     min-height: 250px;
     height: 250px;
@@ -1402,6 +1446,11 @@ main > div:not(.film-grain):not(.old-film-scratches) {
 
   .e {
     min-height: 100%;
+  }
+
+  .pointing-hand {
+    max-width: 55px;
+    transform: none;
   }
 
   .d {
