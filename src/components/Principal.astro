@@ -1,10 +1,11 @@
 ---
-import { getAllVibes, getLatestMovie, getExpectationCommentsByFilmId } from "../lib/db";
+import { getAllVibes, getLatestMovie, getExpectationCommentsByFilmId, getReviewedMovies } from "../lib/db";
 import Vibrarcodion from "./Vibrarcodion.astro";
 import TokenInput from "./TokenInput.astro";
 import MoviePoster from "./MoviePoster.astro";
 import ExpectationModal from "./ExpectationModal.astro";
 import MovieSelector from "./MovieSelector.astro";
+import ReviewedMoviesCarousel from "./ReviewedMoviesCarousel.astro";
 import { moodSequences, defaultSequence } from "../config/moodSequences";
 
 const vibes = await getAllVibes();
@@ -14,6 +15,9 @@ const expectationMood: string | null = latestMovie?.expectation_mood || null;
 const expectationComments = latestMovie && isViewingPeriod 
   ? await getExpectationCommentsByFilmId(latestMovie.film_id) 
   : [];
+
+// Obtener películas revisadas para el carrusel (cuando no hay viewing period)
+const reviewedMovies = !isViewingPeriod ? await getReviewedMovies() : [];
 
 // Seleccionar la secuencia según el mood, o usar la secuencia por defecto
 const currentSequence = expectationMood && moodSequences[expectationMood] 
@@ -50,7 +54,15 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
     <small class="movie">(Haz click para abrir)</small>
     <!-- Datos invisibles para el flipbook -->
     <div id="flipbook-data" data-sequence={JSON.stringify(currentSequence)} style="display: none;"></div>
-  </div>) : <div class="b">Próximamente...</div>
+  </div>) : (
+    <div class="b">
+      {reviewedMovies.length > 0 ? (
+        <ReviewedMoviesCarousel movies={reviewedMovies} />
+      ) : (
+        <div>Próximamente...</div>
+      )}
+    </div>
+  )
     }
 
 

@@ -29,6 +29,15 @@ interface ReviewRow extends RowDataPacket {
   interface VibeRow extends RowDataPacket {
     vibe: string;
   }
+  
+  interface ReviewedMovieRow extends RowDataPacket {
+    id: number;
+    film_id: number;
+    title: string;
+    year: number;
+    poster_url: string;
+    vibe: string;
+  }
   export async function insertReview(film_id: number, title: string, year: number, review: string | null, vibe: string, poster: string, viewing_period: boolean = true, expectation_mood: string | null = null, selected_by: string | null = null, youtube_id: string | null = null, watched_date: string | null = null  ) {
     const [result] = await pool.execute(
       'INSERT INTO reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by, youtube_id, watched_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -225,6 +234,17 @@ export async function getMoviesWithMultipleReviews() {
      GROUP BY film_id, title, poster_url 
      HAVING COUNT(*) > 1
      ORDER BY review_count DESC`
+  );
+  return rows;
+}
+
+// Obtener todas las películas que ya tienen review (películas revisadas)
+export async function getReviewedMovies(): Promise<ReviewedMovieRow[]> {
+  const [rows] = await pool.query<ReviewedMovieRow[]>(
+    `SELECT id, film_id, title, year, poster_url, vibe 
+     FROM reviews 
+     WHERE review IS NOT NULL AND viewing_period = false
+     ORDER BY id DESC`
   );
   return rows;
 }

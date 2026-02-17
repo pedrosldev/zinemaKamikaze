@@ -1,0 +1,235 @@
+---
+import { getPosterUrl } from '../lib/catalogUtils';
+
+interface Movie {
+  id: number;
+  film_id: number;
+  title: string;
+  year: number;
+  poster_url: string;
+  vibe: string;
+}
+
+interface Props {
+  movies: Movie[];
+}
+
+const { movies } = Astro.props;
+---
+
+<div class="carousel-container">
+  <div class="carousel-header">
+    <small class="carousel-title">Películas ya comentadas</small>
+  </div>
+  <div class="carousel-track-container">
+    <div class="carousel-track">
+      {movies.map((movie) => (
+        <a href={`/reviews/${movie.id}`} class="carousel-item">
+          <div class="carousel-poster-wrapper">
+            {movie.poster_url ? (
+              <img 
+                src={getPosterUrl(movie.poster_url)} 
+                alt={`${movie.title} (${movie.year})`}
+                class="carousel-poster"
+              />
+            ) : (
+              <div class="carousel-no-poster">
+                <span>Sin póster</span>
+              </div>
+            )}
+            <div class="carousel-overlay">
+              <h4>{movie.title}</h4>
+              <p>({movie.year})</p>
+              <span class="carousel-vibe">{movie.vibe}</span>
+            </div>
+          </div>
+        </a>
+      ))}
+      <!-- Duplicar las películas para crear un efecto de loop infinito -->
+      {movies.map((movie) => (
+        <a href={`/reviews/${movie.id}`} class="carousel-item">
+          <div class="carousel-poster-wrapper">
+            {movie.poster_url ? (
+              <img 
+                src={getPosterUrl(movie.poster_url)} 
+                alt={`${movie.title} (${movie.year})`}
+                class="carousel-poster"
+              />
+            ) : (
+              <div class="carousel-no-poster">
+                <span>Sin póster</span>
+              </div>
+            )}
+            <div class="carousel-overlay">
+              <h4>{movie.title}</h4>
+              <p>({movie.year})</p>
+              <span class="carousel-vibe">{movie.vibe}</span>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .carousel-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .carousel-header {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+  }
+
+  .carousel-title {
+    color: #c9be9c;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    font-weight: bold;
+  }
+
+  .carousel-track-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 20px 0;
+  }
+
+  .carousel-track {
+    display: flex;
+    gap: 20px;
+    animation: scroll 60s linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .carousel-track:hover {
+    animation-play-state: paused;
+  }
+
+  .carousel-item {
+    flex-shrink: 0;
+    width: 180px;
+    height: 270px;
+    position: relative;
+    text-decoration: none;
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+
+  .carousel-item:hover {
+    transform: scale(1.1) translateY(-10px);
+    z-index: 5;
+  }
+
+  .carousel-item:hover .carousel-overlay {
+    opacity: 1;
+  }
+
+  .carousel-poster-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 
+      0 4px 8px rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(107, 63, 47, 0.4);
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .carousel-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(30%) sepia(20%);
+    transition: filter 0.3s ease;
+  }
+
+  .carousel-item:hover .carousel-poster {
+    filter: grayscale(0%) sepia(0%);
+  }
+
+  .carousel-no-poster {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .carousel-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.8) 60%, transparent 100%);
+    padding: 15px 10px 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .carousel-overlay h4 {
+    color: #f5d742;
+    font-size: 0.9rem;
+    margin: 0 0 5px 0;
+    font-weight: bold;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+  .carousel-overlay p {
+    color: #c9be9c;
+    font-size: 0.75rem;
+    margin: 0 0 8px 0;
+  }
+
+  .carousel-vibe {
+    display: inline-block;
+    background: rgba(245, 215, 66, 0.2);
+    color: #f5d742;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid rgba(245, 215, 66, 0.4);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .carousel-item {
+      width: 120px;
+      height: 180px;
+    }
+
+    .carousel-track {
+      gap: 15px;
+    }
+  }
+</style>

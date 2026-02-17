@@ -423,6 +423,54 @@ main>div:not(.film-grain):not(.old-film-scratches) {
 }
 
 /* ============================================
+   CARRUSEL DE PELÍCULAS REVISADAS
+   ============================================ */
+.b .carousel-container {
+  background: none !important;
+  filter: none !important;
+  animation: none !important;
+  border: none !important;
+}
+
+.b .carousel-track {
+  padding-left: 20px;
+}
+
+.b .carousel-item {
+  filter: grayscale(40%) sepia(30%) brightness(0.9);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.b .carousel-item:hover {
+  filter: grayscale(0%) sepia(0%) brightness(1.1);
+}
+
+/* Añadir efecto de viñeta al carrusel */
+.b .carousel-track-container::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  background: linear-gradient(to right, rgba(26, 84, 250, 0.8), transparent);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.b .carousel-track-container::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  background: linear-gradient(to left, rgba(26, 84, 250, 0.8), transparent);
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ============================================
    FLIPBOOK
    ============================================ */
 .flipbook-frame {
