@@ -11,6 +11,7 @@ main {
     "a b b b c"
     "d e e e f"
     "d e e e f";
+  grid-template-rows: 1fr 2fr 2fr;
   height: 100vh;
   overflow: hidden;
   grid-gap: 0px;
