@@ -108,7 +108,12 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
     )}
   </div>
 
-<div class="e surprise">
+<div 
+  class="e surprise" 
+  data-viewing-period={isViewingPeriod ? 'true' : 'false'}
+  data-has-poster={isViewingPeriod && latestMovie?.poster_url ? 'true' : 'false'}
+  style={isViewingPeriod && latestMovie?.poster_url ? `--poster-url: url(https://image.tmdb.org/t/p/w780${latestMovie.poster_url})` : ''}
+>
   <MoviePoster
     isViewingPeriod={isViewingPeriod}
     latestMovie={latestMovie as { title: string; poster_url: string | null } | null}

@@ -741,6 +741,43 @@ main>div:not(.film-grain):not(.old-film-scratches) {
 
 .e {
   grid-area: e;
+  position: relative;
+}
+
+/* Fondo con poster difuminado durante viewing period */
+.e[data-has-poster="true"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--poster-url);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(25px) brightness(0.7);
+  transform: scale(1.15);
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* Overlay para mejor contraste del contenido */
+.e[data-has-poster="true"]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(26, 84, 250, 0.3);
+  z-index: 1;
+}
+
+/* Asegurar que el contenido esté por encima del fondo */
+.e > * {
+  position: relative;
+  z-index: 2;
 }
 
 .f {
