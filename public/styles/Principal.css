@@ -11,7 +11,6 @@ main {
     "a b b b c"
     "d e e e f"
     "d e e e f";
-  grid-template-rows: 1fr 2fr 2fr;
   height: 100vh;
   overflow: hidden;
   grid-gap: 0px;
@@ -450,15 +449,29 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   filter: none !important;
   animation: none !important;
   border: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+.b .carousel-track-container {
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  position: relative !important;
 }
 
 .b .carousel-track {
   padding-left: 20px;
+  display: flex !important;
 }
 
 .b .carousel-item {
   filter: grayscale(40%) sepia(30%) brightness(0.9);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block !important;
 }
 
 .b .carousel-item:hover {
@@ -1337,24 +1350,19 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   main {
     grid-template-areas:
       "a"
-      "d"
       "b"
       "f"
+      "d"
       "e"
       "c";
-    grid-template-rows: 80px 280px 100px 100px 300px 80px;
+    grid-template-rows: auto auto auto auto 300px auto;
     grid-template-columns: 1fr;
     padding: 0;
-    overflow-y: auto;
   }
 
   main>div:not(.film-grain):not(.old-film-scratches) {
-    min-height: 60px;
+    min-height: 80px;
     padding: 1rem;
-  }
-
-  .a {
-    overflow: hidden;
   }
 
   .a h1 {
@@ -1365,9 +1373,7 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   }
 
   .d {
-    min-height: 250px;
-    max-height: 280px;
-    overflow-y: auto;
+    min-height: 200px;
     padding: 1.5rem 1rem;
   }
 
@@ -1491,36 +1497,17 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   }
 }
 
-/* Samsung A53 y dispositivos similares (400-450px) */
-@media screen and (min-width: 400px) and (max-width: 450px) {
-  main {
-    grid-template-rows: 75px 260px 95px 95px 280px 75px !important;
-    overflow-y: auto !important;
-  }
-
-  .d {
-    min-height: 240px !important;
-    max-height: 260px !important;
-    overflow-y: auto !important;
-  }
-}
-
 /* Móviles pequeños (hasta 480px) */
 @media screen and (max-width: 480px) {
   main {
-    grid-template-rows: 70px 240px 90px 90px 250px 70px;
+    grid-template-rows: auto auto auto auto 250px auto;
     grid-template-areas:
       "a"
-      "d"
-      "b"
       "f"
+      "b"
+      "d"
       "e"
       "c";
-    overflow-y: auto;
-  }
-
-  .a {
-    overflow: hidden;
   }
 
   .a h1 {
@@ -1539,9 +1526,7 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   }
 
   .d {
-    min-height: 220px;
-    max-height: 240px;
-    overflow-y: auto;
+    min-height: 180px;
     padding: 1rem 0.5rem;
   }
 
@@ -1638,26 +1623,10 @@ main>div:not(.film-grain):not(.old-film-scratches) {
       "a b c"
       "d e f"
       "d e f";
-    grid-template-rows: 70px 1fr 1fr;
+    grid-template-rows: minmax(150px, auto) 1fr 1fr;
     grid-template-columns: 1fr 2.5fr 0.8fr;
     height: 100vh;
     overflow: hidden;
-  }
-
-  .a {
-    overflow: hidden;
-    padding: 0.3rem !important;
-  }
-
-  .a h1 {
-    font-size: 0.9rem !important;
-    line-height: 1.1 !important;
-    margin: 0 !important;
-  }
-
-  .a .catalog-link {
-    font-size: 0.45rem !important;
-    padding: 3px 6px !important;
   }
 
   .c p {
@@ -1665,7 +1634,7 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   }
 
   .b {
-    padding: 5px !important;
+    padding: 8px !important;
   }
 
   .e {
@@ -1683,7 +1652,6 @@ main>div:not(.film-grain):not(.old-film-scratches) {
     font-size: 0.7rem;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
     padding: 0.75rem 0.5rem;
     max-height: 100%;
   }
