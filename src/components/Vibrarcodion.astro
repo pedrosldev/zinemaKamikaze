@@ -50,6 +50,8 @@ const { titulo = "Vibreviews" } = Astro.props;
   .acordeon {
     width: 70%;
     margin-right: 15px;
+    position: relative;
+    z-index: 150;
     /* margin: 0 auto; */
   }
 
@@ -100,6 +102,8 @@ const { titulo = "Vibreviews" } = Astro.props;
       transform 0.4s ease-in-out;
     transform: translateY(-10px);
     pointer-events: none;
+    position: relative;
+    z-index: 200;
   }
 
   .acordeon-contenido-interior {
@@ -172,6 +176,39 @@ const { titulo = "Vibreviews" } = Astro.props;
 
   .vibe-enlace:hover {
     color: #0066cc;
+  }
+
+  /* Landscape mobile adjustments */
+  @media screen and (max-width: 896px) and (orientation: landscape) {
+    .acordeon {
+      width: 95%;
+      margin-right: 5px;
+    }
+
+    .acordeon-titulo-principal {
+      font-size: 0.6rem;
+      padding: 0.4rem;
+    }
+
+    .acordeon-contenido-interior {
+      padding: 0.3rem;
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
+    }
+
+    .acordeon-titulo-principal[aria-expanded="true"] + .acordeon-contenido {
+      max-height: calc(100vh - 150px);
+    }
+
+    .vibe-enlace {
+      font-size: 0.5rem;
+      padding: 0.2rem 0;
+    }
+
+    img {
+      width: 12px;
+      height: 12px;
+    }
   }
 </style>
 

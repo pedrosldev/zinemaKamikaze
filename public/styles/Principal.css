@@ -331,6 +331,25 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 1rem 0.5rem;
+}
+
+.a h1 {
+  font-size: 2rem;
+  text-align: center;
+  color: #f5d742;
+  text-shadow:
+    2px 2px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    0 0 10px rgba(0, 0, 0, 0.7);
+  margin: 0;
+  padding: 0 0.5rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
 }
 
 .b {
@@ -782,6 +801,13 @@ main>div:not(.film-grain):not(.old-film-scratches) {
 
 .f {
   grid-area: f;
+  overflow: visible;
+  z-index: 100;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px !important;
 }
 
 /* ============================================
@@ -1285,6 +1311,24 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   .pointing-hand {
     max-width: 60px;
   }
+
+  /* Asegurar que .f permita el desplegable del acordeón */
+  .f {
+    min-height: 100px;
+  }
+
+  .f .acordeon {
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  .f .acordeon-titulo-principal {
+    font-size: 1rem;
+  }
+
+  .f .vibe-enlace {
+    font-size: 0.8rem;
+  }
 }
 
 /* Móviles grandes (hasta 768px) */
@@ -1308,8 +1352,10 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   }
 
   .a h1 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     text-align: center;
+    padding: 0 0.75rem;
+    line-height: 1.2;
   }
 
   .d {
@@ -1414,6 +1460,27 @@ main>div:not(.film-grain):not(.old-film-scratches) {
     font-size: 0.75rem;
     padding: 0.5rem 1rem;
   }
+
+  /* Asegurar que .f permita el desplegable del acordeón */
+  .f {
+    min-height: 120px;
+    justify-content: flex-end;
+    padding-right: 5px !important;
+  }
+
+  .f .acordeon {
+    width: 85%;
+    margin-right: 0;
+  }
+
+  .f .acordeon-titulo-principal {
+    font-size: 1.1rem;
+    padding: 0.6rem;
+  }
+
+  .f .vibe-enlace {
+    font-size: 0.85rem;
+  }
 }
 
 /* Móviles pequeños (hasta 480px) */
@@ -1430,7 +1497,9 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   }
 
   .a h1 {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    padding: 0 0.5rem;
+    line-height: 1.1;
   }
 
   .b,
@@ -1510,6 +1579,27 @@ main>div:not(.film-grain):not(.old-film-scratches) {
     font-size: 0.7rem;
     padding: 0.4rem 0.8rem;
   }
+
+  /* Asegurar que .f permita el desplegable del acordeón */
+  .f {
+    min-height: 100px;
+    justify-content: flex-end;
+    padding-right: 3px !important;
+  }
+
+  .f .acordeon {
+    width: 90%;
+    margin-right: 0;
+  }
+
+  .f .acordeon-titulo-principal {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+  }
+
+  .f .vibe-enlace {
+    font-size: 0.75rem;
+  }
 }
 
 /* Landscape en móviles */
@@ -1517,16 +1607,20 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   main {
     grid-template-areas:
       "a b c"
-      "d e e"
-      "f e e";
-    grid-template-rows: minmax(60px, auto) minmax(400px, 1fr) minmax(80px, auto);
-    grid-template-columns: minmax(280px, 1fr) 2fr minmax(100px, 1fr);
+      "d e f"
+      "d e f";
+    grid-template-rows: minmax(70px, auto) 1fr 1fr;
+    grid-template-columns: minmax(300px, 1fr) 2fr minmax(140px, 0.6fr);
     height: 100vh;
-    overflow-y: auto;
+    overflow: hidden;
   }
 
   .c p {
     font-size: 0.5rem;
+  }
+
+  .b {
+    padding: 5px !important;
   }
 
   .e {
@@ -1541,7 +1635,6 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   .d {
     overflow-y: auto;
     font-size: 0.7rem;
-    min-height: 400px;
     display: flex;
     flex-direction: column;
     padding: 0.5rem;
@@ -1604,5 +1697,34 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   .d #contenido {
     font-size: 0.65rem;
     padding: 0.5rem;
+  }
+
+  /* Asegurar que .f permita el desplegable del acordeón en landscape */
+  .f {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.25rem !important;
+  }
+
+  .a {
+    padding: 0.15rem;
+  }
+
+  .a h1 {
+    font-size: clamp(0.45rem, 2.5vw, 0.6rem);
+    padding: 0;
+    letter-spacing: 0.25px;
+    line-height: 0.95;
+    word-spacing: -0.05em;
+  }
+
+  .catalog-link {
+    font-size: 0.45rem;
+    padding: 3px 6px;
+    margin-top: 8px;
+  }
+
+  .catalog-link small {
+    font-size: 0.3rem;
   }
 }

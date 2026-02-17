@@ -232,4 +232,42 @@ const { movies } = Astro.props;
       gap: 15px;
     }
   }
+
+  /* Landscape mobile adjustments */
+  @media screen and (max-width: 896px) and (orientation: landscape) {
+    .carousel-container {
+      padding: 5px 0;
+    }
+
+    .carousel-track-container {
+      padding: 10px 0;
+    }
+
+    .carousel-item {
+      width: 130px;
+      height: 195px;
+    }
+
+    .carousel-track {
+      gap: 12px;
+    }
+
+    .carousel-title {
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+    }
+
+    .carousel-overlay h4 {
+      font-size: 0.7rem;
+    }
+
+    .carousel-overlay p {
+      font-size: 0.6rem;
+    }
+
+    .carousel-vibe {
+      font-size: 0.55rem;
+      padding: 2px 6px;
+    }
+  }
 </style>
