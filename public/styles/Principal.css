@@ -1519,8 +1519,8 @@ main>div:not(.film-grain):not(.old-film-scratches) {
       "a b c"
       "d e e"
       "f e e";
-    grid-template-rows: auto 1fr auto;
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows: minmax(60px, auto) minmax(400px, 1fr) minmax(80px, auto);
+    grid-template-columns: minmax(280px, 1fr) 2fr minmax(100px, 1fr);
     height: 100vh;
     overflow-y: auto;
   }
@@ -1541,30 +1541,46 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   .d {
     overflow-y: auto;
     font-size: 0.7rem;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+  }
+
+  .d .token-input-container {
+    flex-shrink: 0;
+    padding: 0.5rem;
   }
 
   .d .token-input-container h3 {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
   }
 
   .d .token-input {
     font-size: 0.7rem;
     padding: 6px 10px;
+    width: 90%;
   }
 
   .d .token-btn {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     padding: 6px 12px;
   }
 
   .d .selected-by-container label {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
   }
 
   .d .selected-by-input {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     padding: 6px 10px;
+    width: 85%;
+  }
+
+  .d .selected-by-container small {
+    font-size: 0.55rem;
   }
 
   .d .viewing-period-info h3 {
@@ -1577,5 +1593,16 @@ main>div:not(.film-grain):not(.old-film-scratches) {
 
   .d .status-message {
     font-size: 0.7rem;
+  }
+
+  .d #btnLeer {
+    font-size: 0.6rem;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+
+  .d #contenido {
+    font-size: 0.65rem;
+    padding: 0.5rem;
   }
 }
