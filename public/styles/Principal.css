@@ -1623,7 +1623,7 @@ main>div:not(.film-grain):not(.old-film-scratches) {
       "a b c"
       "d e f"
       "d e f";
-    grid-template-rows: minmax(150px, auto) 1fr 1fr;
+    grid-template-rows: minmax(100px, 25vh) 1fr 1fr;
     grid-template-columns: 1fr 2.5fr 0.8fr;
     height: 100vh;
     overflow: hidden;
@@ -1633,8 +1633,15 @@ main>div:not(.film-grain):not(.old-film-scratches) {
     font-size: 0.5rem;
   }
 
+  .c {
+    max-height: 25vh;
+    overflow: hidden;
+  }
+
   .b {
     padding: 8px !important;
+    max-height: 25vh;
+    overflow: hidden;
   }
 
   .e {
@@ -1731,6 +1738,8 @@ main>div:not(.film-grain):not(.old-film-scratches) {
 
   .a {
     padding: 0.25rem;
+    max-height: 25vh;
+    overflow: hidden;
   }
 
   .a h1 {
