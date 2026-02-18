@@ -3,6 +3,8 @@
  * Componente de póster de película
  * Muestra el póster de la película actual o un placeholder
  */
+import ComingSoon from './ComingSoon.astro';
+
 interface Props {
   isViewingPeriod: boolean;
   latestMovie?: {
@@ -33,6 +35,6 @@ const { isViewingPeriod, latestMovie, expectationCommentsCount } = Astro.props;
 ) : (
   <!-- Contenido alternativo cuando NO hay periodo de visionado -->
   <div class="no-movie-placeholder">
-    <p>Próxima película por seleccionar</p>
+    <ComingSoon />
   </div>
 )}

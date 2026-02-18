@@ -1,0 +1,290 @@
+---
+/**
+ * Componente de "Coming Soon" animado
+ * Muestra mensajes rotativos con diferentes estilos visuales
+ */
+---
+
+<div class="coming-soon-container">
+  <div class="message-stack">
+    <!-- Mensaje 1: Estilo Neón Parpadeante -->
+    <div class="message message-neon" data-delay="0">
+      <span>COMING SOON...</span>
+    </div>
+    
+    <!-- Mensaje 2: Efecto Glitch -->
+    <div class="message message-glitch" data-delay="4">
+      <span data-text="PRÓXIMA BATALLA...">PRÓXIMA BATALLA...</span>
+    </div>
+    
+    <!-- Mensaje 3: Estilo Máquina de Escribir -->
+    <div class="message message-typewriter" data-delay="8">
+      <span>PREPARANDO BOMBA...</span>
+    </div>
+    
+    <!-- Mensaje 4: Efecto Scanlines + Fade -->
+    <div class="message message-scanlines" data-delay="12">
+      <span>CARGANDO KAMIKAZE...</span>
+    </div>
+
+    <!-- Mensaje 5: Efecto Vintage -->
+    <div class="message message-vintage" data-delay="16">
+      <span>SIGUIENTE ARTEFACTO...</span>
+    </div>
+
+    <!-- Mensaje 6: Efecto Explosión -->
+    <div class="message message-explosion" data-delay="20">
+      <span>💣 EN PREPARACIÓN 💣</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .coming-soon-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .message-stack {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .message {
+    position: absolute;
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: bold;
+    text-align: center;
+    opacity: 0;
+    animation: messageRotate 24s infinite;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 20px;
+  }
+
+  /* Ajustar delays para cada mensaje */
+  .message[data-delay="0"] { animation-delay: 0s; }
+  .message[data-delay="4"] { animation-delay: 4s; }
+  .message[data-delay="8"] { animation-delay: 8s; }
+  .message[data-delay="12"] { animation-delay: 12s; }
+  .message[data-delay="16"] { animation-delay: 16s; }
+  .message[data-delay="20"] { animation-delay: 20s; }
+
+  /* Animación base de rotación */
+  @keyframes messageRotate {
+    0%, 100% { opacity: 0; transform: scale(0.8); }
+    4%, 12% { opacity: 1; transform: scale(1); }
+    16% { opacity: 0; transform: scale(0.8); }
+  }
+
+  /* ============================================
+     ESTILO 1: NEÓN PARPADEANTE
+     ============================================ */
+  .message-neon {
+    color: #ff00ff;
+    text-shadow: 
+      0 0 10px #ff00ff,
+      0 0 20px #ff00ff,
+      0 0 30px #ff00ff,
+      0 0 40px #ff00ff;
+    animation: messageRotate 24s infinite, neonFlicker 0.5s infinite alternate;
+  }
+
+  @keyframes neonFlicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      text-shadow: 
+        0 0 10px #ff00ff,
+        0 0 20px #ff00ff,
+        0 0 30px #ff00ff,
+        0 0 40px #ff00ff;
+    }
+    20%, 24%, 55% {
+      text-shadow: none;
+    }
+  }
+
+  /* ============================================
+     ESTILO 2: GLITCH
+     ============================================ */
+  .message-glitch {
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    animation: messageRotate 24s infinite, glitchMove 0.3s infinite;
+  }
+
+  .message-glitch span::before,
+  .message-glitch span::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .message-glitch span::before {
+    animation: glitchTop 0.4s infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+    color: #ff0000;
+  }
+
+  .message-glitch span::after {
+    animation: glitchBottom 0.5s infinite;
+    clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+    color: #0000ff;
+  }
+
+  @keyframes glitchTop {
+    0%, 100% { transform: translate(0); }
+    33% { transform: translate(-2px, 2px); }
+    66% { transform: translate(2px, -2px); }
+  }
+
+  @keyframes glitchBottom {
+    0%, 100% { transform: translate(0); }
+    33% { transform: translate(2px, -2px); }
+    66% { transform: translate(-2px, 2px); }
+  }
+
+  @keyframes glitchMove {
+    0%, 100% { transform: translate(0) skew(0deg); }
+    25% { transform: translate(-2px, 1px) skew(1deg); }
+    50% { transform: translate(2px, -1px) skew(-1deg); }
+    75% { transform: translate(-1px, 2px) skew(0.5deg); }
+  }
+
+  /* ============================================
+     ESTILO 3: MÁQUINA DE ESCRIBIR
+     ============================================ */
+  .message-typewriter {
+    color: #f5d742;
+    font-family: 'Special Elite', cursive;
+    border-right: 3px solid #f5d742;
+    white-space: nowrap;
+    overflow: hidden;
+    animation: 
+      messageRotate 24s infinite,
+      typing 2s steps(20) infinite,
+      blink 0.7s step-end infinite;
+  }
+
+  @keyframes typing {
+    0%, 90%, 100% { width: 0; }
+    20%, 80% { width: 100%; }
+  }
+
+  @keyframes blink {
+    50% { border-color: transparent; }
+  }
+
+  /* ============================================
+     ESTILO 4: SCANLINES + FADE
+     ============================================ */
+  .message-scanlines {
+    color: #00ffff;
+    position: relative;
+    animation: messageRotate 24s infinite, scanlineGlow 2s linear infinite;
+  }
+
+  .message-scanlines::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 255, 255, 0.1) 0px,
+      rgba(0, 255, 255, 0.1) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+    animation: scanlineMove 0.5s linear infinite;
+  }
+
+  @keyframes scanlineMove {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(2px); }
+  }
+
+  @keyframes scanlineGlow {
+    0%, 100% { 
+      text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff; 
+      filter: brightness(1);
+    }
+    50% { 
+      text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff; 
+      filter: brightness(1.3);
+    }
+  }
+
+  /* ============================================
+     ESTILO 5: VINTAGE FILM
+     ============================================ */
+  .message-vintage {
+    color: #c9be9c;
+    font-family: 'Special Elite', cursive;
+    animation: 
+      messageRotate 24s infinite,
+      vintageFlicker 0.1s infinite,
+      vintageShake 0.3s infinite;
+    filter: sepia(0.8) contrast(1.2);
+  }
+
+  @keyframes vintageFlicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.95; }
+  }
+
+  @keyframes vintageShake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(1px, -1px) rotate(0.2deg); }
+    50% { transform: translate(-1px, 1px) rotate(-0.2deg); }
+    75% { transform: translate(1px, 1px) rotate(0.1deg); }
+  }
+
+  /* ============================================
+     ESTILO 6: EXPLOSIÓN
+     ============================================ */
+  .message-explosion {
+    color: #ff4500;
+    animation: 
+      messageRotate 24s infinite,
+      explosionPulse 1s ease-in-out infinite;
+    text-shadow: 
+      0 0 10px #ff4500,
+      0 0 20px #ff6347,
+      0 0 30px #ff0000;
+  }
+
+  @keyframes explosionPulse {
+    0%, 100% { 
+      transform: scale(1); 
+      filter: hue-rotate(0deg);
+    }
+    50% { 
+      transform: scale(1.1); 
+      filter: hue-rotate(20deg);
+    }
+  }
+
+  /* Responsividad */
+  @media (max-width: 768px) {
+    .message {
+      font-size: clamp(1rem, 5vw, 2rem);
+      letter-spacing: 2px;
+      padding: 15px;
+    }
+  }
+</style>
