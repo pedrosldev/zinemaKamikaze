@@ -61,10 +61,12 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
 
 <script>
   import { initCatalogSearch } from '../../scripts/catalog/catalogSearch';
+  import { initCatalogSelection } from '../../scripts/catalog/catalogSelection';
   
-  // Inicializar búsqueda cuando el DOM esté listo
+  // Inicializar búsqueda y selección cuando el DOM esté listo
   document.addEventListener('DOMContentLoaded', () => {
     initCatalogSearch();
+    initCatalogSelection();
   });
 </script>
 

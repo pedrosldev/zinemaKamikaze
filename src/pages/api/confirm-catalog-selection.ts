@@ -41,35 +41,64 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // 2. Verificar que no exista ya una review con este film_id
+    // 2. Verificar si ya existe una review con este film_id
     const [existingReviews]: any = await connection.query(
-      'SELECT id FROM reviews WHERE film_id = ?',
+      'SELECT id, title, review FROM reviews WHERE film_id = ?',
       [film_id]
     );
 
-    if (existingReviews.length > 0) {
-      await connection.rollback();
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          message: 'Esta película ya ha sido seleccionada anteriormente' 
-        }),
-        { status: 409, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // 3. Insertar la película seleccionada en reviews
     const posterUrl = poster || '';
     const movieYear = year || new Date().getFullYear();
 
-    await connection.query(
-      `INSERT INTO reviews 
-       (film_id, title, year, poster_url, selected_by, review, vibe, viewing_period, expectation_mood, youtube_id, watched_date) 
-       VALUES (?, ?, ?, ?, ?, NULL, NULL, true, NULL, NULL, NULL)`,
-      [film_id, title, movieYear, posterUrl, selected_by || 'Anónimo']
-    );
+    console.log(`🔍 Verificando película film_id=${film_id}, existe=${existingReviews.length > 0}`, 
+      existingReviews.length > 0 ? { id: existingReviews[0].id, title: existingReviews[0].title, hasReview: existingReviews[0].review !== null } : 'nueva');
 
-    // 4. Marcar el token como usado
+    if (existingReviews.length > 0) {
+      // Si ya existe, resetear la review para un nuevo viewing period
+      const reviewId = existingReviews[0].id;
+      
+      const [updateResult]: any = await connection.query(
+        `UPDATE reviews 
+         SET viewing_period = true, 
+             selected_by = ?,
+             poster_url = ?,
+             year = ?,
+             review = NULL,
+             vibe = NULL,
+             expectation_mood = NULL,
+             youtube_id = NULL,
+             watched_date = NULL
+         WHERE film_id = ?`,
+        [selected_by || 'Anónimo', posterUrl, movieYear, film_id]
+      );
+      
+      console.log(`📝 UPDATE ejecutado: affectedRows=${updateResult.affectedRows}, changedRows=${updateResult.changedRows}`);
+      
+      // Limpiar comentarios de expectativas anteriores
+      await connection.query(
+        'DELETE FROM expectation_comments WHERE film_id = ?',
+        [film_id]
+      );
+      
+      // Limpiar comentarios de la crítica anterior
+      await connection.query(
+        'DELETE FROM comments WHERE review_id = ?',
+        [reviewId]
+      );
+      
+      console.log(`✅ Película RE-seleccionada: ${title} (${film_id}) por ${selected_by || 'Anónimo'}`);
+    } else {
+      // Si no existe, insertar nueva review
+      await connection.query(
+        `INSERT INTO reviews 
+         (film_id, title, year, poster_url, selected_by, review, vibe, viewing_period, expectation_mood, youtube_id, watched_date) 
+         VALUES (?, ?, ?, ?, ?, NULL, NULL, true, NULL, NULL, NULL)`,
+        [film_id, title, movieYear, posterUrl, selected_by || 'Anónimo']
+      );
+      console.log(`✅ Película seleccionada: ${title} (${film_id}) por ${selected_by || 'Anónimo'}`);
+    }
+
+    // 3. Marcar el token como usado
     await connection.query(
       'UPDATE trigger_tokens SET is_active = false WHERE token = ?',
       [token]
@@ -77,8 +106,6 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Commit de la transacción
     await connection.commit();
-
-    console.log(`✅ Película seleccionada desde catálogo: ${title} (${film_id}) por ${selected_by || 'Anónimo'}`);
 
     return new Response(
       JSON.stringify({ 
