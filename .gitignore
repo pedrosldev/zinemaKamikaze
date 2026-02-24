@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # Local Netlify folder
 .netlify
+
+# Documentación personal/propuestas
+PROPUESTAS_PERFIL_CREATIVO.md
