@@ -70,7 +70,8 @@ export default defineConfig({
   adapter: isDev
     ? netlify({ edgeMiddleware: false })
     : cloudflare({
-      imageService: 'passthrough'
+      imageService: 'passthrough',
+      prerenderEnvironment: 'node' // 👈 La línea que soluciona el error
     }),
   security: {
     checkOrigin: false,
