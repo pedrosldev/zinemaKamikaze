@@ -49,6 +49,7 @@ export default defineConfig({
   output: "server",
   adapter: cloudflare({
     imageService: 'passthrough', // 👈 Evita errores con imágenes en Cloudflare
+    prerenderEnvironment: "node",
   }),
   security: {
     checkOrigin: false,
