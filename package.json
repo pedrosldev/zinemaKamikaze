@@ -12,10 +12,10 @@
     "migrate:prod": "cross-env NODE_ENV=production node scripts/migrate.cjs"
   },
   "dependencies": {
-    "@astrojs/netlify": "^6.6.4",
-    "@astrojs/node": "^9.5.2",
+    "@astrojs/netlify": "8.2.10",
+    "@astrojs/node": "11.1.9",
     "@justinribeiro/lite-youtube": "^1.9.0",
-    "astro": "^5.17.1",
+    "astro": "7.4.4",
     "dotenv": "^16.5.0",
     "mysql2": "^3.14.0",
     "openai": "^4.87.3"
