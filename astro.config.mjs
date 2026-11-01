@@ -18,25 +18,41 @@
 //   },
 // });
 // @ts-check
+// import { defineConfig } from 'astro/config';
+// import cloudflare from '@astrojs/cloudflare';
+// //import netlify from '@astrojs/netlify'; // 1. Cambiamos la importación
+
+// // https://astro.build/config
+// export default defineConfig({
+//   output: "server", // 2. Mantenemos el modo server para que funcione la DB y OpenAI
+//   adapter: cloudflare(),
+//   // adapter: netlify({
+//   //   // 3. El adaptador de Netlify no necesita el modo 'standalone'
+//   //   edgeMiddleware: false, 
+//   // }),
+
+//   security: {
+//     checkOrigin: false, // 4. Mantenlo así para evitar problemas de CORS con formularios
+//   },
+
+//   // 5. La sección 'server' (host/port) ya no es necesaria en producción, 
+//   // pero puedes dejarla si quieres que en tu PC local siga usando ese puerto.
+//   server: {
+//     port: 4321,
+//   },
+// });
+
 import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
-//import netlify from '@astrojs/netlify'; // 1. Cambiamos la importación
 
-// https://astro.build/config
 export default defineConfig({
-  output: "server", // 2. Mantenemos el modo server para que funcione la DB y OpenAI
-  adapter: cloudflare(),
-  // adapter: netlify({
-  //   // 3. El adaptador de Netlify no necesita el modo 'standalone'
-  //   edgeMiddleware: false, 
-  // }),
-
+  output: "server",
+  adapter: cloudflare({
+    imageService: 'passthrough', // 👈 Evita errores con imágenes en Cloudflare
+  }),
   security: {
-    checkOrigin: false, // 4. Mantenlo así para evitar problemas de CORS con formularios
+    checkOrigin: false,
   },
-
-  // 5. La sección 'server' (host/port) ya no es necesaria en producción, 
-  // pero puedes dejarla si quieres que en tu PC local siga usando ese puerto.
   server: {
     port: 4321,
   },
