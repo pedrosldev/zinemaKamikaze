@@ -63,17 +63,15 @@ import { defineConfig } from 'astro/config';
 import netlify from '@astrojs/netlify';
 import cloudflare from '@astrojs/cloudflare';
 
-// Detectamos el entorno. En local será 'development', en Cloudflare será 'production'.
 const isDev = process.env.NODE_ENV === 'development';
 
 export default defineConfig({
   output: "server",
-
-  // Si estamos en desarrollo (local), usamos Netlify. Si no, usamos Cloudflare.
   adapter: isDev
     ? netlify({ edgeMiddleware: false })
-    : cloudflare({ imageService: 'passthrough' }),
-
+    : cloudflare({
+      imageService: 'passthrough'
+    }),
   security: {
     checkOrigin: false,
   },
