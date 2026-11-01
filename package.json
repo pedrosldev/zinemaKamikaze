@@ -12,6 +12,7 @@
     "migrate:prod": "cross-env NODE_ENV=production node scripts/migrate.cjs"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.4.3",
     "@astrojs/netlify": "8.2.10",
     "@astrojs/node": "11.1.9",
     "@justinribeiro/lite-youtube": "^1.9.0",

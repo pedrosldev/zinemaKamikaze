@@ -19,16 +19,17 @@
 // });
 // @ts-check
 import { defineConfig } from 'astro/config';
-import netlify from '@astrojs/netlify'; // 1. Cambiamos la importación
+import cloudflare from '@astrojs/cloudflare';
+//import netlify from '@astrojs/netlify'; // 1. Cambiamos la importación
 
 // https://astro.build/config
 export default defineConfig({
   output: "server", // 2. Mantenemos el modo server para que funcione la DB y OpenAI
-  
-  adapter: netlify({
-    // 3. El adaptador de Netlify no necesita el modo 'standalone'
-    edgeMiddleware: false, 
-  }),
+  adapter: cloudflare(),
+  // adapter: netlify({
+  //   // 3. El adaptador de Netlify no necesita el modo 'standalone'
+  //   edgeMiddleware: false, 
+  // }),
 
   security: {
     checkOrigin: false, // 4. Mantenlo así para evitar problemas de CORS con formularios
