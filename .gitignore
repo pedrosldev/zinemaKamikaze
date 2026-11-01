@@ -28,3 +28,9 @@ pnpm-debug.log*
 
 # Documentación personal/propuestas
 PROPUESTAS_PERFIL_CREATIVO.md
+
+# Wrangler / Cloudflare
+.wrangler/
+.dev.vars*
+wrangler.json
+wrangler.jsonc
