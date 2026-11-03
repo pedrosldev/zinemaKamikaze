@@ -1,4 +1,4 @@
-import { createPool } from 'mysql2/promise';
+import { createPool, createConnection } from 'mysql2/promise';
 import * as dotenv from 'dotenv';
 import type { RowDataPacket } from 'mysql2';
 import type { Pool } from 'mysql2/promise';
@@ -12,16 +12,46 @@ let _dbPool: Pool | null = null;
 export function initDb(env?: any) {
   if (_dbPool) return;
 
-  if (env && env.HYPERDRIVE) {
-    _dbPool = createPool({
-      host: env.HYPERDRIVE.host,
-      user: env.HYPERDRIVE.user,
-      password: env.HYPERDRIVE.password,
-      database: env.HYPERDRIVE.database,
-      port: env.HYPERDRIVE.port,
-      disableEval: true,
-    });
+  if (env && (env as any).HYPERDRIVE) {
+    const hyperdrive = (env as any).HYPERDRIVE;
+    
+    // En Cloudflare, NO usamos createPool.
+    // Creamos un objeto que imite al pool pero abra/cierre conexión por consulta.
+    _dbPool = {
+      query: async (...args: any[]) => {
+        const conn = await createConnection({
+          host: hyperdrive.host,
+          user: hyperdrive.user,
+          password: hyperdrive.password,
+          database: hyperdrive.database,
+          port: hyperdrive.port,
+          disableEval: true,
+        });
+        try {
+          return await (conn as any).query(...args);
+        } finally {
+          await conn.end();
+        }
+      },
+      execute: async (...args: any[]) => {
+        // Para Hyperdrive, execute también debe usar query (protocolo de texto)
+        const conn = await createConnection({
+          host: hyperdrive.host,
+          user: hyperdrive.user,
+          password: hyperdrive.password,
+          database: hyperdrive.database,
+          port: hyperdrive.port,
+          disableEval: true,
+        });
+        try {
+          return await (conn as any).query(...args);
+        } finally {
+          await conn.end();
+        }
+      }
+    } as unknown as Pool;
   } else {
+    // En local (XAMPP), seguimos usando createPool normal
     _dbPool = createPool({
       host: process.env.DB_HOST || '127.0.0.1',
       user: process.env.DB_USER || 'root',
