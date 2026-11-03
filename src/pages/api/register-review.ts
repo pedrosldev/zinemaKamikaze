@@ -1,6 +1,6 @@
 // src/pages/api/register-review.ts
 import type { APIRoute } from 'astro';
-import { insertReview } from '../../lib/db';
+import { insertReview, pool } from '../../lib/db';
 
 export const prerender = false;
 
@@ -23,7 +23,7 @@ export const POST: APIRoute = async ({ request }) => {
     
     if (body.token) {
       // Verificar que el token existe y NO está usado
-      const [tokenRows]: any = await pool.query(
+      const [tokenRows]: any = await pool!.query(
         'SELECT * FROM trigger_tokens WHERE token = ? AND is_active = true',
         [body.token]
       );
@@ -62,7 +62,7 @@ export const POST: APIRoute = async ({ request }) => {
     
     // AHORA SÍ marcar el token como usado (solo si la review se guardó exitosamente)
     if (body.token) {
-      await pool.execute(
+      await pool!.execute(
         'UPDATE trigger_tokens SET is_active = false WHERE token = ?',
         [body.token]
       );

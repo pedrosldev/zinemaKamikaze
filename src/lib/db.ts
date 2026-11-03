@@ -7,14 +7,13 @@ dotenv.config();
 // ==========================================
 // CONFIGURACIÓN DEL POOL DE CONEXIONES
 // ==========================================
-let pool: Pool | null = null;
+let _dbPool: Pool | null = null;
 
 export function initDb(env?: any) {
-  if (pool) return; // Si ya está inicializado, no hacemos nada
+  if (_dbPool) return;
 
-  // Si nos pasan el env de Cloudflare (Hyperdrive)
   if (env && env.HYPERDRIVE) {
-    pool = createPool({
+    _dbPool = createPool({
       host: env.HYPERDRIVE.host,
       user: env.HYPERDRIVE.user,
       password: env.HYPERDRIVE.password,
@@ -23,9 +22,7 @@ export function initDb(env?: any) {
       disableEval: true,
     });
   } else {
-    // Entorno Local (Netlify/XAMPP). 
-    // Si estamos en Cloudflare pero falló el env, esto intentará conectar a localhost (dará error en prod, pero no crasheará Astro)
-    pool = createPool({
+    _dbPool = createPool({
       host: process.env.DB_HOST || '127.0.0.1',
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
@@ -35,19 +32,21 @@ export function initDb(env?: any) {
   }
 }
 
-if (!(globalThis as any).__dbInitialized) {
-  initDb((globalThis as any).__cf_env);
-  (globalThis as any).__dbInitialized = true;
-}
-
 // Función auxiliar para asegurar que el pool existe antes de usarlo
-function getPool(): Pool {
-  if (!pool) {
-    // throw new Error("La base de datos no ha sido inicializada. Llama a initDb(env) primero.");
+export function getPool(): Pool {
+  if (!_dbPool) {
     initDb();
   }
-  return pool as Pool;
+  return _dbPool as Pool;
 }
+
+// ==========================================
+// EXPORTAMOS EL POOL PARA LAS APIS ANTIGUAS
+// ==========================================
+export const pool = {
+  query: (...args: any[]) => (getPool() as any).query(...args),
+  execute: (...args: any[]) => (getPool() as any).execute(...args),
+};
 
 // ==========================================
 // INTERFACES
@@ -170,7 +169,6 @@ export async function deactivateToken(token: string): Promise<void> {
   );
 }
 
-// Función atómica para reclamar un token (evita race conditions)
 export async function claimToken(token: string, used_by: string = 'Anónimo'): Promise<boolean> {
   try {
     const [result]: any = await getPool().execute(
@@ -179,9 +177,6 @@ export async function claimToken(token: string, used_by: string = 'Anónimo'): P
        WHERE token = ? AND is_active = true`,
       [used_by, token]
     );
-    
-    // Si affectedRows = 1, el token era válido y se reclamó exitosamente
-    // Si affectedRows = 0, el token ya estaba usado o no existe
     return result.affectedRows === 1;
   } catch (error) {
     console.error('Error claiming token:', error);
@@ -189,7 +184,6 @@ export async function claimToken(token: string, used_by: string = 'Anónimo'): P
   }
 }
 
-// Obtener datos completos de un token
 export async function getTokenData(token: string) {
   const [rows]: any = await getPool().query(
     "SELECT * FROM trigger_tokens WHERE token = ? LIMIT 1",
@@ -217,7 +211,6 @@ export async function getReviewsWithNullReview(): Promise<Pick<ReviewRow, 'id' |
   }
 }
 
-// Actualizar una review existente
 export async function updateReview(
   id: number,
   film_id: number,
@@ -244,7 +237,6 @@ export async function updateReview(
   }
 }
 
-// Función adicional: Obtener review por ID para edición
 export async function getReviewForEdit(id: number) {
   try {
     const [rows] = await getPool().execute(
@@ -278,7 +270,6 @@ export async function updateExpectationMood(id: number, expectation_mood: string
   }
 }
 
-// Obtener todas las reviews de una película específica
 export async function getReviewsByFilmId(filmId: number): Promise<ReviewRow[]> {
   const [rows] = await getPool().query<(ReviewRow & RowDataPacket)[]>(
     `SELECT * FROM reviews 
@@ -289,7 +280,6 @@ export async function getReviewsByFilmId(filmId: number): Promise<ReviewRow[]> {
   return rows;
 }
 
-// Obtener películas con múltiples reviews
 export async function getMoviesWithMultipleReviews() {
   const [rows] = await getPool().query<(RowDataPacket & { 
     film_id: number; 
@@ -306,7 +296,6 @@ export async function getMoviesWithMultipleReviews() {
   return rows;
 }
 
-// Obtener todas las películas que ya tienen review (películas revisadas)
 export async function getReviewedMovies(): Promise<ReviewedMovieRow[]> {
   const [rows] = await getPool().query<ReviewedMovieRow[]>(
     `SELECT id, film_id, title, year, poster_url, vibe 
@@ -317,7 +306,6 @@ export async function getReviewedMovies(): Promise<ReviewedMovieRow[]> {
   return rows;
 }
 
-// Contar cuántas reviews tiene una película
 export async function getReviewCountByFilmId(filmId: number): Promise<number> {
   const [rows] = await getPool().query<(RowDataPacket & { count: number })[]>(
     'SELECT COUNT(*) as count FROM reviews WHERE film_id = ?',
@@ -326,9 +314,6 @@ export async function getReviewCountByFilmId(filmId: number): Promise<number> {
   return rows[0]?.count || 0;
 }
 
-// ============= COMENTARIOS =============
-
-// Añadir un comentario a una review
 export async function addComment(reviewId: number, authorName: string, content: string) {
   const [result] = await getPool().execute(
     'INSERT INTO comments (review_id, author_name, content) VALUES (?, ?, ?)',
@@ -337,7 +322,6 @@ export async function addComment(reviewId: number, authorName: string, content: 
   return result;
 }
 
-// Obtener todos los comentarios de una review
 export async function getCommentsByReviewId(reviewId: number): Promise<CommentRow[]> {
   const [rows] = await getPool().query<(CommentRow & RowDataPacket)[]>(
     'SELECT * FROM comments WHERE review_id = ? ORDER BY created_at ASC',
@@ -346,9 +330,6 @@ export async function getCommentsByReviewId(reviewId: number): Promise<CommentRo
   return rows;
 }
 
-// ============= COMENTARIOS DE EXPECTATIVAS =============
-
-// Añadir un comentario de expectativa sobre una película
 export async function addExpectationComment(filmId: number, authorName: string, content: string) {
   const [result] = await getPool().execute(
     'INSERT INTO expectation_comments (film_id, author_name, content) VALUES (?, ?, ?)',
@@ -357,7 +338,6 @@ export async function addExpectationComment(filmId: number, authorName: string, 
   return result;
 }
 
-// Obtener todos los comentarios de expectativa de una película
 export async function getExpectationCommentsByFilmId(filmId: number): Promise<ExpectationCommentRow[]> {
   const [rows] = await getPool().query<(ExpectationCommentRow & RowDataPacket)[]>(
     'SELECT * FROM expectation_comments WHERE film_id = ? ORDER BY created_at ASC',
@@ -366,14 +346,6 @@ export async function getExpectationCommentsByFilmId(filmId: number): Promise<Ex
   return rows;
 }
 
-// ============= CONFIGURACIÓN DE LA APLICACIÓN =============
-
-/**
- * Obtiene el valor de un setting de configuración
- * @param key - Clave del setting
- * @param defaultValue - Valor por defecto si no existe
- * @returns El valor del setting o el valor por defecto
- */
 export async function getSetting(key: string, defaultValue: string = ''): Promise<string> {
   const [rows] = await getPool().query<(AppSettingRow & RowDataPacket)[]>(
     'SELECT setting_value FROM app_settings WHERE setting_key = ?',
@@ -383,12 +355,6 @@ export async function getSetting(key: string, defaultValue: string = ''): Promis
   return rows.length > 0 ? rows[0].setting_value : defaultValue;
 }
 
-/**
- * Actualiza o crea un setting de configuración
- * @param key - Clave del setting
- * @param value - Nuevo valor
- * @param description - Descripción opcional (solo para nuevos settings)
- */
 export async function setSetting(key: string, value: string, description: string | null = null): Promise<void> {
   await getPool().execute(
     `INSERT INTO app_settings (setting_key, setting_value, description) 
@@ -398,10 +364,6 @@ export async function setSetting(key: string, value: string, description: string
   );
 }
 
-/**
- * Obtiene todos los settings de configuración
- * @returns Array con todos los settings
- */
 export async function getAllSettings(): Promise<AppSettingRow[]> {
   const [rows] = await getPool().query<(AppSettingRow & RowDataPacket)[]>(
     'SELECT * FROM app_settings ORDER BY setting_key'
@@ -409,19 +371,11 @@ export async function getAllSettings(): Promise<AppSettingRow[]> {
   return rows;
 }
 
-/**
- * Obtiene el modo de selección de películas actual
- * @returns 'normal' | 'triple_choice' | 'catalog'
- */
 export async function getSelectionMode(): Promise<'normal' | 'triple_choice' | 'catalog'> {
   const mode = await getSetting('selection_mode', 'normal');
   return mode as 'normal' | 'triple_choice' | 'catalog';
 }
 
-/**
- * Actualiza el modo de selección de películas
- * @param mode - 'normal' | 'triple_choice' | 'catalog'
- */
 export async function setSelectionMode(mode: 'normal' | 'triple_choice' | 'catalog'): Promise<void> {
   await setSetting('selection_mode', mode);
 }
