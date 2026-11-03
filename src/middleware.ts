@@ -1,5 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
 import { initDb } from "./lib/db";
+import { env } from "cloudflare:workers"; // 👈 La importación mágica
 
 const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || "tu-password-segura";
 
@@ -7,15 +8,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // ==========================================
     // 1. INICIALIZAR BASE DE DATOS (Cloudflare Hyperdrive)
     // ==========================================
-    // En Cloudflare, el entorno está en context.locals.runtime.env
-    // @ts-ignore
-    const env = context.locals.runtime?.env;
-    
-    if (env) {
-        // Inicializamos la DB con el entorno (contiene las credenciales de Hyperdrive)
+    // El objeto 'env' ahora viene de la importación de 'cloudflare:workers'
+    // Si no existe (ej. en local con Netlify), pasamos 'undefined' para que use XAMPP
+    if (env && (env as any).HYPERDRIVE) {
         initDb(env);
     } else {
-        // En local (pnpm dev), initDb() usará automáticamente las variables de XAMPP
         initDb(); 
     }
 
