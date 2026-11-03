@@ -20,9 +20,6 @@ export function initDb(env?: any) {
       database: env.HYPERDRIVE.database,
       port: env.HYPERDRIVE.port,
       disableEval: true,
-        ssl: {
-      rejectUnauthorized: false // Aiven a veces usa certificados que Node no reconoce por defecto
-    }
     });
   } else {
     _dbPool = createPool({
