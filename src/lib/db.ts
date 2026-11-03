@@ -45,7 +45,7 @@ export function getPool(): Pool {
 // ==========================================
 export const pool = {
   query: (...args: any[]) => (getPool() as any).query(...args),
-  execute: (...args: any[]) => (getPool() as any).execute(...args),
+  execute: (...args: any[]) => (getPool() as any).query(...args),
 };
 
 // ==========================================
@@ -114,7 +114,7 @@ interface AppSettingRow extends RowDataPacket {
 // ==========================================
 
 export async function insertReview(film_id: number, title: string, year: number, review: string | null, vibe: string, poster: string, viewing_period: boolean = true, expectation_mood: string | null = null, selected_by: string | null = null, youtube_id: string | null = null, watched_date: string | null = null  ) {
-  const [result] = await getPool().execute(
+  const [result] = await getPool().query(
     'INSERT INTO reviews (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by, youtube_id, watched_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     [film_id, title, year, review, vibe, poster, viewing_period, expectation_mood, selected_by, youtube_id, watched_date]
   );
@@ -145,7 +145,7 @@ export async function getReviewById(id: number): Promise<ReviewRow | null> {
 export async function createTriggerToken(): Promise<string> {
   const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
 
-  await getPool().execute(
+  await getPool().query(
     "INSERT INTO trigger_tokens (token, is_active) VALUES (?, true)",
     [token]
   );
@@ -163,7 +163,7 @@ export async function validateToken(token: string): Promise<boolean> {
 }
 
 export async function deactivateToken(token: string): Promise<void> {
-  await getPool().execute(
+  await getPool().query(
     "UPDATE trigger_tokens SET is_active = false WHERE token = ?",
     [token]
   );
@@ -171,7 +171,7 @@ export async function deactivateToken(token: string): Promise<void> {
 
 export async function claimToken(token: string, used_by: string = 'Anónimo'): Promise<boolean> {
   try {
-    const [result]: any = await getPool().execute(
+    const [result]: any = await getPool().query(
       `UPDATE trigger_tokens 
        SET is_active = false, used_by = ? 
        WHERE token = ? AND is_active = true`,
@@ -201,7 +201,7 @@ export async function getActiveTokens(): Promise<TokenRow[]> {
 
 export async function getReviewsWithNullReview(): Promise<Pick<ReviewRow, 'id' | 'film_id' | 'title' | 'year' | 'poster' | 'youtube_id' | 'vibe' | 'expectation_mood'>[]> {
   try {
-    const [rows] = await getPool().execute<Array<Pick<ReviewRow, 'id' | 'film_id' | 'title' | 'year' | 'poster' | 'youtube_id' | 'vibe' | 'expectation_mood'> & RowDataPacket>>(
+    const [rows] = await getPool().query<Array<Pick<ReviewRow, 'id' | 'film_id' | 'title' | 'year' | 'poster' | 'youtube_id' | 'vibe' | 'expectation_mood'> & RowDataPacket>>(
       'SELECT id, film_id, title, year, poster_url as poster, youtube_id, vibe, expectation_mood FROM reviews WHERE review IS NULL'
     );
     return rows;
@@ -226,7 +226,7 @@ export async function updateReview(
   watched_date: string | null = null
 ) {
   try {
-    const [result] = await getPool().execute(
+    const [result] = await getPool().query(
       'UPDATE reviews SET film_id = ?, title = ?, year = ?, review = ?, vibe = ?, poster_url = ?, viewing_period=?, expectation_mood=?, final_mood=?, youtube_id=?, watched_date=? WHERE id = ?',
       [film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, final_mood, youtube_id, watched_date, id]
     );
@@ -239,7 +239,7 @@ export async function updateReview(
 
 export async function getReviewForEdit(id: number) {
   try {
-    const [rows] = await getPool().execute(
+    const [rows] = await getPool().query(
       'SELECT id, film_id, title, year, type, vibe, poster_url, review FROM reviews WHERE id = ?',
       [id]
     );
@@ -259,7 +259,7 @@ export async function getLatestMovie() {
 
 export async function updateExpectationMood(id: number, expectation_mood: string) {
   try {
-    const [result] = await getPool().execute(
+    const [result] = await getPool().query(
       'UPDATE reviews SET expectation_mood = ? WHERE id = ?',
       [expectation_mood, id]
     );
@@ -315,7 +315,7 @@ export async function getReviewCountByFilmId(filmId: number): Promise<number> {
 }
 
 export async function addComment(reviewId: number, authorName: string, content: string) {
-  const [result] = await getPool().execute(
+  const [result] = await getPool().query(
     'INSERT INTO comments (review_id, author_name, content) VALUES (?, ?, ?)',
     [reviewId, authorName, content]
   );
@@ -331,7 +331,7 @@ export async function getCommentsByReviewId(reviewId: number): Promise<CommentRo
 }
 
 export async function addExpectationComment(filmId: number, authorName: string, content: string) {
-  const [result] = await getPool().execute(
+  const [result] = await getPool().query(
     'INSERT INTO expectation_comments (film_id, author_name, content) VALUES (?, ?, ?)',
     [filmId, authorName, content]
   );
@@ -356,7 +356,7 @@ export async function getSetting(key: string, defaultValue: string = ''): Promis
 }
 
 export async function setSetting(key: string, value: string, description: string | null = null): Promise<void> {
-  await getPool().execute(
+  await getPool().query(
     `INSERT INTO app_settings (setting_key, setting_value, description) 
      VALUES (?, ?, ?) 
      ON DUPLICATE KEY UPDATE setting_value = ?, updated_at = NOW()`,
