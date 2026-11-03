@@ -1,6 +1,6 @@
 // src/pages/api/register-review.ts
 import type { APIRoute } from 'astro';
-import { insertReview, pool } from '../../lib/db';
+import { insertReview } from '../../lib/db';
 
 export const prerender = false;
 
