@@ -1,88 +1,80 @@
 // src/pages/api/register-review.ts
-import type { APIRoute } from 'astro';
-import { insertReview, pool } from '../../lib/db';
+import type { APIRoute } from "astro";
+import {
+  insertReview,
+  getTokenData,
+  claimToken,
+} from "../../lib/db";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
- const body = await request.json() as any;
+function json(body: unknown, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export const POST: APIRoute = async ({ request, locals }) => {
+  const body = (await request.json()) as any;
 
   if (!body.film_id) {
-    return new Response(
-      JSON.stringify({ message: 'El film_id es obligatorio' }),
-      {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return json({ message: "El film_id es obligatorio" }, 400);
   }
 
+  if (!body.title) {
+    return json({ message: "El title es obligatorio" }, 400);
+  }
+
+  const isAdmin = locals.adminAuthenticated === true;
+  let selectedBy =
+    typeof body.selected_by === "string" && body.selected_by.trim()
+      ? body.selected_by.trim().slice(0, 100)
+      : isAdmin
+        ? "Admin"
+        : "Anónimo";
+
   try {
-    // Obtener selected_by y validar token
-    let selected_by = 'Anónimo';
-    
-    if (body.token) {
-      // Verificar que el token existe y NO está usado
-      const [tokenRows]: any = await pool!.query(
-        'SELECT * FROM trigger_tokens WHERE token = ? AND is_active = true',
-        [body.token]
-      );
-      
-      if (tokenRows.length === 0) {
-        return new Response(
-          JSON.stringify({ message: 'Token inválido o ya utilizado' }),
-          {
-            status: 403,
-            headers: { 'Content-Type': 'application/json' },
-          }
-        );
+    // Un usuario anónimo SOLO puede registrar si canjea un token válido.
+    if (!isAdmin) {
+      if (!body.token) {
+        return json({ message: "Token requerido" }, 401);
       }
-      
-      // Usar el selected_by del frontend (ya lo guardamos en validateToken)
-      selected_by = tokenRows[0].used_by || 'Anónimo';
+
+      const tokenData = await getTokenData(String(body.token));
+      if (!tokenData || !tokenData.is_active) {
+        return json({ message: "Token inválido o ya utilizado" }, 403);
+      }
+
+      selectedBy = tokenData.used_by || selectedBy;
+
+      // Canje atómico: solo una petición puede consumir el token.
+      const claimed = await claimToken(String(body.token), selectedBy);
+      if (!claimed) {
+        return json({ message: "Token inválido o ya utilizado" }, 403);
+      }
     }
 
-    // Establecer fecha actual si no se proporciona
-    const watchedDate = body.watched_date || new Date().toISOString().split('T')[0];
+    const watchedDate =
+      body.watched_date || new Date().toISOString().split("T")[0];
 
-    // Insertar la review
     await insertReview(
-      body.film_id, 
-      body.title, 
-      body.year, 
+      Number(body.film_id),
+      String(body.title).slice(0, 255),
+      Number(body.year) || 0,
       body.review || null,
-      body.vibe, 
-      body.poster,
-      true,  // viewing_period
-      null,  // expectation_mood
-      selected_by,
+      body.vibe || "pasable",
+      String(body.poster || ""),
+      true, // viewing_period
+      null, // expectation_mood
+      selectedBy,
       body.youtube_id || null,
       watchedDate
     );
-    
-    // AHORA SÍ marcar el token como usado (solo si la review se guardó exitosamente)
-    if (body.token) {
-      await pool!.execute(
-        'UPDATE trigger_tokens SET is_active = false WHERE token = ?',
-        [body.token]
-      );
-    }
 
-    return new Response(
-      JSON.stringify({ message: 'Review guardada exitosamente' }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return json({ message: "Review guardada exitosamente" }, 200);
   } catch (error) {
     console.error(error);
-    return new Response(
-      JSON.stringify({ message: 'Error al guardar la review' }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return json({ message: "Error al guardar la review" }, 500);
   }
 };

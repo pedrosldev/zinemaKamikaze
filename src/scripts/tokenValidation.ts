@@ -221,7 +221,9 @@ export function generateMovie(validatedToken: string | null): void {
       // Actualizar contenido
       try {
         if (contenidoDiv) {
-          contenidoDiv.innerHTML = "<strong>" + title + " (" + year + ")</strong>";
+          const strong = document.createElement("strong");
+          strong.textContent = `${title} (${year})`;
+          contenidoDiv.replaceChildren(strong);
         }
       } catch (e) {
         console.error("❌ Error actualizando contenido:", e);
@@ -255,7 +257,10 @@ export function generateMovie(validatedToken: string | null): void {
       
       if (contenidoDiv) {
         try {
-          contenidoDiv.innerHTML = "<strong style='color: #ff6b6b;'>" + errorMessage + "</strong>";
+          const strong = document.createElement("strong");
+          strong.style.color = "#ff6b6b";
+          strong.textContent = errorMessage;
+          contenidoDiv.replaceChildren(strong);
         } catch (e) {
           console.error("❌ No se pudo mostrar el error en contenidoDiv:", e);
         }
@@ -357,13 +362,10 @@ async function validateToken(token: string): Promise<void> {
           }
 
           if (contenidoDiv) {
-            contenidoDiv.innerHTML = "<strong>" + result.movie.title + " (" + result.movie.year + ")</strong>";
+            const strong = document.createElement("strong");
+            strong.textContent = `${result.movie.title} (${result.movie.year})`;
+            contenidoDiv.replaceChildren(strong);
             console.log("📝 Título mostrado");
-          }
-
-          if (btnLeer) {
-            btnLeer.style.display = "block";
-            console.log("✅ Botón mostrado");
           }
         } catch (displayError) {
           console.error("❌ Error mostrando película:", displayError);
@@ -485,11 +487,6 @@ export function initTokenValidation(): void {
       }
     }
   });
-
-  // Función para generar la crítica (mantener por si acaso)
-  btnLeer.addEventListener("click", () => {
-    generateMovie(validatedToken);
-  });
 }
 
 /**
@@ -523,28 +520,37 @@ function showMovieSelector(
 
     const card = document.createElement('div');
     card.className = 'movie-card';
-    card.innerHTML = `
-      <img 
-        src="${posterUrl}" 
-        alt="${movie.title}" 
-        class="movie-poster"
-        onerror="this.src='/images/noImg.png'"
-      />
-      <div class="movie-info">
-        <h3 class="movie-title">${movie.title}</h3>
-        <p class="movie-year">(${movie.year})</p>
-      </div>
-      <button class="choose-btn" data-film-id="${movie.film_id}">
-        🎬 ELEGIR ESTA
-      </button>
-    `;
 
-    // Event listener para el botón
-    const chooseBtn = card.querySelector('.choose-btn') as HTMLButtonElement;
+    const img = document.createElement('img');
+    img.src = posterUrl;
+    img.alt = movie.title;
+    img.className = 'movie-poster';
+    img.addEventListener('error', () => {
+      img.src = '/images/noImg.png';
+    });
+
+    const info = document.createElement('div');
+    info.className = 'movie-info';
+
+    const titleEl = document.createElement('h3');
+    titleEl.className = 'movie-title';
+    titleEl.textContent = movie.title;
+
+    const yearEl = document.createElement('p');
+    yearEl.className = 'movie-year';
+    yearEl.textContent = `(${movie.year})`;
+
+    info.append(titleEl, yearEl);
+
+    const chooseBtn = document.createElement('button');
+    chooseBtn.className = 'choose-btn';
+    chooseBtn.dataset.filmId = String(movie.film_id);
+    chooseBtn.textContent = '🎬 ELEGIR ESTA';
     chooseBtn.addEventListener('click', () => {
       confirmSelection(movie, token, selectedBy, selectorMessage);
     });
 
+    card.append(img, info, chooseBtn);
     moviesGrid.appendChild(card);
   });
 

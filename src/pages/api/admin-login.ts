@@ -1,40 +1,56 @@
 import type { APIRoute } from "astro";
+import {
+  ADMIN_COOKIE,
+  ADMIN_SESSION_TTL,
+  LEGACY_ADMIN_COOKIE,
+  createAdminSession,
+  safeCompare,
+} from "../../lib/auth";
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+function json(body: unknown, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export const POST: APIRoute = async ({
+  request,
+  cookies,
+  locals,
+  url,
+}) => {
   try {
     const { password } = await request.json();
-    const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || "tu-password-segura";
-    
-    if (password === ADMIN_PASSWORD) {
-      // Establecer cookie de autenticación (válida por 24 horas)
-      cookies.set("admin_auth", ADMIN_PASSWORD, {
-        httpOnly: true,
-        secure: false,
-        sameSite: "strict",
-        maxAge: 60 * 60 * 24, // 24 horas
-        path: "/"
-      });
-      
-      return new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" }
-      });
+    const adminPassword = locals.adminPassword;
+
+    if (!adminPassword) {
+      return json(
+        { success: false, message: "Administración no configurada" },
+        503
+      );
     }
-    
-    return new Response(JSON.stringify({ 
-      success: false, 
-      message: "Contraseña incorrecta" 
-    }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" }
+
+    if (typeof password !== "string" || !safeCompare(password, adminPassword)) {
+      return json({ success: false, message: "Contraseña incorrecta" }, 401);
+    }
+
+    const session = await createAdminSession(adminPassword);
+
+    cookies.set(ADMIN_COOKIE, session, {
+      httpOnly: true,
+      secure: url.protocol === "https:",
+      sameSite: "strict",
+      maxAge: ADMIN_SESSION_TTL,
+      path: "/",
     });
+
+    // Cookie antigua: guardaba la contraseña en claro. Se elimina siempre.
+    cookies.delete(LEGACY_ADMIN_COOKIE, { path: "/" });
+
+    return json({ success: true }, 200);
   } catch (error) {
-    return new Response(JSON.stringify({ 
-      success: false, 
-      message: "Error en el servidor" 
-    }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" }
-    });
+    console.error("Error en admin-login:", error);
+    return json({ success: false, message: "Error en el servidor" }, 500);
   }
 };

@@ -9,47 +9,62 @@ dotenv.config();
 // ==========================================
 let _dbPool: Pool | null = null;
 
+/**
+ * Pool compatible con mysql2 sobre Hyperdrive.
+ *
+ * - `query` / `execute` abren una conexión por consulta (lecturas simples).
+ * - `getConnection()` devuelve una conexión dedicada para poder usar
+ *   transacciones reales (begin/commit/rollback) en una misma sesión.
+ *
+ * mysql2 `execute` (prepared statements) no funciona de forma fiable a
+ * través de Hyperdrive, así que todo se ejecuta con el protocolo de texto.
+ */
+function createHyperdrivePool(hyperdrive: any): Pool {
+  const connect = () =>
+    createConnection({
+      host: hyperdrive.host,
+      user: hyperdrive.user,
+      password: hyperdrive.password,
+      database: hyperdrive.database,
+      port: hyperdrive.port,
+      disableEval: true,
+    });
+
+  const runQuery = async (args: any[]) => {
+    const conn = await connect();
+    try {
+      return await (conn as any).query(...args);
+    } finally {
+      await conn.end();
+    }
+  };
+
+  return {
+    query: (...args: any[]) => runQuery(args),
+    execute: (...args: any[]) => runQuery(args),
+    getConnection: async () => {
+      const conn = await connect();
+      return {
+        query: (...args: any[]) => (conn as any).query(...args),
+        execute: (...args: any[]) => (conn as any).query(...args),
+        beginTransaction: () => conn.beginTransaction(),
+        commit: () => conn.commit(),
+        rollback: () => conn.rollback(),
+        release: async () => {
+          await conn.end();
+        },
+      };
+    },
+  } as unknown as Pool;
+}
+
 export function initDb(env?: any) {
   if (_dbPool) return;
 
   if (env && (env as any).HYPERDRIVE) {
-    const hyperdrive = (env as any).HYPERDRIVE;
-    
-    // En Cloudflare, NO usamos createPool.
-    // Creamos un objeto que imite al pool pero abra/cierre conexión por consulta.
-    _dbPool = {
-      query: async (...args: any[]) => {
-        const conn = await createConnection({
-          host: hyperdrive.host,
-          user: hyperdrive.user,
-          password: hyperdrive.password,
-          database: hyperdrive.database,
-          port: hyperdrive.port,
-          disableEval: true,
-        });
-        try {
-          return await (conn as any).query(...args);
-        } finally {
-          await conn.end();
-        }
-      },
-      execute: async (...args: any[]) => {
-        // Para Hyperdrive, execute también debe usar query (protocolo de texto)
-        const conn = await createConnection({
-          host: hyperdrive.host,
-          user: hyperdrive.user,
-          password: hyperdrive.password,
-          database: hyperdrive.database,
-          port: hyperdrive.port,
-          disableEval: true,
-        });
-        try {
-          return await (conn as any).query(...args);
-        } finally {
-          await conn.end();
-        }
-      }
-    } as unknown as Pool;
+    // En Cloudflare usamos Hyperdrive con una conexión por petición cuando
+    // hace falta transacción.
+    _dbPool = createHyperdrivePool((env as any).HYPERDRIVE);
   } else {
     // En local (XAMPP), seguimos usando createPool normal
     _dbPool = createPool({
@@ -76,6 +91,7 @@ export function getPool(): Pool {
 export const pool = {
   query: (...args: any[]) => (getPool() as any).query(...args),
   execute: (...args: any[]) => (getPool() as any).query(...args),
+  getConnection: () => (getPool() as any).getConnection(),
 };
 
 // ==========================================
@@ -114,6 +130,7 @@ interface TokenRow extends RowDataPacket {
   token: string;
   is_active: boolean;
   created_at: string;
+  expires_at: string | null;
 }
 
 interface CommentRow extends RowDataPacket {
@@ -172,11 +189,22 @@ export async function getReviewById(id: number): Promise<ReviewRow | null> {
   return rows.length > 0 ? rows[0] : null;
 }
 
+/** Días que un token de selección permanece válido. */
+export const TOKEN_TTL_DAYS = 30;
+
+/** Condición SQL reutilizable: token activo y no caducado. */
+export const TOKEN_USABLE_SQL =
+  "is_active = true AND (expires_at IS NULL OR expires_at > NOW())";
+
 export async function createTriggerToken(): Promise<string> {
-  const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
+  // 128 bits de entropía criptográfica (Math.random() es predecible).
+  const token = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
 
   await getPool().query(
-    "INSERT INTO trigger_tokens (token, is_active) VALUES (?, true)",
+    `INSERT INTO trigger_tokens (token, is_active, expires_at)
+     VALUES (?, true, DATE_ADD(NOW(), INTERVAL ${TOKEN_TTL_DAYS} DAY))`,
     [token]
   );
 
@@ -185,7 +213,7 @@ export async function createTriggerToken(): Promise<string> {
 
 export async function validateToken(token: string): Promise<boolean> {
   const [rows] = await getPool().query<(TokenRow & RowDataPacket)[]>(
-    "SELECT is_active FROM trigger_tokens WHERE token = ? AND is_active = true",
+    `SELECT is_active FROM trigger_tokens WHERE token = ? AND ${TOKEN_USABLE_SQL}`,
     [token]
   );
 
@@ -204,7 +232,7 @@ export async function claimToken(token: string, used_by: string = 'Anónimo'): P
     const [result]: any = await getPool().query(
       `UPDATE trigger_tokens 
        SET is_active = false, used_by = ? 
-       WHERE token = ? AND is_active = true`,
+       WHERE token = ? AND ${TOKEN_USABLE_SQL}`,
       [used_by, token]
     );
     return result.affectedRows === 1;
@@ -214,9 +242,10 @@ export async function claimToken(token: string, used_by: string = 'Anónimo'): P
   }
 }
 
+/** Devuelve el token solo si existe, está activo y no ha caducado. */
 export async function getTokenData(token: string) {
   const [rows]: any = await getPool().query(
-    "SELECT * FROM trigger_tokens WHERE token = ? LIMIT 1",
+    `SELECT * FROM trigger_tokens WHERE token = ? AND ${TOKEN_USABLE_SQL} LIMIT 1`,
     [token]
   );
   return rows.length > 0 ? rows[0] : null;
@@ -224,7 +253,7 @@ export async function getTokenData(token: string) {
 
 export async function getActiveTokens(): Promise<TokenRow[]> {
   const [rows] = await getPool().query<(TokenRow & RowDataPacket)[]>(
-    "SELECT * FROM trigger_tokens WHERE is_active = true ORDER BY created_at DESC"
+    `SELECT * FROM trigger_tokens WHERE ${TOKEN_USABLE_SQL} ORDER BY created_at DESC`
   );
   return rows;
 }

@@ -8,20 +8,19 @@ interface Props {
 const { title } = Astro.props;
 ---
 
-<Layout>
-  <head>
-    <meta charset="utf-8" />
+<Layout title={title}>
+  <Fragment slot="head">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link
       href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles/MovieDetail.css" />
-    <title>{title}</title>
-  </head>
+  </Fragment>
+
   <slot />
+
   <script>
     // Importar lite-youtube dinámicamente solo en el cliente
     if (typeof window !== "undefined") {
