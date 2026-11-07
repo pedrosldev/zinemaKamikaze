@@ -10,6 +10,7 @@
 
 const mysql = require('mysql2/promise');
 const fs = require('fs').promises;
+const fsSync = require('fs');
 const path = require('path');
 const { config } = require('dotenv');
 
@@ -23,13 +24,54 @@ console.log(`📁 Cargando: ${envFile}\n`);
 config({ path: envFile });
 
 // Configuración de conexión
+// Se puede usar DATABASE_URL (formato de Aiven) o las variables DB_*.
+let dbUrl = null;
+if (process.env.DATABASE_URL) {
+  try {
+    dbUrl = new URL(process.env.DATABASE_URL);
+  } catch {
+    console.warn('⚠️  DATABASE_URL no es una URL válida; se usarán las variables DB_*');
+  }
+}
+
+const dbHost = dbUrl ? dbUrl.hostname : process.env.DB_HOST;
+const dbPort = dbUrl
+  ? Number(dbUrl.port) || 3306
+  : Number(process.env.DB_PORT) || 3306;
+const dbUser = dbUrl
+  ? decodeURIComponent(dbUrl.username)
+  : process.env.DB_USER;
+const dbPassword = dbUrl
+  ? decodeURIComponent(dbUrl.password)
+  : process.env.DB_PASSWORD;
+const dbName = dbUrl
+  ? decodeURIComponent(dbUrl.pathname.replace(/^\//, ''))
+  : process.env.DB_NAME;
+
+// Aiven (y la mayoría de MySQL gestionados) exigen TLS. Se activa con
+// DB_SSL=true, con ssl-mode en DATABASE_URL o automáticamente para Aiven.
+const useSsl =
+  process.env.DB_SSL === 'true' ||
+  /[?&]ssl-mode=(REQUIRED|VERIFY_CA|VERIFY_IDENTITY)/i.test(
+    process.env.DATABASE_URL || ''
+  ) ||
+  /\.aivencloud\.com$/i.test(dbHost || '');
+
+const ssl = useSsl
+  ? process.env.DB_SSL_CA
+    ? { ca: fsSync.readFileSync(process.env.DB_SSL_CA) }
+    : { rejectUnauthorized: false }
+  : undefined;
+
 const dbConfig = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: Number(process.env.DB_PORT) || 3306,
-  multipleStatements: true // Permitir múltiples statements por archivo
+  host: dbHost,
+  user: dbUser,
+  password: dbPassword,
+  database: dbName,
+  port: dbPort,
+  connectTimeout: 15000,
+  multipleStatements: true, // Permitir múltiples statements por archivo
+  ...(ssl ? { ssl } : {})
 };
 
 const MIGRATIONS_DIR = path.join(__dirname, '..', 'migrations');
@@ -117,8 +159,9 @@ async function migrate() {
   
   try {
     console.log('🔌 Conectando a la base de datos...');
-    console.log(`   Host: ${dbConfig.host}`);
-    console.log(`   BD: ${dbConfig.database}\n`);
+    console.log(`   Host: ${dbConfig.host}:${dbConfig.port}`);
+    console.log(`   BD: ${dbConfig.database}`);
+    console.log(`   TLS: ${useSsl ? 'sí' : 'no'}\n`);
     
     connection = await mysql.createConnection(dbConfig);
     
@@ -169,6 +212,10 @@ async function migrate() {
     if (error.code === 'ENOTFOUND') {
       console.error('⚠️  No se pudo resolver el host de la base de datos');
       console.error(`   Host: ${dbConfig.host}`);
+    } else if (error.code === 'ETIMEDOUT') {
+      console.error('❌  Tiempo de espera agotado al conectar');
+      console.error(`   Host: ${dbConfig.host}:${dbConfig.port}`);
+      console.error('   Comprueba el host/puerto de Aiven y que tu IP esté permitida.');
     } else if (error.code === 'ECONNREFUSED') {
       console.error('⚠️  Conexión rechazada');
       console.error('   Verifica que MySQL esté corriendo y acepte conexiones');
