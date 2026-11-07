@@ -24,6 +24,25 @@ const PUBLIC_API = new Set<string>([
   "/api/register-review",
 ]);
 
+/**
+ * Cabeceras de seguridad para respuestas dinámicas.
+ * `_headers` solo cubre archivos estáticos; el HTML y las APIs los sirve el
+ * Worker, así que hay que añadirlas aquí también.
+ */
+const SECURITY_HEADERS: Record<string, string> = {
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+};
+
+function withSecurityHeaders(response: Response): Response {
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+    response.headers.set(name, value);
+  }
+  return response;
+}
+
 async function resolveCloudflareEnv(): Promise<any | null> {
   try {
     const { env } = await import("cloudflare:workers");
@@ -70,23 +89,25 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // 3. APIs: lista blanca explícita; el resto requiere sesión de admin.
   if (pathname.startsWith("/api/")) {
     if (PUBLIC_API.has(pathname) || isAdmin) {
-      return next();
+      return withSecurityHeaders(await next());
     }
 
-    return new Response(
-      JSON.stringify({ success: false, message: "No autorizado" }),
-      {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      }
+    return withSecurityHeaders(
+      new Response(
+        JSON.stringify({ success: false, message: "No autorizado" }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      )
     );
   }
 
   // 4. Zona de administración.
   const isLoginPage = pathname === "/admin/login";
   if (pathname.startsWith("/admin") && !isLoginPage && !isAdmin) {
-    return redirect("/admin/login");
+    return withSecurityHeaders(redirect("/admin/login"));
   }
 
-  return next();
+  return withSecurityHeaders(await next());
 });
