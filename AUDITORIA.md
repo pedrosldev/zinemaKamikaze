@@ -383,6 +383,9 @@ const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
 - **Build y secretos:** `ADMIN_PASSWORD` se declara como secreto de servidor en `astro:env`, por lo que ya no se inlinea en el bundle. `post-build.js` elimina `dist/server/.dev.vars`, los source maps y `wrangler.json`, añade cabeceras de seguridad y redirige `/server/*`.
 - **Layout y metadatos:** documento HTML válido, `lang="es"`, slot `head`, títulos por página, `404.astro`, `robots.txt`.
 - **Configuración:** `checkOrigin: true`; `.npmrc` hoistea `cookie` para que el bundle de prerender resuelva la versión correcta.
+- **Datos canónicos del catálogo (P1):** `src/lib/catalogUtils.ts` expone `getMovieById`; `confirm-selection`, `confirm-catalog-selection` y `register-review` (flujo con token) toman `title`/`year`/`poster` del catálogo y rechazan ids inexistentes, sin confiar en el cuerpo de la petición.
+- **Vibes centralizados:** `src/lib/vibes.ts` es la única fuente de la lista; el select del admin la importa y las APIs validan el valor con `sanitizeVibe`.
+- **Testing:** `tests/auth.test.mts`, `tests/vibes.test.mts` y `tests/token-lifecycle.test.mts` con `node:test` y `--experimental-strip-types` (sin dependencias nuevas). `pnpm test` ejecuta los tests sin BD y `pnpm test:db` añade el ciclo de vida de tokens contra MySQL.
 
 ### Verificado
 
@@ -392,6 +395,8 @@ const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
 - `register-review` sin token → 401; token inválido → 403.
 - Token recién creado → válido; tras reclamarlo → inválido; token caducado → inválido; doble reclamo → rechazado.
 - `pnpm build` completo y ausencia de `ADMIN_PASSWORD`/`DB_PASSWORD` en `dist`.
+- `pnpm test` → 14 tests en verde y 5 de BD omitidos; `pnpm test:db` → 19 tests en verde.
+- El build no genera `.map`, `.dev.vars` ni `wrangler.json` en `dist`.
 
 ### Pendiente / requiere acción del usuario
 
@@ -399,6 +404,5 @@ const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
 - **Aplicar la migración en producción:** `pnpm migrate:prod` antes de desplegar código que usa `expires_at`.
 - **Verificar en producción** que `/server/.dev.vars` y `/server/chunks/*.mjs` no responden (la redirección `_redirects` es defensa en profundidad; la eliminación real ocurre en el build).
 - **Rate limiting** en login y endpoints públicos de comentarios/tokens (requiere KV o similar).
-- **Validación del catálogo** en `confirm-selection`/`confirm-catalog-selection` (hoy confían en los datos enviados por el portador del token).
 - **Un solo adaptador/pipeline de deploy** y `astro check` en CI.
 

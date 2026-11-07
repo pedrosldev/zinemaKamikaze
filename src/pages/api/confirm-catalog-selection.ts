@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { pool, TOKEN_USABLE_SQL } from "../../lib/db";
+import { getMovieById } from "../../lib/catalogUtils";
 
 export const prerender = false;
 
@@ -12,17 +13,28 @@ function json(body: unknown, status: number): Response {
 
 export const POST: APIRoute = async ({ request }) => {
   const body = await request.json();
-  const { token, film_id, title, year, poster, selected_by } = body;
+  const { token, film_id, selected_by } = body;
 
-  if (!token || !film_id || !title) {
+  if (!token || !film_id) {
     return json(
       {
         success: false,
-        message: "Faltan datos requeridos (token, film_id, title)",
+        message: "Faltan datos requeridos (token, film_id)",
       },
       400
     );
   }
+
+  // Datos canónicos del catálogo: no se confía en title/year/poster del cliente.
+  const catalogFilm = getMovieById(film_id);
+  if (!catalogFilm) {
+    return json({ success: false, message: "Película no válida" }, 400);
+  }
+
+  const filmId = Number(catalogFilm.id);
+  const filmTitle = catalogFilm.title;
+  const filmYear = catalogFilm.year || "Unknown";
+  const filmPoster = catalogFilm.poster_path || "";
 
   const connection = await pool.getConnection();
 
@@ -46,7 +58,7 @@ export const POST: APIRoute = async ({ request }) => {
     // 2. Si ya hay una selección pendiente de esta película, no duplicarla.
     const [pendingReviews]: any = await connection.query(
       "SELECT id FROM reviews WHERE film_id = ? AND viewing_period = true AND review IS NULL LIMIT 1",
-      [film_id]
+      [filmId]
     );
 
     if (pendingReviews.length > 0) {
@@ -77,18 +89,19 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // 4. Insertar un NUEVO visionado. No se tocan las críticas anteriores.
+    // 4. Insertar un NUEVO visionado con los datos canónicos.
+    //    No se tocan las críticas anteriores.
     await connection.execute(
       `INSERT INTO reviews
         (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by, youtube_id, watched_date)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        Number(film_id),
-        String(title),
-        year || "Unknown",
+        filmId,
+        filmTitle,
+        filmYear,
         null,
         null,
-        poster || "",
+        filmPoster,
         true,
         null,
         selectedBy,
@@ -103,8 +116,8 @@ export const POST: APIRoute = async ({ request }) => {
       {
         success: true,
         message: "Película seleccionada exitosamente",
-        film_id,
-        title,
+        film_id: filmId,
+        title: filmTitle,
       },
       200
     );

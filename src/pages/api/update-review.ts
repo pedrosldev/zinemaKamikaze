@@ -3,6 +3,7 @@ import {
   updateReview,
   getReviewsWithNullReview,
 } from "../../lib/db";
+import { sanitizeVibe } from "../../lib/vibes";
 
 export const prerender = false;
 
@@ -35,7 +36,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       String(body.title || ""),
       Number(body.year) || 0,
       body.review || null,
-      String(body.vibe || "pasable"),
+      sanitizeVibe(body.vibe),
       String(body.poster || ""),
       false, // viewing_period
       body.expectation_mood || null, // expectation_mood

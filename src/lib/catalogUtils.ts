@@ -16,6 +16,36 @@ export interface PaginatedMovies {
 }
 
 /**
+ * Índice id → película, construido de forma perezosa.
+ */
+let movieIndex: Map<number, Movie> | null = null;
+
+function buildMovieIndex(): Map<number, Movie> {
+  const index = new Map<number, Movie>();
+  for (const entry of allTitlesData) {
+    if (!entry.films || !Array.isArray(entry.films)) continue;
+    for (const movie of entry.films) {
+      const id = Number(movie?.id);
+      if (Number.isFinite(id) && movie?.title) {
+        index.set(id, movie);
+      }
+    }
+  }
+  return index;
+}
+
+/**
+ * Busca una película del catálogo por id.
+ * Devuelve null si el id no existe (evita confiar en datos del cliente).
+ */
+export function getMovieById(id: number | string): Movie | null {
+  const numericId = Number(id);
+  if (!Number.isFinite(numericId)) return null;
+  movieIndex ??= buildMovieIndex();
+  return movieIndex.get(numericId) ?? null;
+}
+
+/**
  * Aplana el JSON anidado y devuelve todas las películas como un array plano
  * Ordena alfabéticamente por título
  */

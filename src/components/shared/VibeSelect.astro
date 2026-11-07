@@ -2,6 +2,8 @@
 // Componente para select dinámico de vibes
 // Genera opciones de vibe desde una configuración centralizada
 
+import { VIBES } from "../../lib/vibes";
+
 interface Props {
   name: string;
   id: string;
@@ -10,18 +12,6 @@ interface Props {
 }
 
 const { name, id, required = false, selectedValue } = Astro.props;
-
-// Configuración centralizada de vibes
-const VIBES = [
-  { value: "eutanasia", label: "EUTANASIA" },
-  { value: "vomito", label: "VOMITO" },
-  { value: "aburrida", label: "ABURRIDA" },
-  { value: "pasable", label: "PASABLE" },
-  { value: "disfrutable", label: "DISFRUTABLE" },
-  { value: "entretenida", label: "ENTRETENIDA" },
-  { value: "mola", label: "MOLA" },
-  { value: "obra maestra", label: "OBRA MAESTRA" }
-];
 ---
 
 <select name={name} id={id} required={required}>
