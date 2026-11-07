@@ -11,7 +11,8 @@
     "migrate": "node scripts/migrate.cjs",
     "migrate:prod": "cross-env NODE_ENV=production node scripts/migrate.cjs",
     "test": "node --experimental-strip-types --test \"tests/**/*.test.mts\"",
-    "test:db": "cross-env TEST_DB=1 node --experimental-strip-types --test \"tests/**/*.test.mts\""
+    "test:db": "cross-env TEST_DB=1 node --experimental-strip-types --test \"tests/**/*.test.mts\"",
+    "smoke": "node scripts/smoke-test.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.4.3",
