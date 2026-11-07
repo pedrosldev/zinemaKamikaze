@@ -5,18 +5,17 @@ interface Props {
   title?: string;
 }
 
-const { title = "Catálogo - ZinemaKamikaze" } = Astro.props;
+const { title = "Catálogo - Zinema Kamikaze" } = Astro.props;
 ---
 
-<Layout>
-  <head>
+<Layout title={title}>
+  <Fragment slot="head">
     <link
       href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles/Catalog.css" />
-    <title>{title}</title>
-  </head>
+  </Fragment>
 
   <div class="catalog-layout">
     <slot />

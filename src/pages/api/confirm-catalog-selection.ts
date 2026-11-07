@@ -1,141 +1,145 @@
-import type { APIRoute } from 'astro';
-import { pool } from '../../lib/db';
+import type { APIRoute } from "astro";
+import { pool, TOKEN_USABLE_SQL } from "../../lib/db";
+import { getMovieById } from "../../lib/catalogUtils";
 
 export const prerender = false;
 
+function json(body: unknown, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
 export const POST: APIRoute = async ({ request }) => {
   const body = await request.json();
-  const { token, film_id, title, year, poster, selected_by } = body;
+  const { token, film_id, selected_by } = body;
 
-  // Validaciones básicas
-  if (!token || !film_id || !title) {
-    return new Response(
-      JSON.stringify({ 
-        success: false, 
-        message: 'Faltan datos requeridos (token, film_id, title)' 
-      }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
+  if (!token || !film_id) {
+    return json(
+      {
+        success: false,
+        message: "Faltan datos requeridos (token, film_id)",
+      },
+      400
     );
   }
+
+  // Datos canónicos del catálogo: no se confía en title/year/poster del cliente.
+  const catalogFilm = getMovieById(film_id);
+  if (!catalogFilm) {
+    return json({ success: false, message: "Película no válida" }, 400);
+  }
+
+  const filmId = Number(catalogFilm.id);
+  const filmTitle = catalogFilm.title;
+  const filmYear = catalogFilm.year || "Unknown";
+  const filmPoster = catalogFilm.poster_path || "";
 
   const connection = await pool.getConnection();
 
   try {
-    // Iniciar transacción para operación atómica
     await connection.beginTransaction();
 
-    // 1. Verificar que el token existe y está activo
+    // 1. Token activo y no caducado.
     const [tokenRows]: any = await connection.query(
-      'SELECT * FROM trigger_tokens WHERE token = ? AND is_active = true',
+      `SELECT * FROM trigger_tokens WHERE token = ? AND ${TOKEN_USABLE_SQL}`,
       [token]
     );
 
     if (tokenRows.length === 0) {
       await connection.rollback();
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          message: 'Token inválido o ya utilizado' 
-        }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      return json(
+        { success: false, message: "Token inválido o ya utilizado" },
+        403
       );
     }
 
-    // 2. Verificar si ya existe una review con este film_id
-    const [existingReviews]: any = await connection.query(
-      'SELECT id, title, review FROM reviews WHERE film_id = ?',
-      [film_id]
+    // 2. Si ya hay una selección pendiente de esta película, no duplicarla.
+    const [pendingReviews]: any = await connection.query(
+      "SELECT id FROM reviews WHERE film_id = ? AND viewing_period = true AND review IS NULL LIMIT 1",
+      [filmId]
     );
 
-    const posterUrl = poster || '';
-    const movieYear = year || new Date().getFullYear();
-
-    console.log(`🔍 Verificando película film_id=${film_id}, existe=${existingReviews.length > 0}`, 
-      existingReviews.length > 0 ? { id: existingReviews[0].id, title: existingReviews[0].title, hasReview: existingReviews[0].review !== null } : 'nueva');
-
-    if (existingReviews.length > 0) {
-      // Si ya existe, resetear la review para un nuevo viewing period
-      const reviewId = existingReviews[0].id;
-      
-      const [updateResult]: any = await connection.query(
-        `UPDATE reviews 
-         SET viewing_period = true, 
-             selected_by = ?,
-             poster_url = ?,
-             year = ?,
-             review = NULL,
-             vibe = NULL,
-             expectation_mood = NULL,
-             youtube_id = NULL,
-             watched_date = NULL
-         WHERE film_id = ?`,
-        [selected_by || 'Anónimo', posterUrl, movieYear, film_id]
+    if (pendingReviews.length > 0) {
+      await connection.rollback();
+      return json(
+        {
+          success: false,
+          message: "Esta película ya fue seleccionada anteriormente",
+        },
+        409
       );
-      
-      console.log(`📝 UPDATE ejecutado: affectedRows=${updateResult.affectedRows}, changedRows=${updateResult.changedRows}`);
-      
-      // Limpiar comentarios de expectativas anteriores
-      await connection.query(
-        'DELETE FROM expectation_comments WHERE film_id = ?',
-        [film_id]
-      );
-      
-      // Limpiar comentarios de la crítica anterior
-      await connection.query(
-        'DELETE FROM comments WHERE review_id = ?',
-        [reviewId]
-      );
-      
-      console.log(`✅ Película RE-seleccionada: ${title} (${film_id}) por ${selected_by || 'Anónimo'}`);
-    } else {
-      // Si no existe, insertar nueva review
-      await connection.query(
-        `INSERT INTO reviews 
-         (film_id, title, year, poster_url, selected_by, review, vibe, viewing_period, expectation_mood, youtube_id, watched_date) 
-         VALUES (?, ?, ?, ?, ?, NULL, NULL, true, NULL, NULL, NULL)`,
-        [film_id, title, movieYear, posterUrl, selected_by || 'Anónimo']
-      );
-      console.log(`✅ Película seleccionada: ${title} (${film_id}) por ${selected_by || 'Anónimo'}`);
     }
 
-    // 3. Marcar el token como usado
-    await connection.query(
-      'UPDATE trigger_tokens SET is_active = false WHERE token = ?',
-      [token]
+    const selectedBy = selected_by || "Anónimo";
+    const watchedDate = new Date().toISOString().split("T")[0];
+
+    // 3. Consumir el token de forma atómica.
+    const [tokenUpdate]: any = await connection.execute(
+      `UPDATE trigger_tokens SET is_active = false, used_by = ? WHERE token = ? AND ${TOKEN_USABLE_SQL}`,
+      [selectedBy, token]
     );
 
-    // Commit de la transacción
+    if (tokenUpdate.affectedRows !== 1) {
+      await connection.rollback();
+      return json(
+        { success: false, message: "Token inválido o ya utilizado" },
+        403
+      );
+    }
+
+    // 4. Insertar un NUEVO visionado con los datos canónicos.
+    //    No se tocan las críticas anteriores.
+    await connection.execute(
+      `INSERT INTO reviews
+        (film_id, title, year, review, vibe, poster_url, viewing_period, expectation_mood, selected_by, youtube_id, watched_date)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        filmId,
+        filmTitle,
+        filmYear,
+        null,
+        null,
+        filmPoster,
+        true,
+        null,
+        selectedBy,
+        null,
+        watchedDate,
+      ]
+    );
+
     await connection.commit();
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'Película seleccionada exitosamente',
-        film_id,
-        title
-      }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    return json(
+      {
+        success: true,
+        message: "Película seleccionada exitosamente",
+        film_id: filmId,
+        title: filmTitle,
+      },
+      200
     );
-
   } catch (error) {
-    await connection.rollback();
-    
-    console.error('Error en confirm-catalog-selection:', {
+    try {
+      await connection.rollback();
+    } catch {
+      // Ignorar errores de rollback.
+    }
+
+    console.error("Error en confirm-catalog-selection:", {
       timestamp: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,
       film_id,
-      title
     });
 
-    return new Response(
-      JSON.stringify({ 
-        success: false, 
-        message: 'Error al procesar la selección' 
-      }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    return json(
+      { success: false, message: "Error al procesar la selección" },
+      500
     );
   } finally {
-    connection.release();
+    await connection.release();
   }
 };

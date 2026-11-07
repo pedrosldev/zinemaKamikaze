@@ -8,15 +8,13 @@ import PendingReviewsSelector from "../../components/admin/PendingReviewsSelecto
 import ReviewForm from "../../components/admin/ReviewForm.astro";
 import NewReviewForm from "../../components/admin/NewReviewForm.astro";
 
-const authToken = Astro.cookies.get("admin_auth")?.value;
-const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || "tu-password-segura";
+// El middleware ya redirige, pero no consultamos la BD hasta comprobarlo.
+if (!Astro.locals.adminAuthenticated) {
+  return Astro.redirect("/admin/login");
+}
 
 const activeTokens = await getActiveTokens();
 const pendingReviews = await getReviewsWithNullReview();
-
-if (authToken !== ADMIN_PASSWORD) {
-  return Astro.redirect("/admin/login");
-}
 ---
 
 <AdminLayout title="Administración - Zinema Kamikaze">

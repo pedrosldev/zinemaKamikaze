@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { pool } from '../../lib/db';
+import { pool, TOKEN_USABLE_SQL } from '../../lib/db';
 
 export const prerender = false;
 
@@ -17,15 +17,19 @@ export const POST: APIRoute = async ({ request }) => {
     try {
         // PRIMERO: Verificar que el token existe y NO ha sido usado
         const [rows]: any = await pool.query(
-            'SELECT * FROM trigger_tokens WHERE token = ? AND is_active = true',
+            `SELECT * FROM trigger_tokens WHERE token = ? AND ${TOKEN_USABLE_SQL}`,
             [token]
         );
 
         if (rows.length > 0) {
+            const name = typeof selected_by === 'string' && selected_by.trim()
+                ? selected_by.trim().slice(0, 100)
+                : 'Anónimo';
+
             // Token válido - Guardar el selected_by pero NO marcar como usado todavía
             await pool.execute(
                 'UPDATE trigger_tokens SET used_by = ? WHERE token = ?',
-                [selected_by || 'Anónimo', token]
+                [name, token]
             );
             
             return new Response(

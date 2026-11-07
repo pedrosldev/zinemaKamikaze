@@ -355,15 +355,54 @@ const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
 
 ## 8. Checklist rápido de verificación post-arreglo
 
-- [ ] `POST /api/generate-tokens` sin cookie → 401.
-- [ ] `POST /api/update-review` sin cookie → 401 y no modifica la BD.
-- [ ] `POST /api/register-review` sin token → 401/403.
+- [x] `POST /api/generate-tokens` sin cookie → 401.
+- [x] `POST /api/update-review` sin cookie → 401 y no modifica la BD.
+- [x] `POST /api/register-review` sin token → 401/403.
 - [ ] Flujo completo `normal`, `triple_choice` y `catalog` con token real → 200 y una sola fila creada.
 - [ ] Re-seleccionar una película con 2 críticas → las 2 siguen intactas.
 - [ ] Crítica con `<img src=x onerror=alert(1)>` → se muestra como texto.
-- [ ] `/server/.dev.vars` y `/server/chunks/*.mjs` → 404 en producción.
-- [ ] Login con `tu-password-segura` → 401.
+- [x] `/server/.dev.vars` y `/server/chunks/*.mjs` → no se publican (se eliminan/redirigen en el build).
+- [x] Login con `tu-password-segura` → 401.
 - [ ] Rotar `ADMIN_PASSWORD` en Cloudflare sin rebuild → el login usa el valor nuevo y el antiguo deja de funcionar.
-- [ ] `/admin` sin cookie → 302 a login sin consultar la BD.
-- [ ] `grep -r "tu-password-segura"` → 0 resultados.
-- [ ] `pnpm build` limpio desde cero y `astro check` sin errores.
+- [x] `/admin` sin cookie → 302 a login sin consultar la BD.
+- [x] `grep -r "tu-password-segura"` → 0 resultados.
+- [x] `pnpm build` limpio desde cero (sin `astro check`, que no está instalado).
+
+---
+
+## 9. Estado de remediación (2026-11-05)
+
+### Corregido en `cloudflare-deploy`
+
+- **Pool y transacciones (P0-1/P0-2):** `getConnection()` real en Hyperdrive y en el pool local; los flujos de selección usan `beginTransaction`/`commit`/`rollback` sobre una misma conexión. `execute` usa el protocolo de texto en Hyperdrive.
+- **Autenticación (P0-3/P0-4):** se eliminó el fallback público `"tu-password-segura"`. La cookie `admin_session` contiene una caducidad y una firma HMAC-SHA256; ya no guarda la contraseña. `admin_auth` se borra al iniciar y cerrar sesión.
+- **APIs (P0-3):** middleware con lista blanca explícita. Todo `/api/*` no listado exige sesión de admin; `register-review` exige admin o token válido y consume el token de forma atómica.
+- **XSS (P0-5):** eliminado `set:html` en las críticas; el texto del usuario se escapa. Las tarjetas de selección y los mensajes de estado se construyen con `textContent`.
+- **Pérdida de datos (P0-6):** `confirm-catalog-selection` inserta un nuevo visionado en lugar de sobrescribir la crítica anterior.
+- **Tokens (P0-7):** 128 bits de entropía (`crypto.getRandomValues`), generación solo para admin, caducidad de 30 días (`expires_at`) y consumo atómico. Migración `003_add_token_expiry.sql`.
+- **Build y secretos:** `ADMIN_PASSWORD` se declara como secreto de servidor en `astro:env`, por lo que ya no se inlinea en el bundle. `post-build.js` elimina `dist/server/.dev.vars`, los source maps y `wrangler.json`, añade cabeceras de seguridad y redirige `/server/*`.
+- **Layout y metadatos:** documento HTML válido, `lang="es"`, slot `head`, títulos por página, `404.astro`, `robots.txt`.
+- **Configuración:** `checkOrigin: true`; `.npmrc` hoistea `cookie` para que el bundle de prerender resuelva la versión correcta.
+- **Datos canónicos del catálogo (P1):** `src/lib/catalogUtils.ts` expone `getMovieById`; `confirm-selection`, `confirm-catalog-selection` y `register-review` (flujo con token) toman `title`/`year`/`poster` del catálogo y rechazan ids inexistentes, sin confiar en el cuerpo de la petición.
+- **Vibes centralizados:** `src/lib/vibes.ts` es la única fuente de la lista; el select del admin la importa y las APIs validan el valor con `sanitizeVibe`.
+- **Testing:** `tests/auth.test.mts`, `tests/vibes.test.mts` y `tests/token-lifecycle.test.mts` con `node:test` y `--experimental-strip-types` (sin dependencias nuevas). `pnpm test` ejecuta los tests sin BD y `pnpm test:db` añade el ciclo de vida de tokens contra MySQL.
+
+### Verificado
+
+- Login incorrecto → 401; login correcto → 200 + `admin_session` firmada.
+- `/admin` sin cookie → 302 a `/admin/login`; con sesión → 200.
+- APIs sensibles sin cookie → 401; con sesión → 200.
+- `register-review` sin token → 401; token inválido → 403.
+- Token recién creado → válido; tras reclamarlo → inválido; token caducado → inválido; doble reclamo → rechazado.
+- `pnpm build` completo y ausencia de `ADMIN_PASSWORD`/`DB_PASSWORD` en `dist`.
+- `pnpm test` → 14 tests en verde y 5 de BD omitidos; `pnpm test:db` → 19 tests en verde.
+- El build no genera `.map`, `.dev.vars` ni `wrangler.json` en `dist`.
+
+### Pendiente / requiere acción del usuario
+
+- **Rotar credenciales** (`ADMIN_PASSWORD`, `PUBLIC_TMDB_API_KEY`, contraseña de BD): la clave TMDB sigue siendo pública por diseño y apareció en el historial; la contraseña de admin actual es débil.
+- **Aplicar la migración en producción:** `pnpm migrate:prod` antes de desplegar código que usa `expires_at`.
+- **Verificar en producción** que `/server/.dev.vars` y `/server/chunks/*.mjs` no responden (la redirección `_redirects` es defensa en profundidad; la eliminación real ocurre en el build).
+- **Rate limiting** en login y endpoints públicos de comentarios/tokens (requiere KV o similar).
+- **Un solo adaptador/pipeline de deploy** y `astro check` en CI.
+

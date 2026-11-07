@@ -34,3 +34,6 @@ PROPUESTAS_PERFIL_CREATIVO.md
 .dev.vars*
 wrangler.json
 wrangler.jsonc
+
+# Backups locales de base de datos
+backups/

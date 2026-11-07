@@ -1,53 +1,113 @@
 import { defineMiddleware } from "astro:middleware";
+import { ADMIN_PASSWORD } from "astro:env/server";
 import { initDb } from "./lib/db";
+import { ADMIN_COOKIE, verifyAdminSession } from "./lib/auth";
+
+/**
+ * Endpoints que pueden llamarse sin sesión de admin.
+ * Cualquier otro `/api/*` exige sesión válida.
+ *
+ * `register-review` se valida dentro del propio handler porque admite tanto
+ * sesión de admin como un token de selección válido.
+ */
+const PUBLIC_API = new Set<string>([
+  "/api/admin-login",
+  "/api/admin-logout",
+  "/api/add-comment",
+  "/api/add-expectation-comment",
+  "/api/get-latest-movie",
+  "/api/titles.json",
+  "/api/validate-and-select",
+  "/api/confirm-selection",
+  "/api/confirm-catalog-selection",
+  "/api/validate-tokens",
+  "/api/register-review",
+]);
+
+/**
+ * Cabeceras de seguridad para respuestas dinámicas.
+ * `_headers` solo cubre archivos estáticos; el HTML y las APIs los sirve el
+ * Worker, así que hay que añadirlas aquí también.
+ */
+const SECURITY_HEADERS: Record<string, string> = {
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+};
+
+function withSecurityHeaders(response: Response): Response {
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+    response.headers.set(name, value);
+  }
+  return response;
+}
+
+async function resolveCloudflareEnv(): Promise<any | null> {
+  try {
+    const { env } = await import("cloudflare:workers");
+    return env ?? null;
+  } catch {
+    // En local (Node/Netlify) este módulo no existe.
+    return null;
+  }
+}
+
+/**
+ * Resuelve la contraseña de admin sin valores por defecto públicos.
+ * - Cloudflare: secreto del binding en runtime.
+ * - Node/local: variable de entorno.
+ * - Dev: `astro:env/server` (cargado desde .env por Astro, sin inline en build).
+ */
+function resolveAdminPassword(cfEnv: any): string | null {
+  return (
+    cfEnv?.ADMIN_PASSWORD ||
+    (typeof process !== "undefined" ? process.env?.ADMIN_PASSWORD : undefined) ||
+    ADMIN_PASSWORD ||
+    null
+  );
+}
 
 export const onRequest = defineMiddleware(async (context, next) => {
-    // 1. Valor por defecto (para local)
-    let adminPassword = import.meta.env.ADMIN_PASSWORD || "tu-password-segura";
+  const cfEnv = await resolveCloudflareEnv();
 
-    // ==========================================
-    // 2. INICIALIZAR DB Y LEER SECRETS (Solo en Cloudflare)
-    // ==========================================
-    try {
-        const { env } = await import("cloudflare:workers");
-        if (env) {
-            if ((env as any).HYPERDRIVE) {
-                initDb(env);
-            } else {
-                initDb();
-            }
+  // 1. Inicializar la base de datos (Hyperdrive en Cloudflare, pool local en dev).
+  initDb(cfEnv ?? undefined);
 
-            // 👇 Leemos la contraseña del Secret de Cloudflare
-            if ((env as any).ADMIN_PASSWORD) {
-                adminPassword = (env as any).ADMIN_PASSWORD;
-            }
-        } else {
-            initDb();
+  // 2. Resolver credenciales y validar la sesión firmada.
+  const adminPassword = resolveAdminPassword(cfEnv);
+  context.locals.adminPassword = adminPassword;
+
+  const { url, cookies, redirect } = context;
+  const pathname = url.pathname.replace(/\/+$/, "") || "/";
+  const isAdmin = await verifyAdminSession(
+    cookies.get(ADMIN_COOKIE)?.value,
+    adminPassword
+  );
+  context.locals.adminAuthenticated = isAdmin;
+
+  // 3. APIs: lista blanca explícita; el resto requiere sesión de admin.
+  if (pathname.startsWith("/api/")) {
+    if (PUBLIC_API.has(pathname) || isAdmin) {
+      return withSecurityHeaders(await next());
+    }
+
+    return withSecurityHeaders(
+      new Response(
+        JSON.stringify({ success: false, message: "No autorizado" }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
         }
-    } catch (e) {
-        // Si falla (ej. en local con Netlify), usamos la conexión local
-        initDb();
-    }
+      )
+    );
+  }
 
-    // ==========================================
-    // 3. LÓGICA DE AUTENTICACIÓN
-    // ==========================================
-    const { url, cookies, redirect } = context;
+  // 4. Zona de administración.
+  const isLoginPage = pathname === "/admin/login";
+  if (pathname.startsWith("/admin") && !isLoginPage && !isAdmin) {
+    return withSecurityHeaders(redirect("/admin/login"));
+  }
 
-    if (url.pathname.startsWith("/api/")) {
-        return next();
-    }
-
-    const isLoginPage = url.pathname === "/admin/login";
-
-    if (url.pathname.startsWith("/admin") && !isLoginPage) {
-        const authToken = cookies.get("admin_auth")?.value;
-
-        // 👇 Usamos 'adminPassword' (que ahora tiene el valor de Cloudflare)
-        if (authToken !== adminPassword) {
-            return redirect("/admin/login");
-        }
-    }
-
-    return next();
+  return withSecurityHeaders(await next());
 });

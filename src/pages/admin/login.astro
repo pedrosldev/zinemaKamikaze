@@ -2,22 +2,19 @@
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import LoginForm from "../../components/admin/LoginForm.astro";
 
-// Si ya está autenticado, redirigir al admin
-const authToken = Astro.cookies.get("admin_auth")?.value;
-const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || "tu-password-segura";
-
-if (authToken === ADMIN_PASSWORD) {
+// Si ya está autenticado, redirigir al panel.
+if (Astro.locals.adminAuthenticated) {
   return Astro.redirect("/admin");
 }
 ---
 
-<AdminLayout title="Login Admin - ZinemaKamikaze">
+<AdminLayout title="Login Admin - Zinema Kamikaze">
   <LoginForm />
 </AdminLayout>
 
 <script>
   import { initAdminLogin } from '../../scripts/admin/auth';
-  
+
   // Inicializar el formulario de login cuando el DOM esté listo
   document.addEventListener('DOMContentLoaded', () => {
     initAdminLogin();

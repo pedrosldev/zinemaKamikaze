@@ -81,7 +81,7 @@ const { review, index } = Astro.props;
   {/* Preview del texto si no hay video */}
   {!review.youtube_id && review.review && (
     <div class="text-preview">
-      <Fragment set:html={review.review.substring(0, 300) + "..."} />
+      {review.review.substring(0, 300) + "..."}
     </div>
   )}
 
