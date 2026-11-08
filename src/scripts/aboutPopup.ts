@@ -55,6 +55,9 @@ function showAboutPopup(): void {
       <p style="margin-bottom: 1rem;">Cada cierto tiempo otorgaré un código a un usuario con el cual disparará el evento que ejecute la ruleta rusa.</p>
       <p style="margin-bottom: 0;"><strong>Una vez vista, escribiré una crítica que, ya lo adelanto, no será ni sesuda ni técnica.</strong></p>
     </div>
+    <p style="margin: 1.5rem 0 0; padding-top: 1rem; border-top: 1px solid rgba(107, 63, 47, 0.5); font-size: 0.75rem; line-height: 1.4; opacity: 0.6; text-align: center;">
+      This product uses the TMDB API but is not endorsed or certified by TMDB.
+    </p>
     <button id="closePopup" style="
       background: #f5d742;
       color: #000;
