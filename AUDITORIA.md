@@ -196,7 +196,7 @@ const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
 ### P1-3. Secretos y credenciales en el repositorio/artefactos
 
 - `.env` fue commiteado en `e8585a0` y el repo es **público**. Contenía `PUBLIC_TMDB_API_KEY` (244 caracteres), `DB_HOST`, `DB_USER` (`root`) y `DB_PASSWORD` vacío. No había contraseña de producción, pero **sí una API key y datos de infraestructura**. Rotar la key si sigue vigente.
-  - **Resuelto (2026-11-08):** eliminada de `.env`, `.env.production` y `worker-configuration.d.ts`. No se usa en el código (solo se usaban las URLs públicas de `image.tmdb.org`), así que el build ya no la inlinea. Falta revocar la clave antigua en el panel de TMDB.
+  - **Resuelto (2026-11-08):** eliminada de `.env`, `.env.production` y `worker-configuration.d.ts`. No se usa en el código (solo se usaban las URLs públicas de `image.tmdb.org`), así que el build ya no la inlinea. Cuenta de TMDB eliminada por el titular; el token del historial devuelve **401** (verificado con cache-buster).
 - `test-connection.cjs` (commiteado) expone IP pública (`200.234.227.110`), usuario (`netlify_user`) y base de datos. Eliminar el archivo y restringir el acceso remoto.
 - `dist/server/.dev.vars` contiene credenciales de producción y está dentro del directorio de publicación.
 - `wrangler.toml` expone el ID de Hyperdrive (no es secreto, pero conviene moverlo a variable de entorno/CI).
@@ -402,7 +402,7 @@ const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
 
 ### Pendiente / requiere acción del usuario
 
-- **Rotar credenciales**: contraseña de admin actual es débil y la contraseña de BD apareció en el historial. La clave `PUBLIC_TMDB_API_KEY` ya está eliminada del proyecto y del bundle (2026-11-08).
+- **Rotar credenciales**: contraseña de admin actual es débil y la contraseña de BD apareció en el historial. La clave `PUBLIC_TMDB_API_KEY` está cerrada del todo (2026-11-08): fuera del bundle y la cuenta de TMDB eliminada.
 - **Aplicar la migración en producción:** `pnpm migrate:prod` antes de desplegar código que usa `expires_at`.
 - **Verificar en producción** que `/server/.dev.vars` y `/server/chunks/*.mjs` no responden (la redirección `_redirects` es defensa en profundidad; la eliminación real ocurre en el build).
 - **Rate limiting** en login y endpoints públicos de comentarios/tokens (requiere KV o similar).
