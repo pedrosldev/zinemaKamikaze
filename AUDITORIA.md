@@ -198,10 +198,11 @@ const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
 - `.env` fue commiteado en `e8585a0` y el repo es **público**. Contenía `PUBLIC_TMDB_API_KEY` (244 caracteres), `DB_HOST`, `DB_USER` (`root`) y `DB_PASSWORD` vacío. No había contraseña de producción, pero **sí una API key y datos de infraestructura**. Rotar la key si sigue vigente.
   - **Resuelto (2026-11-08):** eliminada de `.env`, `.env.production` y `worker-configuration.d.ts`. No se usa en el código (solo se usaban las URLs públicas de `image.tmdb.org`), así que el build ya no la inlinea. Cuenta de TMDB eliminada por el titular; el token del historial devuelve **401** (verificado con cache-buster).
 - `test-connection.cjs` (commiteado) expone IP pública (`200.234.227.110`), usuario (`netlify_user`) y base de datos. Eliminar el archivo y restringir el acceso remoto.
+  - **Resuelto parcialmente (2026-11-08):** archivo eliminado del árbol (`git rm`). El contenido sigue en el historial público (commits anteriores), pero corresponde a la infraestructura antigua de Netlify, no a la actual. Si ese servidor ya no existe, no hay nada más que hacer.
 - `dist/server/.dev.vars` contiene credenciales de producción y está dentro del directorio de publicación.
 - `wrangler.toml` expone el ID de Hyperdrive (no es secreto, pero conviene moverlo a variable de entorno/CI).
 
-**Solución:** rotar `PUBLIC_TMDB_API_KEY` y la contraseña de BD; borrar `test-connection.cjs`; añadir `dist/server/.dev.vars` y `*.map` a una limpieza de `post-build.js`; usar `wrangler secret put` para todo.
+**Solución:** rotar `PUBLIC_TMDB_API_KEY` (hecho) y, opcionalmente, la contraseña de BD; borrar `test-connection.cjs` (hecho); añadir `dist/server/.dev.vars` y `*.map` a una limpieza de `post-build.js` (hecho); usar `wrangler secret put` para todo.
 
 ### P1-4. `security.checkOrigin: false` desactiva la protección CSRF nativa de Astro
 
@@ -339,7 +340,7 @@ const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
 
 ### Fase 2 — Alto (1 semana)
 
-8. Rotar `PUBLIC_TMDB_API_KEY`, contraseña de BD y secreto de admin; borrar `test-connection.cjs`; limpiar `.dev.vars`/source maps de `dist/`.
+8. Rotar `PUBLIC_TMDB_API_KEY` (hecho), secreto de admin (pendiente, decisión del titular) y contraseña de BD (opcional); borrar `test-connection.cjs` (hecho); limpiar `.dev.vars`/source maps de `dist/` (hecho).
 9. Corregir `Layout.astro`, títulos, `lang`, 404, `robots.txt`, sitemap y cabeceras de seguridad.
 10. Exigir token en `register-review`; eliminar el botón/flujo `generateMovie`.
 11. Reintroducir `checkOrigin: true` y CSRF tokens.
@@ -402,7 +403,9 @@ const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
 
 ### Pendiente / requiere acción del usuario
 
-- **Rotar credenciales**: contraseña de admin actual es débil y la contraseña de BD apareció en el historial. La clave `PUBLIC_TMDB_API_KEY` está cerrada del todo (2026-11-08): fuera del bundle y la cuenta de TMDB eliminada.
+- **`ADMIN_PASSWORD` (riesgo aceptado por el titular, 2026-11-08):** 12 caracteres, solo minúsculas y dígitos, contiene una palabra reconocible. No aparece en el historial de git ni en el bundle, así que no hay fuga conocida; el riesgo es de robustez, no de exposición. Como firma las cookies de sesión (`src/lib/auth.ts`, HMAC-SHA256), una cookie filtrada permitiría atacarla offline sin límite de intentos; además el login no tiene rate limiting. Rotarla invalida todas las sesiones activas.
+- **`DB_PASSWORD`:** no aparece en el historial de git (ni `DB_HOST` de Aiven ni las contraseñas están en ningún commit). Rotarla es higiene opcional, no respuesta a una brecha; requiere tocar Aiven, la conexión de Hyperdrive y `.env.production`.
+- **`PUBLIC_TMDB_API_KEY`:** cerrada del todo (2026-11-08): fuera del bundle y cuenta de TMDB eliminada.
 - **Aplicar la migración en producción:** `pnpm migrate:prod` antes de desplegar código que usa `expires_at`.
 - **Verificar en producción** que `/server/.dev.vars` y `/server/chunks/*.mjs` no responden (la redirección `_redirects` es defensa en profundidad; la eliminación real ocurre en el build).
 - **Rate limiting** en login y endpoints públicos de comentarios/tokens (requiere KV o similar).
