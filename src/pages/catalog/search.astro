@@ -4,7 +4,7 @@ import SearchControls from "../../components/catalog/SearchControls.astro";
 import { getUniqueYears, getAllMovies } from "../../lib/catalogUtils";
 import MovieCard from '../../components/catalog/MovieCard.astro';
 
-export const prerender = false;
+export const prerender = true;
 
 // Obtener años únicos para el select
 const years = getUniqueYears();
@@ -12,12 +12,7 @@ const years = getUniqueYears();
 // Obtener todas las películas
 const allMovies = getAllMovies();
 
-// SSR: obtener query params para búsqueda inicial si vienen de URL
-const url = new URL(Astro.request.url);
-const initialQuery = url.searchParams.get('q') || '';
-const initialYear = url.searchParams.get('year') || '';
-
-// Solo para meta tags
+// Página estática: el filtro inicial por URL se aplica en cliente (ver script).
 const pageTitle = "Buscar películas - Zinema Kamikaze";
 ---
 
@@ -25,8 +20,6 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
   <main class="catalog-layout">
     <SearchControls 
       years={years} 
-      initialQuery={initialQuery} 
-      initialYear={initialYear} 
     />
 
     <!-- Contenedor principal -->
@@ -58,6 +51,18 @@ const pageTitle = "Buscar películas - Zinema Kamikaze";
     </div>
   </main>
 </CatalogLayout>
+
+<script is:inline>
+  // Página estática: aplica ?q= y ?year= al cargar, antes de que el módulo
+  // de búsqueda ejecute el filtro inicial.
+  (() => {
+    const params = new URLSearchParams(location.search);
+    const query = params.get('q');
+    const year = params.get('year');
+    if (query) document.getElementById('searchInput').value = query;
+    if (year) document.getElementById('yearFilter').value = year;
+  })();
+</script>
 
 <script>
   import { initCatalogSearch } from '../../scripts/catalog/catalogSearch';
