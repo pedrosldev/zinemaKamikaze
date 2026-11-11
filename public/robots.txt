@@ -3,3 +3,8 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 Disallow: /server/
+
+# Rastreador de OpenAI. Recorre el catálogo entero y cada ficha consume CPU
+# del plan gratuito; las críticas y el catálogo siguen accesibles.
+User-agent: GPTBot
+Disallow: /movies/

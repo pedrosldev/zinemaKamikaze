@@ -3,7 +3,7 @@ import MovieLayout from "../../layouts/MovieLayout.astro";
 import MovieHeader from "../../components/movies/MovieHeader.astro";
 import MovieReviewCard from "../../components/movies/MovieReviewCard.astro";
 import { getReviewsByFilmId } from "../../lib/db";
-import { getAllMovies } from "../../lib/catalogUtils";
+import { getMovieById } from "../../lib/catalogUtils";
 
 // SSR para evitar timeout en Netlify (25,947 páginas exceden el límite de 18 min)
 export const prerender = false;
@@ -12,8 +12,7 @@ const filmId = Number(Astro.params.film_id);
 const reviews = await getReviewsByFilmId(filmId);
 
 // Buscar info básica de la película en el catálogo
-const allMovies = getAllMovies();
-const movieInfo = allMovies.find(m => m.id === filmId);
+const movieInfo = getMovieById(filmId);
 
 if (!movieInfo) {
   return Astro.redirect("/404");

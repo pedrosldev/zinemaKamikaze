@@ -20,6 +20,21 @@ export interface PaginatedMovies {
  */
 let movieIndex: Map<number, Movie> | null = null;
 
+/**
+ * Lista plana ordenada y años únicos, cacheados por isolate.
+ *
+ * Antes se recalculaban en cada petición (aplanar 18.266 películas y
+ * ordenarlas con `localeCompare`), lo que agotaba el CPU del plan gratuito.
+ */
+let moviesCache: Movie[] | null = null;
+let yearsCache: string[] | null = null;
+
+/**
+ * Colator reutilizable: `String.prototype.localeCompare` con locale crea uno
+ * nuevo en cada comparación y multiplica el coste del `sort`.
+ */
+const collator = new Intl.Collator("es");
+
 function buildMovieIndex(): Map<number, Movie> {
   const index = new Map<number, Movie>();
   for (const entry of allTitlesData) {
@@ -50,6 +65,8 @@ export function getMovieById(id: number | string): Movie | null {
  * Ordena alfabéticamente por título
  */
 export function getAllMovies(): Movie[] {
+  if (moviesCache) return moviesCache;
+
   const flatMovies: Movie[] = [];
 
   // El JSON tiene estructura: [{ title: string, films: [...] }]
@@ -60,23 +77,27 @@ export function getAllMovies(): Movie[] {
   }
 
   // Ordenar alfabéticamente por título
-  return flatMovies.sort((a, b) => a.title.localeCompare(b.title, 'es'));
+  moviesCache = flatMovies.sort(collator.compare);
+  return moviesCache;
 }
 
 /**
  * Obtiene todos los años únicos del catálogo (ordenados descendentemente)
  */
 export function getUniqueYears(): string[] {
+  if (yearsCache) return yearsCache;
+
   const allMovies = getAllMovies();
   const years = new Set<string>();
-  
+
   allMovies.forEach(movie => {
     if (movie.year && movie.year.trim() !== '') {
       years.add(movie.year);
     }
   });
-  
-  return Array.from(years).sort((a, b) => b.localeCompare(a));
+
+  yearsCache = Array.from(years).sort((a, b) => collator.compare(b, a));
+  return yearsCache;
 }
 
 /**
@@ -123,7 +144,7 @@ export function searchMovies(query: string, year: string = ''): Movie[] {
     }
   }
 
-  return matchedMovies.sort((a, b) => a.title.localeCompare(b.title, 'es'));
+  return matchedMovies.sort((a, b) => collator.compare(a.title, b.title));
 }
 
 /**
