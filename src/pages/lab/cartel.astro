@@ -162,26 +162,128 @@ export const prerender = true;
         pointer-events: none;
       }
 
-      /* sello de «próximamente» */
-      .stamp {
+      /* hoja de programación: estado «sorteo pendiente» */
+      .sheet {
         position: absolute;
-        left: 50%;
-        top: 50%;
-        translate: -50% -50%;
-        rotate: -7deg;
-        padding: 0.35em 0.7em;
-        border: 2px solid var(--ink);
+        inset: 0;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.85em;
+        padding: 9% 10%;
+        text-align: center;
         color: var(--ink);
-        background: rgba(236, 226, 201, 0.86);
-        font-size: clamp(0.62rem, 1.3vw, 0.95rem);
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        opacity: 0;
-        transition: opacity 0.2s ease;
+        background:
+          linear-gradient(180deg, #f4ecd8 0%, #e6d9ba 70%, #dccdaa 100%);
+        box-shadow: inset 0 0 46px rgba(120, 95, 55, 0.28);
       }
 
-      body[data-state="proximamente"] .stamp {
-        opacity: 1;
+      body[data-state="sorteo"] .sheet {
+        display: flex;
+      }
+
+      body[data-state="sorteo"] #posterImg {
+        display: none;
+      }
+
+      .sheet__kicker {
+        font-size: clamp(0.45rem, 0.8vw, 0.58rem);
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        opacity: 0.55;
+      }
+
+      .sheet__title {
+        font-family: "Alfa Slab One", serif;
+        font-weight: 400;
+        font-size: clamp(1rem, 2.3vw, 1.65rem);
+        line-height: 1.02;
+        letter-spacing: 0.02em;
+      }
+
+      .sheet__lines {
+        display: grid;
+        gap: 0.5em;
+        width: 66%;
+        margin: 0.3em 0;
+      }
+
+      .sheet__lines span {
+        display: block;
+        height: 1px;
+        background: rgba(29, 23, 18, 0.32);
+      }
+
+      .sheet__stamp {
+        border: 2px solid #8f2f24;
+        color: #8f2f24;
+        padding: 0.22em 0.55em;
+        font-size: clamp(0.5rem, 0.85vw, 0.62rem);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        rotate: -4deg;
+        opacity: 0.85;
+      }
+
+      .sheet__note {
+        font-size: clamp(0.42rem, 0.75vw, 0.52rem);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        opacity: 0.5;
+      }
+
+      .sheet__cta {
+        display: inline-block;
+        margin-top: 0.2em;
+        padding: 0.55em 1.1em 0.5em;
+        font-family: "Special Elite", cursive;
+        font-size: clamp(0.5rem, 0.9vw, 0.66rem);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: #f4ecd8;
+        background: linear-gradient(180deg, #33271d 0%, #1d1712 100%);
+        border: 1px solid #120c06;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 226, 180, 0.18),
+          0 4px 9px -5px rgba(0, 0, 0, 0.7);
+        transition:
+          transform 0.16s ease,
+          box-shadow 0.16s ease;
+      }
+
+      .sheet__cta:hover,
+      .sheet__cta:focus-visible {
+        transform: translateY(-1px);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 226, 180, 0.26),
+          0 8px 14px -6px rgba(0, 0, 0, 0.8);
+      }
+
+      .sheet__cta:focus-visible {
+        outline: 3px solid #8f2f24;
+        outline-offset: 3px;
+      }
+
+      /* faja de «crítica en camino» */
+      .ribbon {
+        position: absolute;
+        left: 50%;
+        bottom: 9%;
+        translate: -50% 0;
+        display: none;
+        padding: 0.3em 0.8em;
+        background: #8f2f24;
+        color: #f4ecd8;
+        font-size: clamp(0.44rem, 0.8vw, 0.56rem);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        rotate: -1.5deg;
+      }
+
+      body[data-state="espera"] .ribbon {
+        display: block;
       }
 
       /* pie del marco */
@@ -274,7 +376,7 @@ export const prerender = true;
       }
 
       body[data-state="espera"] .sign--expectativas,
-      body[data-state="proximamente"] .sign--criticas {
+      body[data-state="sorteo"] .sign--criticas {
         display: inline-block;
       }
 
@@ -370,7 +472,7 @@ export const prerender = true;
     </style>
   </head>
 
-  <body data-state="espera">
+  <body data-state="sorteo">
     <div class="grain"></div>
     <p class="lab__note">laboratorio · no es la portada real</p>
 
@@ -384,7 +486,22 @@ export const prerender = true;
         <div class="mat">
           <div class="poster">
             <img id="posterImg" src="" alt="Póster de la película" />
-            <span class="stamp">Próximamente</span>
+
+            <!-- Estado «sorteo pendiente»: no hay película en cartel -->
+            <div class="sheet">
+              <span class="sheet__kicker">Función sin programar</span>
+              <h2 class="sheet__title">Sorteo pendiente</h2>
+              <div class="sheet__lines" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <span class="sheet__stamp">Taquilla abierta</span>
+              <a class="sheet__cta" href="#taquilla">Elegir película</a>
+              <span class="sheet__note">La primera entrada se lleva la sesión</span>
+            </div>
+
+            <span class="ribbon">Crítica en camino</span>
           </div>
         </div>
       </figure>
@@ -399,14 +516,14 @@ export const prerender = true;
         <a class="sign" href="#about">¿Qué es esto?</a>
       </nav>
 
-      <p class="status" id="statusLine">La crítica estará disponible pronto…</p>
+      <p class="status" id="statusLine">El sorteo está abierto · el primero que llegue elige</p>
     </main>
 
     <!-- Barra de pruebas: no forma parte del diseño -->
     <div class="lab" role="group" aria-label="Controles del laboratorio">
       <span class="lab__label">Estado</span>
-      <button type="button" data-state-btn="espera" aria-pressed="true">En espera</button>
-      <button type="button" data-state-btn="proximamente" aria-pressed="false">Próximamente</button>
+      <button type="button" data-state-btn="sorteo" aria-pressed="true">Sorteo pendiente</button>
+      <button type="button" data-state-btn="espera" aria-pressed="false">En espera</button>
 
       <span class="lab__label" style="margin-left: 8px">Póster</span>
       <button type="button" data-poster="0" aria-pressed="true">Claro</button>
@@ -448,27 +565,34 @@ export const prerender = true;
         const p = posters[index] ?? posters[0];
         img.src = p.src;
         img.alt = p.year ? `Póster de ${p.title} (${p.year})` : "Sin póster disponible";
-        caption.textContent = p.year ? `${p.title} (${p.year})` : "Cartel pendiente";
+        if (document.body.dataset.state === "espera") {
+          caption.textContent = p.year ? `${p.title} (${p.year})` : "Cartel pendiente";
+        }
       }
 
-      function setState(state: "espera" | "proximamente") {
+      function setState(state: "sorteo" | "espera") {
         document.body.dataset.state = state;
-        statusLine.textContent =
-          state === "espera"
-            ? "La crítica estará disponible pronto…"
-            : "La taquilla abre en el próximo sorteo";
+        if (state === "sorteo") {
+          caption.textContent = "Sin película en cartel";
+          statusLine.textContent = "El sorteo está abierto · el primero que llegue elige";
+        } else {
+          const p = posters[currentPoster] ?? posters[0];
+          caption.textContent = p.year ? `${p.title} (${p.year})` : "Cartel pendiente";
+          statusLine.textContent = "La crítica estará disponible pronto…";
+        }
         document.querySelectorAll<HTMLButtonElement>("[data-state-btn]").forEach((btn) => {
           btn.setAttribute("aria-pressed", String(btn.dataset.stateBtn === state));
         });
       }
 
       document.querySelectorAll<HTMLButtonElement>("[data-state-btn]").forEach((btn) => {
-        btn.addEventListener("click", () => setState(btn.dataset.stateBtn as "espera" | "proximamente"));
+        btn.addEventListener("click", () => setState(btn.dataset.stateBtn as "sorteo" | "espera"));
       });
 
       document.querySelectorAll<HTMLButtonElement>("[data-poster]").forEach((btn) => {
         btn.addEventListener("click", () => {
           const index = Number(btn.dataset.poster);
+          currentPoster = index;
           renderPoster(index);
           document.querySelectorAll<HTMLButtonElement>("[data-poster]").forEach((other) => {
             other.setAttribute("aria-pressed", String(other === btn));
@@ -476,8 +600,9 @@ export const prerender = true;
         });
       });
 
+      let currentPoster = 0;
       renderPoster(0);
-      setState("espera");
+      setState("sorteo");
     </script>
   </body>
 </html>
