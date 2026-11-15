@@ -17,6 +17,7 @@ const PUBLIC_API = new Set<string>([
   "/api/add-expectation-comment",
   "/api/get-latest-movie",
   "/api/titles.json",
+  "/api/selection-state",
   "/api/validate-and-select",
   "/api/confirm-selection",
   "/api/confirm-catalog-selection",

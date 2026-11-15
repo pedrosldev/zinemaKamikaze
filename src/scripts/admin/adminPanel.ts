@@ -1,5 +1,5 @@
 // Módulo de inicialización del panel de administración
-import { initTokenGeneration } from './tokenGeneration';
+import { initTaquillaAdmin } from './taquillaAdmin';
 import { initReviewSelection, initMoodOnlyUpdate, initUpdateReviewForm, initNewReviewForm } from './reviewForms';
 import { initAdminLogout } from './auth';
 
@@ -79,7 +79,7 @@ export function initAdminPanel() {
   initMoodOnlyUpdate();
   initUpdateReviewForm();
   initNewReviewForm();
-  initTokenGeneration();
+  initTaquillaAdmin();
   initAdminLogout();
   initSelectionModeToggle();
 }

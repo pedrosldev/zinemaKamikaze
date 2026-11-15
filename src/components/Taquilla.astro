@@ -1,0 +1,97 @@
+---
+/**
+ * Taquilla de la portada.
+ *
+ * Sustituye al formulario de token: el usuario ya no teclea un código.
+ * El estado se decide en servidor (¿hay una ronda abierta?) y el clic
+ * obtiene el pase interno y lo envía al endpoint de siempre.
+ */
+interface Props {
+  open: boolean;
+}
+
+const { open } = Astro.props;
+---
+
+<div class="taquilla" id="taquillaContainer" data-open={open ? "true" : "false"}>
+  {open ? (
+    <>
+      <h3 class="taquilla__title">LA TAQUILLA ESTÁ ABIERTA</h3>
+      <p class="taquilla__lead">
+        El primero que pulse elige la película. Una entrada, una elección.
+      </p>
+
+      <button id="taquillaBtn" class="token-btn taquilla__btn" type="button">
+        ENTRAR Y ELEGIR
+      </button>
+
+      <div class="selected-by-container taquilla__sign">
+        <label for="selectedByInput">¿Quieres firmar la entrada? (opcional)</label>
+        <input
+          type="text"
+          id="selectedByInput"
+          placeholder="Anónimo, @usuario, tu nombre..."
+          maxlength="100"
+          class="selected-by-input"
+        />
+        <small>Si lo dejas vacío, serás anónimo</small>
+      </div>
+    </>
+  ) : (
+    <>
+      <h3 class="taquilla__title">TAQUILLA CERRADA</h3>
+      <p class="taquilla__lead">
+        El próximo sorteo se anunciará en redes. Cuando abra, el botón aparecerá aquí.
+      </p>
+    </>
+  )}
+
+  <p id="taquillaMessage" class="token-message" role="status" aria-live="polite"></p>
+</div>
+
+<style>
+  .taquilla {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    width: 100%;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .taquilla__title {
+    margin: 0 0 0.35rem;
+    color: #c9be9c;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .taquilla[data-open="false"] .taquilla__title {
+    color: #b8ae90;
+  }
+
+  .taquilla__lead {
+    max-width: 22rem;
+    margin: 0 0 0.85rem;
+    color: #d2c9b0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .taquilla__btn {
+    padding: 14px 34px;
+    font-size: 1.05rem;
+  }
+
+  .taquilla__sign {
+    margin-top: 0.6rem;
+  }
+
+  .taquilla__sign label {
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    opacity: 0.85;
+  }
+</style>

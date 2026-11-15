@@ -202,6 +202,12 @@ export async function createTriggerToken(): Promise<string> {
     .map((byte) => byte.toString(16).padStart(2, '0'))
     .join('');
 
+  // Una ronda = un token. Al abrir una nueva, las anteriores dejan de valer:
+  // si quedaran dos usables, la taquilla seguiría abierta después del primer uso.
+  await getPool().query(
+    "UPDATE trigger_tokens SET is_active = false WHERE is_active = true"
+  );
+
   await getPool().query(
     `INSERT INTO trigger_tokens (token, is_active, expires_at)
      VALUES (?, true, DATE_ADD(NOW(), INTERVAL ${TOKEN_TTL_DAYS} DAY))`,
@@ -256,6 +262,27 @@ export async function getActiveTokens(): Promise<TokenRow[]> {
     `SELECT * FROM trigger_tokens WHERE ${TOKEN_USABLE_SQL} ORDER BY created_at DESC`
   );
   return rows;
+}
+
+/**
+ * Devuelve el token de la ronda abierta (el usable más reciente), o null.
+ * No expone nada al público por sí sola: es la portada y el endpoint de
+ * estado quienes deciden qué se cuenta.
+ */
+export async function getOpenSelection(): Promise<TokenRow | null> {
+  const [rows] = await getPool().query<(TokenRow & RowDataPacket)[]>(
+    `SELECT * FROM trigger_tokens WHERE ${TOKEN_USABLE_SQL}
+     ORDER BY created_at DESC, token DESC LIMIT 1`
+  );
+  return rows.length > 0 ? rows[0] : null;
+}
+
+/** Cierra la ronda abierta: ningún token usable. Devuelve cuántos cerró. */
+export async function closeOpenSelection(): Promise<number> {
+  const [result]: any = await getPool().query(
+    "UPDATE trigger_tokens SET is_active = false WHERE is_active = true"
+  );
+  return result.affectedRows ?? 0;
 }
 
 export async function getReviewsWithNullReview(): Promise<Pick<ReviewRow, 'id' | 'film_id' | 'title' | 'year' | 'poster' | 'youtube_id' | 'vibe' | 'expectation_mood'>[]> {
