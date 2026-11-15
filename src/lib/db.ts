@@ -277,6 +277,14 @@ export async function getOpenSelection(): Promise<TokenRow | null> {
   return rows.length > 0 ? rows[0] : null;
 }
 
+/** Cierra la ronda abierta: ningún token usable. Devuelve cuántos cerró. */
+export async function closeOpenSelection(): Promise<number> {
+  const [result]: any = await getPool().query(
+    "UPDATE trigger_tokens SET is_active = false WHERE is_active = true"
+  );
+  return result.affectedRows ?? 0;
+}
+
 export async function getReviewsWithNullReview(): Promise<Pick<ReviewRow, 'id' | 'film_id' | 'title' | 'year' | 'poster' | 'youtube_id' | 'vibe' | 'expectation_mood'>[]> {
   try {
     const [rows] = await getPool().query<Array<Pick<ReviewRow, 'id' | 'film_id' | 'title' | 'year' | 'poster' | 'youtube_id' | 'vibe' | 'expectation_mood'> & RowDataPacket>>(
