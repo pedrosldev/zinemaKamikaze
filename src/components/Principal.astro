@@ -35,8 +35,16 @@ const frameOverride =
   Number.isFinite(frameParam) && frameParam >= 250 && frameParam <= 2000
     ? frameParam
     : undefined;
+
+// La película actual no tiene expectativa guardada. En esta rama de estilos
+// usamos una secuencia de demostración para que la animación se vea al abrir
+// `/`; en `main` este bloque no existe y manda siempre el póster estático.
+const DEMO_MOOD = "fear";
+const usingDemoMood = !expectationMood && !(moodOverride && moodSequences[moodOverride]);
 const activeMood =
-  moodOverride && moodSequences[moodOverride] ? moodOverride : expectationMood;
+  moodOverride && moodSequences[moodOverride]
+    ? moodOverride
+    : expectationMood ?? DEMO_MOOD;
 const hasMoodSequence = Boolean(activeMood && moodSequences[activeMood]);
 const showExpectationAnimation =
   isViewingPeriod &&
@@ -133,6 +141,7 @@ const currentSequence = activeMood && moodSequences[activeMood]
     <ExpectationPoster
       sequence={currentSequence}
       mood={activeMood}
+      demo={usingDemoMood}
       expectationCommentsCount={expectationComments.length}
       frameMs={frameOverride}
     />
