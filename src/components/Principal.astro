@@ -3,7 +3,7 @@ import { getAllVibes, getLatestMovie, getExpectationCommentsByFilmId, getReviewe
 import Vibrarcodion from "./Vibrarcodion.astro";
 import Taquilla from "./Taquilla.astro";
 import MoviePoster from "./MoviePoster.astro";
-import ExpectationPoster from "./ExpectationPoster.astro";
+import ExpectationStrip from "./ExpectationStrip.astro";
 import ExpectationModal from "./ExpectationModal.astro";
 import MovieSelector from "./MovieSelector.astro";
 import ReviewedMoviesCarousel from "./ReviewedMoviesCarousel.astro";
@@ -23,12 +23,12 @@ const reviewedMovies = !isViewingPeriod ? await getReviewedMovies() : [];
 // Taquilla pública: hay ronda abierta si existe un pase usable.
 const taquillaOpen = !isViewingPeriod && (await getOpenSelection()) !== null;
 
-// ==== Experimento de la rama de estilos: póster animado ====
-// `?poster=static` devuelve el póster de siempre para comparar.
+// ==== Experimento de la rama de estilos: animación en #flipbookTrigger ====
+// `?anim=off` deja el fondo de cine de siempre para comparar.
 // `?mood=fear` (o excitement, curiosity, dread, surprise, boredom) fuerza
-// una secuencia para poder probar la animación sin tocar la base de datos.
+// una secuencia para poder probarla sin tocar la base de datos.
 // `?frame=500` ajusta la duración de cada fotograma (250–2000 ms).
-const posterMode = Astro.url.searchParams.get("poster");
+const animMode = Astro.url.searchParams.get("anim");
 const moodOverride = Astro.url.searchParams.get("mood");
 const frameParam = Number(Astro.url.searchParams.get("frame"));
 const frameOverride =
@@ -36,21 +36,9 @@ const frameOverride =
     ? frameParam
     : undefined;
 
-// La película actual no tiene expectativa guardada. En esta rama de estilos
-// usamos una secuencia de demostración para que la animación se vea al abrir
-// `/`; en `main` este bloque no existe y manda siempre el póster estático.
-const DEMO_MOOD = "fear";
-const usingDemoMood = !expectationMood && !(moodOverride && moodSequences[moodOverride]);
 const activeMood =
-  moodOverride && moodSequences[moodOverride]
-    ? moodOverride
-    : expectationMood ?? DEMO_MOOD;
-const hasMoodSequence = Boolean(activeMood && moodSequences[activeMood]);
-const showExpectationAnimation =
-  isViewingPeriod &&
-  latestMovie !== null &&
-  hasMoodSequence &&
-  posterMode !== "static";
+  moodOverride && moodSequences[moodOverride] ? moodOverride : expectationMood;
+const showStripAnimation = isViewingPeriod && animMode !== "off";
 
 // Seleccionar la secuencia según el mood, o usar la secuencia por defecto
 const currentSequence = activeMood && moodSequences[activeMood]
@@ -71,7 +59,14 @@ const currentSequence = activeMood && moodSequences[activeMood]
 
      {
       isViewingPeriod ? (
-  <div class="b" id="flipbookTrigger">
+  <div class="b" id="flipbookTrigger" data-animation={showStripAnimation ? "true" : "false"}>
+    {showStripAnimation && (
+      <ExpectationStrip
+        sequence={currentSequence}
+        mood={activeMood}
+        frameMs={frameOverride}
+      />
+    )}
     <small class="movie">Expectativas con el visionado</small>
     <small class="movie">(Haz click para abrir)</small>
     <!-- Datos invisibles para el flipbook -->
@@ -134,24 +129,13 @@ const currentSequence = activeMood && moodSequences[activeMood]
   class="e surprise" 
   data-viewing-period={isViewingPeriod ? 'true' : 'false'}
   data-has-poster={isViewingPeriod && latestMovie?.poster_url ? 'true' : 'false'}
-  data-poster-mode={showExpectationAnimation ? 'animation' : 'static'}
   style={isViewingPeriod && latestMovie?.poster_url ? `--poster-url: url(https://image.tmdb.org/t/p/w780${latestMovie.poster_url})` : ''}
 >
-  {showExpectationAnimation ? (
-    <ExpectationPoster
-      sequence={currentSequence}
-      mood={activeMood}
-      demo={usingDemoMood}
-      expectationCommentsCount={expectationComments.length}
-      frameMs={frameOverride}
-    />
-  ) : (
-    <MoviePoster
-      isViewingPeriod={isViewingPeriod}
-      latestMovie={latestMovie as { title: string; poster_url: string | null } | null}
-      expectationCommentsCount={expectationComments.length}
-    />
-  )}
+  <MoviePoster
+    isViewingPeriod={isViewingPeriod}
+    latestMovie={latestMovie as { title: string; poster_url: string | null } | null}
+    expectationCommentsCount={expectationComments.length}
+  />
 </div>
 
   <div class="f">

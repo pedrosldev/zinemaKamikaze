@@ -1,0 +1,173 @@
+---
+/**
+ * Animación de expectativas dentro de #flipbookTrigger — EXPERIMENTO DE LA RAMA DE ESTILOS.
+ *
+ * Sustituye el fondo fijo de la cola del cine por la secuencia que ya usa la
+ * moviola: el mood elegido o, si todavía no hay elección, la secuencia por
+ * defecto. El bloque sigue siendo clicable: al pulsar se abre el popup de
+ * siempre.
+ *
+ * No toca datos ni el flujo de comentarios. En `main` este componente no existe.
+ */
+interface Props {
+  sequence: string[];
+  mood?: string | null;
+  /** Duración de cada fotograma en milisegundos. */
+  frameMs?: number;
+}
+
+const { sequence, mood = null, frameMs = 620 } = Astro.props;
+
+const totalFrames = Math.max(sequence.length, 1);
+const totalMs = totalFrames * frameMs;
+const slot = 100 / totalFrames;
+
+// Nombre único por mood y número de fotogramas.
+const uid = `es-${mood ?? "default"}-${totalFrames}`;
+const firstFrame = sequence[0] ?? "";
+
+// Los keyframes dependen del número de fotogramas, así que se generan aquí.
+const keyframes = `
+@keyframes ${uid}-frame {
+  0% { opacity: 0; transform: scale(1.025); }
+  2% { opacity: 1; transform: scale(1.008); }
+  ${(slot - 3).toFixed(3)}% { opacity: 1; transform: scale(1); }
+  ${slot.toFixed(3)}% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes ${uid}-grain {
+  0%, 100% { transform: translate(0, 0); opacity: 0.12; }
+  20% { transform: translate(-1.5%, 1%); opacity: 0.18; }
+  40% { transform: translate(1%, -1.5%); opacity: 0.1; }
+  60% { transform: translate(-1%, -1%); opacity: 0.16; }
+  80% { transform: translate(1.5%, 1.5%); opacity: 0.11; }
+}
+
+@keyframes ${uid}-flicker {
+  0%, 100% { opacity: 0.35; }
+  22% { opacity: 0.5; }
+  47% { opacity: 0.28; }
+  71% { opacity: 0.55; }
+}
+`;
+---
+
+<Fragment set:html={`<style>${keyframes}</style>`} />
+
+<div class="expectation-strip" aria-hidden="true">
+  {firstFrame && (
+    <div class="expectation-strip__wash" style={`--src: url('${firstFrame}');`}></div>
+  )}
+
+  {sequence.map((src, index) => (
+    <div
+      class="expectation-strip__frame"
+      data-frame={index}
+      style={`--src: url('${src}'); --dur: ${totalMs}ms; --delay: ${index * frameMs}ms; --anim: ${uid}-frame;`}
+    ></div>
+  ))}
+
+  <div class="expectation-strip__grain" style={`--grain-anim: ${uid}-grain;`}></div>
+  <div class="expectation-strip__shade"></div>
+  <div class="expectation-strip__flicker" style={`--flicker-anim: ${uid}-flicker;`}></div>
+</div>
+
+<style>
+  .expectation-strip {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        ellipse at 50% 42%,
+        rgba(52, 78, 140, 0.5) 0%,
+        rgba(8, 12, 24, 0.94) 62%,
+        #04060b 100%
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .expectation-strip__wash {
+    position: absolute;
+    inset: -22%;
+    background-image: var(--src);
+    background-position: center 35%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0.65;
+    filter: blur(26px) brightness(0.42) saturate(1.15);
+    transform: scale(1.12);
+  }
+
+  .expectation-strip__frame {
+    position: absolute;
+    inset: 0;
+    background-image: var(--src);
+    background-position: center 35%;
+    background-repeat: no-repeat;
+    background-size: auto 134%;
+    opacity: 0;
+    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.65)) contrast(1.03)
+      saturate(1.05);
+    animation-name: var(--anim);
+    animation-duration: var(--dur);
+    animation-delay: var(--delay);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: opacity, transform;
+  }
+
+  .expectation-strip__grain {
+    position: absolute;
+    inset: -12%;
+    background: url("/images/old_celluloid.png");
+    background-size: cover;
+    mix-blend-mode: screen;
+    animation-name: var(--grain-anim);
+    animation-duration: 8s;
+    animation-timing-function: steps(30);
+    animation-iteration-count: infinite;
+  }
+
+  .expectation-strip__shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.78) 0%,
+      rgba(0, 0, 0, 0.2) 30%,
+      transparent 58%
+    );
+  }
+
+  .expectation-strip__flicker {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 38%,
+      rgba(0, 0, 0, 0.62) 100%
+    );
+    animation-name: var(--flicker-anim);
+    animation-duration: 2.4s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .expectation-strip__frame {
+      animation: none;
+    }
+
+    .expectation-strip__frame[data-frame="0"] {
+      opacity: 1;
+    }
+
+    .expectation-strip__grain,
+    .expectation-strip__flicker {
+      animation: none;
+    }
+  }
+</style>

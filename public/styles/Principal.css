@@ -368,6 +368,19 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   animation: oldFilmFocus 3s ease-in-out infinite;
 }
 
+/* La animación de expectativas sustituye temporalmente el fondo de cine
+   dentro de #flipbookTrigger. El bloque sigue siendo clicable. */
+.b[data-animation="true"] {
+  background-image: none !important;
+  filter: none;
+  animation: none;
+}
+
+.b[data-animation="true"] .movie {
+  position: relative;
+  z-index: 3;
+}
+
 @keyframes oldFilmFocus {
   0% {
     filter: grayscale(100%) contrast(1.4) brightness(0.85) sepia(40%) blur(0px);
