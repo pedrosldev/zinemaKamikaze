@@ -96,8 +96,8 @@ const keyframes = `
     background-position: center 35%;
     background-repeat: no-repeat;
     background-size: cover;
-    opacity: 0.65;
-    filter: blur(26px) brightness(0.42) saturate(1.15);
+    opacity: 0.55;
+    filter: blur(30px) brightness(0.62) saturate(1.1);
     transform: scale(1.12);
   }
 
@@ -107,10 +107,10 @@ const keyframes = `
     background-image: var(--src);
     background-position: center 35%;
     background-repeat: no-repeat;
-    background-size: auto 134%;
+    background-size: auto 150%;
     opacity: 0;
-    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.65)) contrast(1.03)
-      saturate(1.05);
+    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.65)) brightness(1.18)
+      contrast(1.06) saturate(1.05);
     animation-name: var(--anim);
     animation-duration: var(--dur);
     animation-delay: var(--delay);
@@ -136,9 +136,9 @@ const keyframes = `
     inset: 0;
     background: linear-gradient(
       to top,
-      rgba(0, 0, 0, 0.78) 0%,
-      rgba(0, 0, 0, 0.2) 30%,
-      transparent 58%
+      rgba(0, 0, 0, 0.66) 0%,
+      rgba(0, 0, 0, 0.12) 28%,
+      transparent 54%
     );
   }
 
@@ -147,8 +147,8 @@ const keyframes = `
     inset: 0;
     background: radial-gradient(
       ellipse at center,
-      transparent 38%,
-      rgba(0, 0, 0, 0.62) 100%
+      transparent 46%,
+      rgba(0, 0, 0, 0.5) 100%
     );
     animation-name: var(--flicker-anim);
     animation-duration: 2.4s;
