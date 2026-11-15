@@ -495,7 +495,7 @@ export function initTokenValidation(): void {
  * @param token - Token válido para usar en confirm-selection
  * @param selectedBy - Nombre del usuario que selecciona
  */
-function showMovieSelector(
+export function showMovieSelector(
   movies: Array<{ film_id: number; title: string; year: string | number; poster: string | null }>,
   token: string,
   selectedBy: string

@@ -2,7 +2,7 @@
 // src/pages/admin/index.astro
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { getActiveTokens, getReviewsWithNullReview } from "../../lib/db";
-import TokenManagement from "../../components/admin/TokenManagement.astro";
+import TaquillaAdmin from "../../components/admin/TaquillaAdmin.astro";
 import SelectionModeToggle from "../../components/admin/SelectionModeToggle.astro";
 import PendingReviewsSelector from "../../components/admin/PendingReviewsSelector.astro";
 import ReviewForm from "../../components/admin/ReviewForm.astro";
@@ -15,6 +15,9 @@ if (!Astro.locals.adminAuthenticated) {
 
 const activeTokens = await getActiveTokens();
 const pendingReviews = await getReviewsWithNullReview();
+const taquillaOpen = activeTokens.length > 0;
+const taquillaOpenedAt = activeTokens[0]?.created_at ?? null;
+const taquillaToken = activeTokens[0]?.token ?? null;
 ---
 
 <AdminLayout title="Administración - Zinema Kamikaze">
@@ -22,11 +25,15 @@ const pendingReviews = await getReviewsWithNullReview();
     <div class="logout-container">
       <button id="logoutBtn" class="logout-btn">CERRAR SESIÓN</button>
     </div>
-    <h1>ZONA DE ADMINISTRACIÓN - TOKENS</h1>
+    <h1>ZONA DE ADMINISTRACIÓN</h1>
 
     <SelectionModeToggle />
 
-    <TokenManagement activeTokens={activeTokens} />
+    <TaquillaAdmin
+      open={taquillaOpen}
+      openedAt={taquillaOpenedAt}
+      token={taquillaToken}
+    />
 
     <PendingReviewsSelector pendingReviews={pendingReviews} />
 
