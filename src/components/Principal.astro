@@ -3,6 +3,7 @@ import { getAllVibes, getLatestMovie, getExpectationCommentsByFilmId, getReviewe
 import Vibrarcodion from "./Vibrarcodion.astro";
 import Taquilla from "./Taquilla.astro";
 import MoviePoster from "./MoviePoster.astro";
+import ExpectationPoster from "./ExpectationPoster.astro";
 import ExpectationModal from "./ExpectationModal.astro";
 import MovieSelector from "./MovieSelector.astro";
 import ReviewedMoviesCarousel from "./ReviewedMoviesCarousel.astro";
@@ -22,9 +23,30 @@ const reviewedMovies = !isViewingPeriod ? await getReviewedMovies() : [];
 // Taquilla pública: hay ronda abierta si existe un pase usable.
 const taquillaOpen = !isViewingPeriod && (await getOpenSelection()) !== null;
 
+// ==== Experimento de la rama de estilos: póster animado ====
+// `?poster=static` devuelve el póster de siempre para comparar.
+// `?mood=fear` (o excitement, curiosity, dread, surprise, boredom) fuerza
+// una secuencia para poder probar la animación sin tocar la base de datos.
+// `?frame=500` ajusta la duración de cada fotograma (250–2000 ms).
+const posterMode = Astro.url.searchParams.get("poster");
+const moodOverride = Astro.url.searchParams.get("mood");
+const frameParam = Number(Astro.url.searchParams.get("frame"));
+const frameOverride =
+  Number.isFinite(frameParam) && frameParam >= 250 && frameParam <= 2000
+    ? frameParam
+    : undefined;
+const activeMood =
+  moodOverride && moodSequences[moodOverride] ? moodOverride : expectationMood;
+const hasMoodSequence = Boolean(activeMood && moodSequences[activeMood]);
+const showExpectationAnimation =
+  isViewingPeriod &&
+  latestMovie !== null &&
+  hasMoodSequence &&
+  posterMode !== "static";
+
 // Seleccionar la secuencia según el mood, o usar la secuencia por defecto
-const currentSequence = expectationMood && moodSequences[expectationMood] 
-  ? moodSequences[expectationMood] 
+const currentSequence = activeMood && moodSequences[activeMood]
+  ? moodSequences[activeMood]
   : defaultSequence;
 ---
 
@@ -104,13 +126,23 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
   class="e surprise" 
   data-viewing-period={isViewingPeriod ? 'true' : 'false'}
   data-has-poster={isViewingPeriod && latestMovie?.poster_url ? 'true' : 'false'}
+  data-poster-mode={showExpectationAnimation ? 'animation' : 'static'}
   style={isViewingPeriod && latestMovie?.poster_url ? `--poster-url: url(https://image.tmdb.org/t/p/w780${latestMovie.poster_url})` : ''}
 >
-  <MoviePoster
-    isViewingPeriod={isViewingPeriod}
-    latestMovie={latestMovie as { title: string; poster_url: string | null } | null}
-    expectationCommentsCount={expectationComments.length}
-  />
+  {showExpectationAnimation ? (
+    <ExpectationPoster
+      sequence={currentSequence}
+      mood={activeMood}
+      expectationCommentsCount={expectationComments.length}
+      frameMs={frameOverride}
+    />
+  ) : (
+    <MoviePoster
+      isViewingPeriod={isViewingPeriod}
+      latestMovie={latestMovie as { title: string; poster_url: string | null } | null}
+      expectationCommentsCount={expectationComments.length}
+    />
+  )}
 </div>
 
   <div class="f">
