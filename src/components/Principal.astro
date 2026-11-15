@@ -1,7 +1,6 @@
 ---
-import { getAllVibes, getLatestMovie, getExpectationCommentsByFilmId, getReviewedMovies, getSelectionMode, getOpenSelection } from "../lib/db";
+import { getAllVibes, getLatestMovie, getExpectationCommentsByFilmId, getReviewedMovies, getOpenSelection } from "../lib/db";
 import Vibrarcodion from "./Vibrarcodion.astro";
-import TokenInput from "./TokenInput.astro";
 import Taquilla from "./Taquilla.astro";
 import MoviePoster from "./MoviePoster.astro";
 import ExpectationModal from "./ExpectationModal.astro";
@@ -20,13 +19,8 @@ const expectationComments = latestMovie && isViewingPeriod
 // Obtener películas revisadas para el carrusel (cuando no hay viewing period)
 const reviewedMovies = !isViewingPeriod ? await getReviewedMovies() : [];
 
-// Taquilla pública: solo en modo «normal» (una película al azar).
-// En triple_choice/catalog el token sigue pidiéndose como hasta ahora.
-const selectionMode = isViewingPeriod ? "normal" : await getSelectionMode();
-const taquillaOpen =
-  !isViewingPeriod && selectionMode === "normal"
-    ? (await getOpenSelection()) !== null
-    : false;
+// Taquilla pública: hay ronda abierta si existe un pase usable.
+const taquillaOpen = !isViewingPeriod && (await getOpenSelection()) !== null;
 
 // Seleccionar la secuencia según el mood, o usar la secuencia por defecto
 const currentSequence = expectationMood && moodSequences[expectationMood] 
@@ -84,10 +78,8 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
             <em>La crítica estará disponible pronto...</em>
           </div>
         </div>
-      ) : selectionMode === "normal" ? (
-        <Taquilla open={taquillaOpen} />
       ) : (
-        <TokenInput />
+        <Taquilla open={taquillaOpen} />
       )
     }
 
@@ -139,7 +131,6 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
 <MovieSelector movies={[]} token="" selectedBy="" />
 
 <script>
-  import { initTokenValidation } from '../scripts/tokenValidation';
   import { initTaquilla } from '../scripts/taquilla';
   import { initAboutPopup } from '../scripts/aboutPopup';
   import { initFlipbook } from '../scripts/flipbook';
@@ -147,7 +138,6 @@ const currentSequence = expectationMood && moodSequences[expectationMood]
 
   document.addEventListener("DOMContentLoaded", function () {
     // Inicializar todos los módulos
-    initTokenValidation();
     initTaquilla();
     initAboutPopup();
     initFlipbook();

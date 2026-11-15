@@ -5,7 +5,12 @@
  *   1. Al pulsar, pregunta al servidor si sigue habiendo ronda abierta.
  *   2. Envía el pase a /api/validate-and-select, que ya existía.
  *   3. Traduce el 403 (token consumido) a «llegaste tarde».
+ *
+ * Sirve para los tres modos. En triple elección abre el selector de siempre
+ * y el pase se consume al confirmar, igual que con el formulario antiguo.
  */
+
+import { showMovieSelector } from "./tokenValidation";
 
 interface SelectionState {
   open: boolean;
@@ -17,6 +22,13 @@ interface SelectionResult {
   valid: boolean;
   mode?: "normal" | "triple_choice" | "catalog";
   movie?: { title: string; year: string | number };
+  movies?: Array<{
+    film_id: number;
+    title: string;
+    year: string | number;
+    poster: string | null;
+  }>;
+  token?: string;
   message?: string;
 }
 
@@ -106,6 +118,26 @@ export function initTaquilla(): void {
         }
 
         reloadAfter(3000);
+        return;
+      }
+
+      // ==== Triple elección: el pase no se consume hasta confirmar ====
+      // Se reutiliza el selector que ya existía en el flujo del formulario.
+      if (response.ok && result.valid && result.mode === "triple_choice" && result.movies?.length) {
+        container.style.display = "none";
+        showMovieSelector(result.movies, result.token ?? state.token, selectedBy);
+        return;
+      }
+
+      // ==== Catálogo: se guarda el pase y se redirige, como antes ====
+      if (response.ok && result.valid && result.mode === "catalog") {
+        sessionStorage.setItem("catalogToken", result.token ?? state.token);
+        sessionStorage.setItem("catalogSelectedBy", selectedBy);
+        button.textContent = "REDIRIGIENDO...";
+        setMessage(message, "REDIRIGIENDO AL CATÁLOGO...", "success");
+        window.setTimeout(() => {
+          window.location.href = "/catalog";
+        }, 1200);
         return;
       }
 
