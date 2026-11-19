@@ -29,6 +29,12 @@ const taquillaOpen = !isViewingPeriod && (await getOpenSelection()) !== null;
 // una secuencia para poder probarla sin tocar la base de datos.
 // `?frame=500` ajusta la duración de cada fotograma (250–2000 ms).
 const animMode = Astro.url.searchParams.get("anim");
+// `?strip=reel` cambia el retrato centrado por la tira de fotogramas.
+const stripParam = Astro.url.searchParams.get("strip");
+const stripVariant = stripParam === "reel" ? "reel" : "frame";
+// `?bleed=0` vuelve a recortar el retrato dentro de la celda; por defecto la
+// animación sobresale de #flipbookTrigger y cae sobre el hueco de abajo.
+const stripBleed = Astro.url.searchParams.get("bleed") !== "0";
 const moodOverride = Astro.url.searchParams.get("mood");
 const frameParam = Number(Astro.url.searchParams.get("frame"));
 const frameOverride =
@@ -59,12 +65,19 @@ const currentSequence = activeMood && moodSequences[activeMood]
 
      {
       isViewingPeriod ? (
-  <div class="b" id="flipbookTrigger" data-animation={showStripAnimation ? "true" : "false"}>
+  <div
+    class="b"
+    id="flipbookTrigger"
+    data-animation={showStripAnimation ? "true" : "false"}
+    data-bleed={showStripAnimation && stripBleed ? "true" : "false"}
+  >
     {showStripAnimation && (
       <ExpectationStrip
         sequence={currentSequence}
         mood={activeMood}
         frameMs={frameOverride}
+        variant={stripVariant}
+        bleed={stripBleed}
       />
     )}
     <small class="movie">Expectativas con el visionado</small>

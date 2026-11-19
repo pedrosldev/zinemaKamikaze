@@ -374,11 +374,34 @@ main>div:not(.film-grain):not(.old-film-scratches) {
   background-image: none !important;
   filter: none;
   animation: none;
+  /* Mantener el marco de madera de las demás celdas: así se ve que el retrato
+     lo atraviesa cuando sale de la celda. */
+  box-shadow: inset 0 0 0 6px rgba(107, 63, 47, 0.65);
 }
 
 .b[data-animation="true"] .movie {
   position: relative;
   z-index: 3;
+}
+
+/* Las rayas de película de .b::before se saldrían de la celda al dejar de
+   recortarla; dentro de la animación ya tenemos nuestro propio grano. */
+.b[data-animation="true"]::before {
+  display: none;
+}
+
+/* Modo "sale de la celda": la celda deja de recortar y se pone por encima de
+   sus vecinas para que el retrato caiga sobre el hueco de abajo. */
+.b[data-animation="true"][data-bleed="true"] {
+  overflow: visible;
+  z-index: 6;
+}
+
+@media screen and (max-width: 1024px) {
+  .b[data-animation="true"][data-bleed="true"] {
+    overflow: hidden;
+    z-index: auto;
+  }
 }
 
 @keyframes oldFilmFocus {
