@@ -8,6 +8,7 @@ import ExpectationModal from "./ExpectationModal.astro";
 import MovieSelector from "./MovieSelector.astro";
 import ReviewedMoviesCarousel from "./ReviewedMoviesCarousel.astro";
 import { moodSequences, defaultSequence } from "../config/moodSequences";
+import { getMoodConfig } from "../lib/moodMapper";
 
 const vibes = await getAllVibes();
 const latestMovie = await getLatestMovie();
@@ -23,7 +24,7 @@ const reviewedMovies = !isViewingPeriod ? await getReviewedMovies() : [];
 // Taquilla pública: hay ronda abierta si existe un pase usable.
 const taquillaOpen = !isViewingPeriod && (await getOpenSelection()) !== null;
 
-// ==== Experimento de la rama de estilos: animación en #flipbookTrigger ====
+// ==== Experimento de la rama de estilos: animación en .b ====
 // `?anim=off` deja el fondo de cine de siempre para comparar.
 // `?mood=fear` (o excitement, curiosity, dread, surprise, boredom) fuerza
 // una secuencia para poder probarla sin tocar la base de datos.
@@ -33,7 +34,7 @@ const animMode = Astro.url.searchParams.get("anim");
 const stripParam = Astro.url.searchParams.get("strip");
 const stripVariant = stripParam === "reel" ? "reel" : "frame";
 // `?bleed=0` vuelve a recortar el retrato dentro de la celda; por defecto la
-// animación sobresale de #flipbookTrigger y cae sobre el hueco de abajo.
+// animación sobresale de .b y cae sobre el hueco de abajo.
 const stripBleed = Astro.url.searchParams.get("bleed") !== "0";
 // `?mood=none` fuerza la secuencia por defecto (la de cuando nadie ha elegido).
 const moodOverride = Astro.url.searchParams.get("mood");
@@ -55,6 +56,9 @@ const showStripAnimation = isViewingPeriod && animMode !== "off";
 const currentSequence = activeMood && moodSequences[activeMood]
   ? moodSequences[activeMood]
   : defaultSequence;
+
+// Nombre y emoji de la reacción, para el cartel de .b.
+const moodInfo = activeMood ? getMoodConfig(activeMood, "expectation") : null;
 ---
 
 <main>
@@ -72,7 +76,6 @@ const currentSequence = activeMood && moodSequences[activeMood]
       isViewingPeriod ? (
   <div
     class="b"
-    id="flipbookTrigger"
     data-animation={showStripAnimation ? "true" : "false"}
     data-bleed={showStripAnimation && stripBleed && activeMood ? "true" : "false"}
   >
@@ -85,10 +88,18 @@ const currentSequence = activeMood && moodSequences[activeMood]
         bleed={stripBleed}
       />
     )}
-    <small class="movie">Expectativas con el visionado</small>
-    <small class="movie">(Haz click para abrir)</small>
-    <!-- Datos invisibles para el flipbook -->
-    <div id="flipbook-data" data-sequence={JSON.stringify(currentSequence)} style="display: none;"></div>
+    <div class="expectation-caption">
+      <small class="movie expectation-caption__lead">Esto espero</small>
+      <strong
+        class:list={[
+          "movie",
+          "expectation-caption__mood",
+          !moodInfo && "expectation-caption__mood--empty",
+        ]}
+      >
+        {moodInfo ? `${moodInfo.emoji} ${moodInfo.label}` : "Sin reacción todavía"}
+      </strong>
+    </div>
   </div>) : (
     <div class="b">
       {reviewedMovies.length > 0 ? (
@@ -176,14 +187,12 @@ const currentSequence = activeMood && moodSequences[activeMood]
 <script>
   import { initTaquilla } from '../scripts/taquilla';
   import { initAboutPopup } from '../scripts/aboutPopup';
-  import { initFlipbook } from '../scripts/flipbook';
   import { initExpectationComments } from '../scripts/expectationComments';
 
   document.addEventListener("DOMContentLoaded", function () {
     // Inicializar todos los módulos
     initTaquilla();
     initAboutPopup();
-    initFlipbook();
     initExpectationComments();
   });
 </script>
