@@ -35,15 +35,20 @@ const stripVariant = stripParam === "reel" ? "reel" : "frame";
 // `?bleed=0` vuelve a recortar el retrato dentro de la celda; por defecto la
 // animación sobresale de #flipbookTrigger y cae sobre el hueco de abajo.
 const stripBleed = Astro.url.searchParams.get("bleed") !== "0";
+// `?mood=none` fuerza la secuencia por defecto (la de cuando nadie ha elegido).
 const moodOverride = Astro.url.searchParams.get("mood");
+const forceFallback = moodOverride === "none";
 const frameParam = Number(Astro.url.searchParams.get("frame"));
 const frameOverride =
   Number.isFinite(frameParam) && frameParam >= 250 && frameParam <= 2000
     ? frameParam
     : undefined;
 
-const activeMood =
-  moodOverride && moodSequences[moodOverride] ? moodOverride : expectationMood;
+const activeMood = forceFallback
+  ? null
+  : moodOverride && moodSequences[moodOverride]
+    ? moodOverride
+    : expectationMood;
 const showStripAnimation = isViewingPeriod && animMode !== "off";
 
 // Seleccionar la secuencia según el mood, o usar la secuencia por defecto
@@ -69,7 +74,7 @@ const currentSequence = activeMood && moodSequences[activeMood]
     class="b"
     id="flipbookTrigger"
     data-animation={showStripAnimation ? "true" : "false"}
-    data-bleed={showStripAnimation && stripBleed ? "true" : "false"}
+    data-bleed={showStripAnimation && stripBleed && activeMood ? "true" : "false"}
   >
     {showStripAnimation && (
       <ExpectationStrip

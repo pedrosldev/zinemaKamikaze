@@ -37,6 +37,12 @@ const totalFrames = Math.max(sequence.length, 1);
 const totalMs = totalFrames * frameMs;
 const slot = 100 / totalFrames;
 
+// La secuencia por defecto son fotos completas (llevan fondo), así que se
+// quedan recortadas dentro de la celda. Las caras de cada mood son recortes
+// con transparencia: esas sí pueden asomar y van centradas.
+const isFallback = mood == null;
+const useBleed = bleed && !isFallback;
+
 // Nombre único por mood y número de fotogramas.
 const uid = `es-${mood ?? "default"}-${totalFrames}`;
 const firstFrame = sequence[0] ?? "";
@@ -97,7 +103,7 @@ const keyframes = `
     <div
       class:list={[
         "expectation-strip",
-        bleed && "expectation-strip--bleed",
+        useBleed && "expectation-strip--bleed",
       ]}
       aria-hidden="true"
     >
@@ -152,9 +158,9 @@ const keyframes = `
     position: absolute;
     inset: 0;
     background-image: var(--src);
-    background-position: center 35%;
+    background-position: center 40%;
     background-repeat: no-repeat;
-    background-size: auto 150%;
+    background-size: auto 125%;
     opacity: 0;
     filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.65)) brightness(1.18)
       contrast(1.06) saturate(1.05);
@@ -216,12 +222,12 @@ const keyframes = `
     transform: none;
   }
 
-  /* El retrato se hace más grande que la celda y cae sobre el hueco de abajo.
-     Al ser un recorte con transparencia, no se nota ningún borde de caja. */
+  /* El retrato se hace algo más grande que la celda y queda centrado en ella:
+     apenas asoma por abajo, sobre el hueco, sin cortarse por arriba. */
   .expectation-strip--bleed .expectation-strip__frame {
-    top: 0;
+    top: -17.5%;
     bottom: auto;
-    height: 150%;
+    height: 135%;
     background-position: center top;
     background-size: auto 100%;
     filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55)) brightness(1.14)
@@ -308,8 +314,8 @@ const keyframes = `
     .expectation-strip--bleed .expectation-strip__frame {
       top: 0;
       height: 100%;
-      background-position: center 35%;
-      background-size: auto 150%;
+      background-position: center 40%;
+      background-size: auto 125%;
     }
   }
 
