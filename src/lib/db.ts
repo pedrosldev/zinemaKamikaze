@@ -1,4 +1,5 @@
 import { createPool, createConnection } from 'mysql2/promise';
+import { connect as tidbConnect } from '@tidbcloud/serverless';
 import * as dotenv from 'dotenv';
 import type { RowDataPacket } from 'mysql2';
 import type { Pool } from 'mysql2/promise';
@@ -58,10 +59,63 @@ function createHyperdrivePool(hyperdrive: any): Pool {
   } as unknown as Pool;
 }
 
+/**
+ * Pool sobre el driver HTTP de TiDB Cloud.
+ *
+ * Habla HTTPS contra el gateway de TiDB, así que la conexión no pasa por
+ * Hyperdrive: se evita el `AuthSwitchRequest` que Hyperdrive todavía no
+ * soporta. El motor sigue siendo MySQL, así que las consultas no cambian.
+ *
+ * `connect()` solo guarda configuración, no abre nada hasta el `fetch`, así
+ * que se crea uno por consulta: el driver rechaza operaciones solapadas sobre
+ * la misma conexión.
+ */
+function createTiDBPool(databaseUrl: string): Pool {
+  const isWrite = (sql: string) =>
+    /^\s*(insert|update|delete|replace)\b/i.test(sql);
+
+  const runQuery = async (args: any[]) => {
+    const [sql, params] = args as [string, any[]?];
+    const conn = tidbConnect({
+      url: databaseUrl,
+      fullResult: true,
+      // El driver devuelve BIGINT como texto para no perder precisión; mysql2
+      // lo devuelve como número y el código cuenta con ello (COUNT(*)).
+      decoders: { BIGINT: (raw: string) => Number(raw) },
+    } as any);
+    const result: any = await conn.execute(sql, params ?? []);
+
+    // mysql2 devuelve un ResultSetHeader como primer elemento en escrituras.
+    if (isWrite(sql)) {
+      return [
+        {
+          affectedRows: result.rowsAffected ?? 0,
+          insertId: result.lastInsertId,
+        },
+        undefined,
+      ];
+    }
+
+    return [result.rows ?? [], undefined];
+  };
+
+  return {
+    query: (...args: any[]) => runQuery(args),
+    execute: (...args: any[]) => runQuery(args),
+  } as unknown as Pool;
+}
+
 export function initDb(env?: any) {
   if (_dbPool) return;
 
-  if (env && (env as any).HYPERDRIVE) {
+  const tidbUrl =
+    env?.TIDB_DATABASE_URL ||
+    (typeof process !== "undefined" ? process.env?.TIDB_DATABASE_URL : undefined);
+
+  if (tidbUrl) {
+    // TiDB Cloud por HTTPS: sin Hyperdrive y sin handshake MySQL.
+    _dbPool = createTiDBPool(tidbUrl);
+  } else if (env && (env as any).HYPERDRIVE) {
     // En Cloudflare usamos Hyperdrive con una conexión por petición cuando
     // hace falta transacción.
     _dbPool = createHyperdrivePool((env as any).HYPERDRIVE);

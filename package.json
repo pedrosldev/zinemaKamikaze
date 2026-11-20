@@ -19,6 +19,7 @@
     "@astrojs/netlify": "8.2.10",
     "@astrojs/node": "11.1.9",
     "@justinribeiro/lite-youtube": "^1.9.0",
+    "@tidbcloud/serverless": "^0.3.0",
     "astro": "7.4.4",
     "dotenv": "^16.5.0",
     "mysql2": "^3.14.0",
