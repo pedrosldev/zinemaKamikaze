@@ -1,0 +1,608 @@
+---
+/**
+ * LABORATORIO — no es la portada real y no está enlazada desde ningún sitio.
+ *
+ * Objetivo: validar la composición del cartel (marco + paspartú + rótulos)
+ * con pósters reales de TMDB, incluido el caso sin póster.
+ *
+ * Los rótulos son texto a propósito: cuando haya diseños propios, cada <a>
+ * se sustituye por <img src="/images/rotulos/rotulo-*.svg"> manteniendo el
+ * mismo contenedor y el mismo tamaño óptico.
+ */
+export const prerender = true;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Laboratorio · Cartel · Zinema Kamikaze</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Special+Elite&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ---------- pared ---------- */
+      :root {
+        --wall: #241c16;
+        --wall-light: #3a2c22;
+        --paper: #ece2c9;
+        --paper-dark: #d3c09a;
+        --ink: #1d1712;
+        --cream: #e9dfc4;
+        --muted: #b6a888;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        background-color: var(--wall);
+        background-image:
+          radial-gradient(120% 90% at 50% 0%, rgba(255, 214, 150, 0.1), transparent 60%),
+          radial-gradient(90% 60% at 50% 120%, rgba(0, 0, 0, 0.6), transparent 70%),
+          repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.014) 0 2px, transparent 2px 7px),
+          repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.07) 0 3px, transparent 3px 9px);
+        color: var(--cream);
+        font-family: "Special Elite", cursive;
+        overflow-x: hidden;
+      }
+
+      /* Grano de película reutilizado del proyecto, muy tenue. */
+      .grain {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image: url("/images/old_celluloid.png");
+        background-size: 420px;
+        opacity: 0.05;
+        mix-blend-mode: overlay;
+        z-index: 5;
+      }
+
+      /* ---------- composición ---------- */
+      .wall {
+        position: relative;
+        min-height: 100svh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(12px, 2.2vh, 26px);
+        padding: clamp(20px, 3vh, 44px) 16px clamp(26px, 3.5vh, 48px);
+      }
+
+      /* ---------- marquesina ---------- */
+      .marquee {
+        text-align: center;
+        line-height: 1;
+      }
+
+      .marquee h1 {
+        margin: 0;
+        font-family: "Alfa Slab One", serif;
+        font-weight: 400;
+        font-size: clamp(1.45rem, 3.6vw, 2.9rem);
+        letter-spacing: 0.03em;
+        color: var(--cream);
+        text-shadow:
+          0 1px 0 #000,
+          0 3px 0 rgba(0, 0, 0, 0.55),
+          0 12px 26px rgba(0, 0, 0, 0.7);
+      }
+
+      .marquee .tagline {
+        display: block;
+        margin-top: 0.7em;
+        font-size: clamp(0.52rem, 0.9vw, 0.72rem);
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      /* ---------- marco ---------- */
+      .frame {
+        position: relative;
+        width: min(42vh, 30vw, 420px);
+        aspect-ratio: 2 / 3;
+        padding: clamp(9px, 1.1vw, 16px);
+        background:
+          linear-gradient(135deg, #6b4a2f 0%, #3d2917 45%, #241708 100%);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 226, 180, 0.28),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.9),
+          0 0 0 1px #120c06,
+          0 26px 48px -18px rgba(0, 0, 0, 0.85);
+        transform: rotate(-0.22deg);
+      }
+
+      /* paspartú */
+      .mat {
+        height: 100%;
+        padding: clamp(7px, 0.9vw, 13px);
+        background:
+          linear-gradient(180deg, #f2e9d4 0%, var(--paper) 55%, #e0d3b3 100%);
+        box-shadow: inset 0 0 0 1px rgba(90, 70, 40, 0.35);
+        display: flex;
+      }
+
+      .poster {
+        position: relative;
+        flex: 1;
+        overflow: hidden;
+        background: #0d0b09;
+        box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.55);
+      }
+
+      .poster img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: saturate(0.96) contrast(1.02);
+      }
+
+      /* reflejo del cristal */
+      .poster::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(115deg, rgba(255, 255, 255, 0.1), transparent 38%);
+        pointer-events: none;
+      }
+
+      /* hoja de programación: estado «sorteo pendiente» */
+      .sheet {
+        position: absolute;
+        inset: 0;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.85em;
+        padding: 9% 10%;
+        text-align: center;
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, #f4ecd8 0%, #e6d9ba 70%, #dccdaa 100%);
+        box-shadow: inset 0 0 46px rgba(120, 95, 55, 0.28);
+      }
+
+      body[data-state="sorteo"] .sheet {
+        display: flex;
+      }
+
+      body[data-state="sorteo"] #posterImg {
+        display: none;
+      }
+
+      .sheet__kicker {
+        font-size: clamp(0.45rem, 0.8vw, 0.58rem);
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        opacity: 0.55;
+      }
+
+      .sheet__title {
+        font-family: "Alfa Slab One", serif;
+        font-weight: 400;
+        font-size: clamp(1rem, 2.3vw, 1.65rem);
+        line-height: 1.02;
+        letter-spacing: 0.02em;
+      }
+
+      .sheet__lines {
+        display: grid;
+        gap: 0.5em;
+        width: 66%;
+        margin: 0.3em 0;
+      }
+
+      .sheet__lines span {
+        display: block;
+        height: 1px;
+        background: rgba(29, 23, 18, 0.32);
+      }
+
+      .sheet__stamp {
+        border: 2px solid #8f2f24;
+        color: #8f2f24;
+        padding: 0.22em 0.55em;
+        font-size: clamp(0.5rem, 0.85vw, 0.62rem);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        rotate: -4deg;
+        opacity: 0.85;
+      }
+
+      .sheet__note {
+        font-size: clamp(0.42rem, 0.75vw, 0.52rem);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        opacity: 0.5;
+      }
+
+      .sheet__cta {
+        display: inline-block;
+        margin-top: 0.2em;
+        padding: 0.55em 1.1em 0.5em;
+        font-family: "Special Elite", cursive;
+        font-size: clamp(0.5rem, 0.9vw, 0.66rem);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: #f4ecd8;
+        background: linear-gradient(180deg, #33271d 0%, #1d1712 100%);
+        border: 1px solid #120c06;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 226, 180, 0.18),
+          0 4px 9px -5px rgba(0, 0, 0, 0.7);
+        transition:
+          transform 0.16s ease,
+          box-shadow 0.16s ease;
+      }
+
+      .sheet__cta:hover,
+      .sheet__cta:focus-visible {
+        transform: translateY(-1px);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 226, 180, 0.26),
+          0 8px 14px -6px rgba(0, 0, 0, 0.8);
+      }
+
+      .sheet__cta:focus-visible {
+        outline: 3px solid #8f2f24;
+        outline-offset: 3px;
+      }
+
+      /* faja de «crítica en camino» */
+      .ribbon {
+        position: absolute;
+        left: 50%;
+        bottom: 9%;
+        translate: -50% 0;
+        display: none;
+        padding: 0.3em 0.8em;
+        background: #8f2f24;
+        color: #f4ecd8;
+        font-size: clamp(0.44rem, 0.8vw, 0.56rem);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        rotate: -1.5deg;
+      }
+
+      body[data-state="espera"] .ribbon {
+        display: block;
+      }
+
+      /* pie del marco */
+      .caption {
+        text-align: center;
+        font-size: clamp(0.58rem, 0.95vw, 0.75rem);
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        text-transform: uppercase;
+        min-height: 1.2em;
+      }
+
+      /* ---------- rótulos ---------- */
+      .signs {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: clamp(8px, 1.3vw, 18px);
+        max-width: 940px;
+      }
+
+      .sign {
+        --tilt: 0deg;
+        display: inline-block;
+        padding: 0.6em 1.05em 0.55em;
+        font-family: "Special Elite", cursive;
+        font-size: clamp(0.6rem, 0.95vw, 0.8rem);
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: var(--ink);
+        background: linear-gradient(180deg, #e8dbb9 0%, var(--paper-dark) 100%);
+        border: 1px solid rgba(60, 40, 20, 0.55);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.5),
+          0 5px 11px -6px rgba(0, 0, 0, 0.95);
+        transform: rotate(var(--tilt));
+        transition:
+          transform 0.16s ease,
+          box-shadow 0.16s ease;
+        cursor: pointer;
+      }
+
+      .sign:nth-child(1) {
+        --tilt: -1.1deg;
+      }
+      .sign:nth-child(2) {
+        --tilt: 0.7deg;
+      }
+      .sign:nth-child(3) {
+        --tilt: -0.5deg;
+      }
+      .sign:nth-child(4) {
+        --tilt: 1deg;
+      }
+
+      .sign:hover,
+      .sign:focus-visible {
+        transform: rotate(0deg) translateY(-2px);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.6),
+          0 10px 18px -8px rgba(0, 0, 0, 1);
+      }
+
+      .sign:focus-visible {
+        outline: 3px solid #ffd76a;
+        outline-offset: 3px;
+      }
+
+      .sign--primary {
+        font-size: clamp(0.68rem, 1.1vw, 0.9rem);
+        background: linear-gradient(180deg, #f3e6c2 0%, #ddc79e 100%);
+      }
+
+      /* ---------- estado ---------- */
+      .status {
+        min-height: 1.2em;
+        text-align: center;
+        font-size: clamp(0.55rem, 0.9vw, 0.7rem);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      /* alternancia de estado */
+      .sign--expectativas,
+      .sign--criticas {
+        display: none;
+      }
+
+      body[data-state="espera"] .sign--expectativas,
+      body[data-state="sorteo"] .sign--criticas {
+        display: inline-block;
+      }
+
+      /* ---------- barra del laboratorio ---------- */
+      .lab {
+        position: fixed;
+        left: 12px;
+        bottom: 12px;
+        z-index: 50;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 9px;
+        background: rgba(10, 8, 6, 0.82);
+        backdrop-filter: blur(6px);
+        font-family: system-ui, sans-serif;
+        font-size: 11px;
+        color: #cfc7b6;
+      }
+
+      .lab__label {
+        opacity: 0.6;
+        margin-right: 2px;
+      }
+
+      .lab button {
+        font: inherit;
+        color: inherit;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 6px;
+        padding: 4px 8px;
+        cursor: pointer;
+      }
+
+      .lab button:hover {
+        background: rgba(255, 255, 255, 0.14);
+      }
+
+      .lab button[aria-pressed="true"] {
+        background: var(--paper);
+        color: #14100b;
+        border-color: var(--paper);
+      }
+
+      .lab__note {
+        position: fixed;
+        right: 12px;
+        top: 12px;
+        z-index: 50;
+        font-family: system-ui, sans-serif;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.38);
+      }
+
+      /* ---------- móvil ---------- */
+      @media (max-width: 680px), (max-height: 620px) {
+        .frame {
+          width: min(74vw, 330px);
+        }
+
+        .wall {
+          justify-content: flex-start;
+          padding-top: clamp(16px, 4vh, 34px);
+        }
+
+        .signs {
+          gap: 7px;
+        }
+
+        .sign {
+          font-size: 0.56rem;
+          padding: 0.5em 0.75em 0.45em;
+        }
+
+        .lab {
+          left: 8px;
+          right: 8px;
+          bottom: 8px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .sign {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body data-state="sorteo">
+    <div class="grain"></div>
+    <p class="lab__note">laboratorio · no es la portada real</p>
+
+    <main class="wall">
+      <header class="marquee">
+        <h1>ZINEMA KAMIKAZE</h1>
+        <span class="tagline">¿A qué me tengo que enfrentar?</span>
+      </header>
+
+      <figure class="frame" style="margin: 0">
+        <div class="mat">
+          <div class="poster">
+            <img id="posterImg" src="" alt="Póster de la película" />
+
+            <!-- Estado «sorteo pendiente»: no hay película en cartel -->
+            <div class="sheet">
+              <span class="sheet__kicker">Función sin programar</span>
+              <h2 class="sheet__title">Sorteo pendiente</h2>
+              <div class="sheet__lines" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <span class="sheet__stamp">Taquilla abierta</span>
+              <a class="sheet__cta" href="#taquilla">Elegir película</a>
+              <span class="sheet__note">La primera entrada se lleva la sesión</span>
+            </div>
+
+            <span class="ribbon">Crítica en camino</span>
+          </div>
+        </div>
+      </figure>
+
+      <p class="caption" id="posterCaption"></p>
+
+      <nav class="signs" aria-label="Secciones">
+        <a class="sign sign--primary" href="#catalogo">Cartelera</a>
+        <a class="sign sign--expectativas" href="#expectativas">Expectativas</a>
+        <a class="sign sign--criticas" href="#criticas">Últimas críticas</a>
+        <a class="sign" href="#vibes">Vibreviews</a>
+        <a class="sign" href="#about">¿Qué es esto?</a>
+      </nav>
+
+      <p class="status" id="statusLine">El sorteo está abierto · el primero que llegue elige</p>
+    </main>
+
+    <!-- Barra de pruebas: no forma parte del diseño -->
+    <div class="lab" role="group" aria-label="Controles del laboratorio">
+      <span class="lab__label">Estado</span>
+      <button type="button" data-state-btn="sorteo" aria-pressed="true">Sorteo pendiente</button>
+      <button type="button" data-state-btn="espera" aria-pressed="false">En espera</button>
+
+      <span class="lab__label" style="margin-left: 8px">Póster</span>
+      <button type="button" data-poster="0" aria-pressed="true">Claro</button>
+      <button type="button" data-poster="1" aria-pressed="false">Oscuro</button>
+      <button type="button" data-poster="2" aria-pressed="false">Saturado</button>
+      <button type="button" data-poster="3" aria-pressed="false">Sin póster</button>
+    </div>
+
+    <script>
+      // Pósters reales del catálogo, elegidos por contraste entre ellos.
+      const posters = [
+        {
+          src: "https://image.tmdb.org/t/p/w500/3Hr63lBDhvYGpSd8HxDpWvowZpY.jpg",
+          title: "A Star Is Born",
+          year: "1976",
+        },
+        {
+          src: "https://image.tmdb.org/t/p/w500/f0JpsMQ9oEjKBD66Ky3qK3z7LGT.jpg",
+          title: "Woman in the Dunes",
+          year: "1964",
+        },
+        {
+          src: "https://image.tmdb.org/t/p/w500/qJ9Cw1J4EmhBApoue4qlhqVrCZ7.jpg",
+          title: "The Texas Chainsaw Massacre",
+          year: "2003",
+        },
+        {
+          src: "/images/noImg.png",
+          title: "Sin póster",
+          year: "",
+        },
+      ];
+
+      const img = document.getElementById("posterImg") as HTMLImageElement;
+      const caption = document.getElementById("posterCaption") as HTMLElement;
+      const statusLine = document.getElementById("statusLine") as HTMLElement;
+
+      function renderPoster(index: number) {
+        const p = posters[index] ?? posters[0];
+        img.src = p.src;
+        img.alt = p.year ? `Póster de ${p.title} (${p.year})` : "Sin póster disponible";
+        if (document.body.dataset.state === "espera") {
+          caption.textContent = p.year ? `${p.title} (${p.year})` : "Cartel pendiente";
+        }
+      }
+
+      function setState(state: "sorteo" | "espera") {
+        document.body.dataset.state = state;
+        if (state === "sorteo") {
+          caption.textContent = "Sin película en cartel";
+          statusLine.textContent = "El sorteo está abierto · el primero que llegue elige";
+        } else {
+          const p = posters[currentPoster] ?? posters[0];
+          caption.textContent = p.year ? `${p.title} (${p.year})` : "Cartel pendiente";
+          statusLine.textContent = "La crítica estará disponible pronto…";
+        }
+        document.querySelectorAll<HTMLButtonElement>("[data-state-btn]").forEach((btn) => {
+          btn.setAttribute("aria-pressed", String(btn.dataset.stateBtn === state));
+        });
+      }
+
+      document.querySelectorAll<HTMLButtonElement>("[data-state-btn]").forEach((btn) => {
+        btn.addEventListener("click", () => setState(btn.dataset.stateBtn as "sorteo" | "espera"));
+      });
+
+      document.querySelectorAll<HTMLButtonElement>("[data-poster]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const index = Number(btn.dataset.poster);
+          currentPoster = index;
+          renderPoster(index);
+          document.querySelectorAll<HTMLButtonElement>("[data-poster]").forEach((other) => {
+            other.setAttribute("aria-pressed", String(other === btn));
+          });
+        });
+      });
+
+      let currentPoster = 0;
+      renderPoster(0);
+      setState("sorteo");
+    </script>
+  </body>
+</html>

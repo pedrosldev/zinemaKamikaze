@@ -1,0 +1,341 @@
+---
+/**
+ * Animación de expectativas dentro de .b (la antigua #flipbookTrigger) — EXPERIMENTO DE LA RAMA DE ESTILOS.
+ *
+ * Sustituye el fondo fijo de la cola del cine por la secuencia que ya usa la
+ * moviola: el mood elegido o, si todavía no hay elección, la secuencia por
+ * defecto. El bloque ya no se pulsa: la animación y el cartel se ven tal cual.
+ *
+ * Dos variantes, para comparar en la portada:
+ * - `frame` (por defecto): un retrato grande y centrado, con el fondo
+ *   difuminado a los lados.
+ * - `reel`: la secuencia como tira de fotogramas que recorre todo el ancho.
+ *
+ * No toca datos ni el flujo de comentarios. En `main` este componente no existe.
+ */
+interface Props {
+  sequence: string[];
+  mood?: string | null;
+  /** Duración de cada fotograma en milisegundos. */
+  frameMs?: number;
+  /** `frame` = retrato centrado; `reel` = tira de fotogramas. */
+  variant?: "frame" | "reel";
+  /** Deja que el retrato sobresalga de la celda (la celda pierde el recorte). */
+  bleed?: boolean;
+}
+
+const {
+  sequence,
+  mood = null,
+  frameMs = 620,
+  variant = "frame",
+  bleed = false,
+} = Astro.props;
+
+const totalFrames = Math.max(sequence.length, 1);
+const totalMs = totalFrames * frameMs;
+const slot = 100 / totalFrames;
+
+// La secuencia por defecto son fotos completas (llevan fondo), así que se
+// quedan recortadas dentro de la celda. Las caras de cada mood son recortes
+// con transparencia: esas sí pueden asomar y van centradas.
+const isFallback = mood == null;
+const useBleed = bleed && !isFallback;
+
+// Nombre único por mood y número de fotogramas.
+const uid = `es-${mood ?? "default"}-${totalFrames}`;
+const firstFrame = sequence[0] ?? "";
+
+// La tira se repite dos veces para que el bucle no tenga costura.
+const reelCells = [...sequence, ...sequence];
+// Una vuelta completa recorre toda la secuencia: le damos el doble de tiempo
+// que a los fotogramas sueltos para que el desplazamiento sea tranquilo.
+const reelMs = totalMs * 2;
+
+// Los keyframes dependen del número de fotogramas, así que se generan aquí.
+const keyframes = `
+@keyframes ${uid}-frame {
+  0% { opacity: 0; transform: scale(1.025); }
+  2% { opacity: 1; transform: scale(1.008); }
+  ${(slot - 3).toFixed(3)}% { opacity: 1; transform: scale(1); }
+  ${slot.toFixed(3)}% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes ${uid}-grain {
+  0%, 100% { transform: translate(0, 0); opacity: 0.12; }
+  20% { transform: translate(-1.5%, 1%); opacity: 0.18; }
+  40% { transform: translate(1%, -1.5%); opacity: 0.1; }
+  60% { transform: translate(-1%, -1%); opacity: 0.16; }
+  80% { transform: translate(1.5%, 1.5%); opacity: 0.11; }
+}
+
+@keyframes ${uid}-flicker {
+  0%, 100% { opacity: 0.35; }
+  22% { opacity: 0.5; }
+  47% { opacity: 0.28; }
+  71% { opacity: 0.55; }
+}
+`;
+---
+
+<Fragment set:html={`<style>${keyframes}</style>`} />
+
+{
+  variant === "reel" ? (
+    <div class="expectation-strip expectation-strip--reel" aria-hidden="true">
+      <div
+        class="expectation-strip__track"
+        style={`--track-dur: ${reelMs}ms;`}
+      >
+        {reelCells.map((src) => (
+          <div class="expectation-strip__cell" style={`--src: url('${src}');`} />
+        ))}
+      </div>
+
+      <div class="expectation-strip__edges"></div>
+      <div class="expectation-strip__grain" style={`--grain-anim: ${uid}-grain;`} />
+      <div class="expectation-strip__shade expectation-strip__shade--reel"></div>
+      <div class="expectation-strip__flicker" style={`--flicker-anim: ${uid}-flicker;`} />
+    </div>
+  ) : (
+    <div
+      class:list={[
+        "expectation-strip",
+        useBleed && "expectation-strip--bleed",
+      ]}
+      aria-hidden="true"
+    >
+      {firstFrame && (
+        <div class="expectation-strip__wash" style={`--src: url('${firstFrame}');`}></div>
+      )}
+
+      {sequence.map((src, index) => (
+        <div
+          class="expectation-strip__frame"
+          data-frame={index}
+          style={`--src: url('${src}'); --dur: ${totalMs}ms; --delay: ${index * frameMs}ms; --anim: ${uid}-frame;`}
+        ></div>
+      ))}
+
+      <div class="expectation-strip__grain" style={`--grain-anim: ${uid}-grain;`}></div>
+      <div class="expectation-strip__shade"></div>
+      <div class="expectation-strip__flicker" style={`--flicker-anim: ${uid}-flicker;`}></div>
+    </div>
+  )
+}
+
+<style>
+  .expectation-strip {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        ellipse at 50% 42%,
+        rgba(52, 78, 140, 0.5) 0%,
+        rgba(8, 12, 24, 0.94) 62%,
+        #04060b 100%
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .expectation-strip__wash {
+    position: absolute;
+    inset: -10%;
+    background-image: var(--src);
+    background-position: center 35%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0.7;
+    filter: blur(38px) brightness(0.55) saturate(1.25);
+    transform: scale(1.1);
+  }
+
+  .expectation-strip__frame {
+    position: absolute;
+    inset: 0;
+    background-image: var(--src);
+    background-position: center 40%;
+    background-repeat: no-repeat;
+    background-size: auto 125%;
+    opacity: 0;
+    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.65)) brightness(1.18)
+      contrast(1.06) saturate(1.05);
+    animation-name: var(--anim);
+    animation-duration: var(--dur);
+    animation-delay: var(--delay);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: opacity, transform;
+  }
+
+  .expectation-strip__grain {
+    position: absolute;
+    inset: -12%;
+    background: url("/images/old_celluloid.png");
+    background-size: cover;
+    mix-blend-mode: screen;
+    animation-name: var(--grain-anim);
+    animation-duration: 8s;
+    animation-timing-function: steps(30);
+    animation-iteration-count: infinite;
+  }
+
+  .expectation-strip__shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.66) 0%,
+      rgba(0, 0, 0, 0.12) 28%,
+      transparent 54%
+    );
+  }
+
+  .expectation-strip__flicker {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 46%,
+      rgba(0, 0, 0, 0.5) 100%
+    );
+    animation-name: var(--flicker-anim);
+    animation-duration: 2.4s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  /* ============================================
+     VARIANTE QUE SALE DE LA CELDA
+     ============================================ */
+
+  .expectation-strip--bleed {
+    overflow: visible;
+  }
+
+  .expectation-strip--bleed .expectation-strip__wash {
+    inset: 0;
+    transform: none;
+  }
+
+  /* El retrato se hace algo más grande que la celda y queda centrado en ella:
+     apenas asoma por abajo, sobre el hueco, sin cortarse por arriba. */
+  .expectation-strip--bleed .expectation-strip__frame {
+    top: -17.5%;
+    bottom: auto;
+    height: 135%;
+    background-position: center top;
+    background-size: auto 100%;
+    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55)) brightness(1.14)
+      contrast(1.05) saturate(1.04);
+  }
+
+  /* ============================================
+     VARIANTE TIRA DE FOTOGRAMAS
+     ============================================ */
+
+  .expectation-strip--reel {
+    --cell-w: 220px;
+    --cell-gap: 14px;
+    background: linear-gradient(180deg, #0b0e16 0%, #05070c 100%);
+  }
+
+  .expectation-strip__track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    display: flex;
+    gap: var(--cell-gap);
+    width: max-content;
+    animation: es-reel var(--track-dur) linear infinite;
+    will-change: transform;
+  }
+
+  /* La tira está duplicada, así que media anchura más medio hueco devuelve
+     exactamente el mismo fotograma al punto de partida. */
+  @keyframes es-reel {
+    from {
+      transform: translate3d(0, -50%, 0);
+    }
+
+    to {
+      transform: translate3d(calc(-50% - var(--cell-gap) / 2), -50%, 0);
+    }
+  }
+
+  .expectation-strip__cell {
+    flex: 0 0 auto;
+    width: var(--cell-w);
+    aspect-ratio: 4 / 5;
+    background-image: var(--src);
+    background-position: center 32%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 1px;
+    box-shadow:
+      0 10px 22px rgba(0, 0, 0, 0.6),
+      0 0 0 1px rgba(0, 0, 0, 0.85),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    filter: brightness(1.14) contrast(1.05) saturate(1.02);
+  }
+
+  .expectation-strip__edges {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      rgba(4, 6, 11, 0.95) 0%,
+      rgba(4, 6, 11, 0) 16%,
+      rgba(4, 6, 11, 0) 84%,
+      rgba(4, 6, 11, 0.95) 100%
+    );
+  }
+
+  .expectation-strip__shade--reel {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.82) 0%,
+      rgba(0, 0, 0, 0.3) 26%,
+      transparent 48%
+    );
+  }
+
+  /* En pantallas estrechas la rejilla cambia de sitio: el retrato vuelve a
+     quedarse dentro de la celda para no tapar el contenido de al lado. */
+  @media screen and (max-width: 1024px) {
+    .expectation-strip--bleed {
+      overflow: hidden;
+    }
+
+    .expectation-strip--bleed .expectation-strip__frame {
+      top: 0;
+      height: 100%;
+      background-position: center 40%;
+      background-size: auto 125%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .expectation-strip__frame {
+      animation: none;
+    }
+
+    .expectation-strip__frame[data-frame="0"] {
+      opacity: 1;
+    }
+
+    .expectation-strip__track {
+      animation: none;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .expectation-strip__grain,
+    .expectation-strip__flicker {
+      animation: none;
+    }
+  }
+</style>
