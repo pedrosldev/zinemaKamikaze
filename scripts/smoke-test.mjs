@@ -155,7 +155,7 @@ await check('La base de datos responde (consulta SQL)', async () => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token: 'smoke-test-token-inexistente' }),
   });
-  assert(res.status === 403, `esperaba 403 (token inválido), recibí ${res.status}; ¿Hyperdrive/Aiven?`);
+  assert(res.status === 403, `esperaba 403 (token inválido), recibí ${res.status}; ¿base de datos no disponible?`);
   const body = await res.json();
   assert(body.valid === false, 'respuesta inesperada de validate-tokens');
   return 'consulta SQL correcta';

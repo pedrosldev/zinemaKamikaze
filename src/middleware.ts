@@ -72,7 +72,7 @@ function resolveAdminPassword(cfEnv: any): string | null {
 export const onRequest = defineMiddleware(async (context, next) => {
   const cfEnv = await resolveCloudflareEnv();
 
-  // 1. Inicializar la base de datos (Hyperdrive en Cloudflare, pool local en dev).
+  // 1. Inicializar la base de datos (TiDB Cloud en Cloudflare, XAMPP en local).
   initDb(cfEnv ?? undefined);
 
   // 2. Resolver credenciales y validar la sesión firmada.

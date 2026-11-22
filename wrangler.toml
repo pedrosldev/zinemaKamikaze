@@ -2,7 +2,4 @@ name = "zinemakamikaze"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
-[[hyperdrive]]
-binding = "HYPERDRIVE"
-id = "934ee319c80d459dba7ab488699e0aeb" 
 

@@ -1,4 +1,4 @@
-import { createPool, createConnection } from 'mysql2/promise';
+import { createPool } from 'mysql2/promise';
 import { connect as tidbConnect } from '@tidbcloud/serverless';
 import * as dotenv from 'dotenv';
 import type { RowDataPacket } from 'mysql2';
@@ -11,80 +11,31 @@ dotenv.config();
 let _dbPool: Pool | null = null;
 
 /**
- * Pool compatible con mysql2 sobre Hyperdrive.
- *
- * - `query` / `execute` abren una conexión por consulta (lecturas simples).
- * - `getConnection()` devuelve una conexión dedicada para poder usar
- *   transacciones reales (begin/commit/rollback) en una misma sesión.
- *
- * mysql2 `execute` (prepared statements) no funciona de forma fiable a
- * través de Hyperdrive, así que todo se ejecuta con el protocolo de texto.
- */
-function createHyperdrivePool(hyperdrive: any): Pool {
-  const connect = () =>
-    createConnection({
-      host: hyperdrive.host,
-      user: hyperdrive.user,
-      password: hyperdrive.password,
-      database: hyperdrive.database,
-      port: hyperdrive.port,
-      disableEval: true,
-    });
-
-  const runQuery = async (args: any[]) => {
-    const conn = await connect();
-    try {
-      return await (conn as any).query(...args);
-    } finally {
-      await conn.end();
-    }
-  };
-
-  return {
-    query: (...args: any[]) => runQuery(args),
-    execute: (...args: any[]) => runQuery(args),
-    getConnection: async () => {
-      const conn = await connect();
-      return {
-        query: (...args: any[]) => (conn as any).query(...args),
-        execute: (...args: any[]) => (conn as any).query(...args),
-        beginTransaction: () => conn.beginTransaction(),
-        commit: () => conn.commit(),
-        rollback: () => conn.rollback(),
-        release: async () => {
-          await conn.end();
-        },
-      };
-    },
-  } as unknown as Pool;
-}
-
-/**
  * Pool sobre el driver HTTP de TiDB Cloud.
  *
- * Habla HTTPS contra el gateway de TiDB, así que la conexión no pasa por
- * Hyperdrive: se evita el `AuthSwitchRequest` que Hyperdrive todavía no
- * soporta. El motor sigue siendo MySQL, así que las consultas no cambian.
+ * Habla HTTPS contra el gateway de TiDB y el motor sigue siendo MySQL, así
+ * que ninguna consulta cambia respecto a mysql2. Se evita el protocolo MySQL
+ * por TCP (y con él el `AuthSwitchRequest` que rompía el handshake).
  *
  * `connect()` solo guarda configuración, no abre nada hasta el `fetch`, así
- * que se crea uno por consulta: el driver rechaza operaciones solapadas sobre
- * la misma conexión.
+ * que se crea una conexión por consulta: el driver rechaza operaciones
+ * solapadas sobre la misma conexión.
  */
 function createTiDBPool(databaseUrl: string): Pool {
   const isWrite = (sql: string) =>
     /^\s*(insert|update|delete|replace)\b/i.test(sql);
 
-  const runQuery = async (args: any[]) => {
-    const [sql, params] = args as [string, any[]?];
-    const conn = tidbConnect({
+  const openConnection = () =>
+    tidbConnect({
       url: databaseUrl,
       fullResult: true,
       // El driver devuelve BIGINT como texto para no perder precisión; mysql2
       // lo devuelve como número y el código cuenta con ello (COUNT(*)).
       decoders: { BIGINT: (raw: string) => Number(raw) },
     } as any);
-    const result: any = await conn.execute(sql, params ?? []);
 
+  /** Traduce un resultado del driver al contrato `[rows, fields]` de mysql2. */
+  const toMysql2 = (sql: string, result: any) => {
     // mysql2 devuelve un ResultSetHeader como primer elemento en escrituras.
     if (isWrite(sql)) {
       return [
@@ -99,9 +50,63 @@ function createTiDBPool(databaseUrl: string): Pool {
     return [result.rows ?? [], undefined];
   };
 
+  const runQuery = async (args: any[]) => {
+    const [sql, params] = args as [string, any[]?];
+    const conn = openConnection();
+    return toMysql2(sql, await conn.execute(sql, params ?? []));
+  };
+
   return {
     query: (...args: any[]) => runQuery(args),
     execute: (...args: any[]) => runQuery(args),
+    /**
+     * Equivalente a `getConnection()` de mysql2, pero sobre una transacción
+     * del driver HTTP: `beginTransaction()` abre la sesión en TiDB y
+     * `commit()` / `rollback()` la cierran. `release()` no tiene socket que
+     * devolver al pool, así que solo descarta la transacción si quedó abierta.
+     */
+    getConnection: async () => {
+      const conn = openConnection();
+      let tx: any = null;
+
+      const run = async (args: any[]) => {
+        const [sql, params] = args as [string, any[]?];
+        const result = tx
+          ? await tx.execute(sql, params ?? [])
+          : await conn.execute(sql, params ?? []);
+        return toMysql2(sql, result);
+      };
+
+      return {
+        query: (...args: any[]) => run(args),
+        execute: (...args: any[]) => run(args),
+        beginTransaction: async () => {
+          tx = await conn.begin();
+        },
+        commit: async () => {
+          if (!tx) return;
+          const current = tx;
+          tx = null;
+          await current.commit();
+        },
+        rollback: async () => {
+          if (!tx) return;
+          const current = tx;
+          tx = null;
+          await current.rollback();
+        },
+        release: async () => {
+          if (!tx) return;
+          const current = tx;
+          tx = null;
+          try {
+            await current.rollback();
+          } catch {
+            // La sesión ya no existía: no hay nada que deshacer.
+          }
+        },
+      };
+    },
   } as unknown as Pool;
 }
 
@@ -115,20 +120,26 @@ export function initDb(env?: any) {
   if (tidbUrl) {
     // TiDB Cloud por HTTPS: sin Hyperdrive y sin handshake MySQL.
     _dbPool = createTiDBPool(tidbUrl);
-  } else if (env && (env as any).HYPERDRIVE) {
-    // En Cloudflare usamos Hyperdrive con una conexión por petición cuando
-    // hace falta transacción.
-    _dbPool = createHyperdrivePool((env as any).HYPERDRIVE);
-  } else {
-    // En local (XAMPP), seguimos usando createPool normal
-    _dbPool = createPool({
-      host: process.env.DB_HOST || '127.0.0.1',
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_NAME || 'zinemakamikaze',
-      port: Number(process.env.DB_PORT) || 3306,
-    });
+    return;
   }
+
+  // En Cloudflare no hay ningún MySQL local al que caer: si falta la URL es
+  // un error de configuración y debe verse como tal, no intentar localhost.
+  if (env) {
+    throw new Error(
+      "Falta TIDB_DATABASE_URL: el entorno de Cloudflare Pages no tiene la URL de TiDB. " +
+        "Añádela como secreto en Settings → Variables and Secrets (Production y Preview)."
+    );
+  }
+
+  // En local (XAMPP), seguimos usando createPool normal
+  _dbPool = createPool({
+    host: process.env.DB_HOST || '127.0.0.1',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'zinemakamikaze',
+    port: Number(process.env.DB_PORT) || 3306,
+  });
 }
 
 // Función auxiliar para asegurar que el pool existe antes de usarlo
