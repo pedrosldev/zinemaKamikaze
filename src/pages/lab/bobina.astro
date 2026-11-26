@@ -1,0 +1,1108 @@
+---
+/**
+ * LABORATORIO — prototipo de portada «bobina vertical».
+ *
+ * No es la portada real y no está enlazada desde ningún sitio. Sirve para
+ * evaluar la estructura antes de tocar `Principal.astro`:
+ *
+ *  - Índice fijo (claqueta) a la izquierda; la bobina scrollea a la derecha.
+ *  - Un fotograma por pantalla, con perforaciones a ambos lados.
+ *  - Sin animaciones de entrada todavía: solo el resalte del fotograma activo.
+ *  - Datos reales de la base de datos, en modo lectura.
+ *
+ * El rojo de marca (#b8001a) queda en los números, la claqueta, los sellos y
+ * la línea que separa índice y bobina.
+ */
+import {
+  getAllVibes,
+  getLatestMovie,
+  getExpectationCommentsByFilmId,
+  getReviewedMovies,
+  getOpenSelection,
+} from "../../lib/db";
+import { getMoodConfig } from "../../lib/moodMapper";
+
+const vibes = await getAllVibes();
+const latestMovie = await getLatestMovie();
+const isViewingPeriod = latestMovie?.viewing_period ?? false;
+const expectationMood: string | null = latestMovie?.expectation_mood || null;
+const expectationComments =
+  latestMovie && isViewingPeriod
+    ? await getExpectationCommentsByFilmId(latestMovie.film_id)
+    : [];
+// En el laboratorio se piden siempre: sirven para ver el fotograma de críticas
+// aunque la portada real las oculte durante el periodo de visionado.
+const reviewedMovies = await getReviewedMovies();
+// Hay bases con una vibe vacía; en el laboratorio sobra.
+const vibeList = vibes.filter((vibe) => String(vibe ?? "").trim() !== "");
+const taquillaOpen = !isViewingPeriod && (await getOpenSelection()) !== null;
+
+const moodInfo = expectationMood ? getMoodConfig(expectationMood, "expectation") : null;
+
+// watched_date puede llegar como Date (driver) o como "YYYY-MM-DD".
+const watchedLabel = (() => {
+  const raw = latestMovie?.watched_date;
+  if (!raw) return "";
+  const iso = (raw instanceof Date ? raw.toISOString() : String(raw)).slice(0, 10);
+  const [y, m, d] = iso.split("-");
+  if (!y || !m || !d) return "";
+  return `${d}/${m}/${y}`;
+})();
+const posterUrl = latestMovie?.poster_url
+  ? `https://image.tmdb.org/t/p/w500${latestMovie.poster_url}`
+  : "/images/noImg.png";
+
+const frames = [
+  { id: "portada", n: "00", title: "Portada" },
+  { id: "taquilla", n: "01", title: "Taquilla" },
+  { id: "pelicula", n: "02", title: "La película" },
+  { id: "criticas", n: "03", title: "Críticas" },
+  { id: "vibes", n: "04", title: "Vibes" },
+  { id: "cartelera", n: "05", title: "Cartelera" },
+];
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Laboratorio · Bobina · Zinema Kamikaze</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Special+Elite&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #0b0b0c;
+        --ink-2: #131316;
+        --paper: #ece2c9;
+        --paper-dim: #b9ab8c;
+        --red: #b8001a;
+        --red-soft: rgba(184, 0, 26, 0.18);
+        --line: rgba(236, 226, 201, 0.12);
+        --perf: 34px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+
+      body {
+        background: var(--ink);
+        color: var(--paper);
+        font-family: "Special Elite", cursive;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Grano de película, tenue y fijo sobre todo el laboratorio. */
+      .grain {
+        position: fixed;
+        inset: 0;
+        z-index: 40;
+        pointer-events: none;
+        background-image: url("/images/old_celluloid.png");
+        background-size: 420px;
+        opacity: 0.05;
+        mix-blend-mode: overlay;
+      }
+
+      .lab-note {
+        position: fixed;
+        top: 12px;
+        right: calc(var(--perf) + 16px);
+        z-index: 60;
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(236, 226, 201, 0.35);
+      }
+
+      /* ============================================================
+         ESTRUCTURA: claqueta fija + bobina que scrollea
+         ============================================================ */
+
+      .shell {
+        display: grid;
+        grid-template-columns: clamp(168px, 15vw, 232px) 1fr;
+        height: 100dvh;
+        overflow: hidden;
+      }
+
+      /* ---------- claqueta / índice ---------- */
+
+      .clapper {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        padding: 26px 20px 20px;
+        background: var(--ink-2);
+        border-right: 2px solid var(--red);
+        overflow-y: auto;
+      }
+
+      .clapper__brand {
+        margin: 0;
+        width: 46px;
+        height: 46px;
+        display: grid;
+        place-items: center;
+        background: var(--red);
+        color: var(--paper);
+        font-family: "Alfa Slab One", serif;
+        font-size: 1.15rem;
+        letter-spacing: 0.02em;
+      }
+
+      .clapper__meta {
+        margin: 0;
+        font-size: 0.58rem;
+        line-height: 1.7;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--paper-dim);
+      }
+
+      .clapper__nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-top: 4px;
+      }
+
+      .clapper__link {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        padding: 8px 10px 8px 8px;
+        border-left: 3px solid transparent;
+        color: var(--paper-dim);
+        text-decoration: none;
+        font-size: 0.66rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        transition:
+          color 0.2s ease,
+          border-color 0.2s ease,
+          background-color 0.2s ease;
+      }
+
+      .clapper__link:hover,
+      .clapper__link:focus-visible {
+        color: var(--paper);
+        background: rgba(236, 226, 201, 0.05);
+      }
+
+      .clapper__link:focus-visible {
+        outline: 2px solid var(--red);
+        outline-offset: 2px;
+      }
+
+      .clapper__link[aria-current="true"] {
+        color: var(--paper);
+        border-left-color: var(--red);
+        background: var(--red-soft);
+      }
+
+      .clapper__n {
+        font-family: "Alfa Slab One", serif;
+        font-size: 0.78rem;
+        color: var(--red);
+        letter-spacing: 0.04em;
+      }
+
+      .clapper__foot {
+        margin: auto 0 0;
+        font-size: 0.55rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(236, 226, 201, 0.35);
+      }
+
+      /* ---------- bobina ---------- */
+
+      .reel {
+        position: relative;
+        overflow-y: auto;
+        scroll-snap-type: y proximity;
+        scroll-behavior: smooth;
+        background:
+          radial-gradient(120% 80% at 50% 0%, rgba(255, 240, 210, 0.04), transparent 60%),
+          var(--ink);
+      }
+
+      .frame {
+        display: grid;
+        grid-template-columns: var(--perf) 1fr var(--perf);
+        min-height: 100%;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        border-bottom: 1px solid var(--line);
+        opacity: 0.62;
+        transition: opacity 0.45s ease;
+      }
+
+      .frame.is-active {
+        opacity: 1;
+      }
+
+      /* perforaciones: SVG repetido, nítido a cualquier tamaño */
+      .perf {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="34" height="46"><rect x="8" y="11" width="18" height="24" rx="5" fill="%23ece2c9" opacity="0.14"/></svg>');
+        background-repeat: repeat-y;
+        background-size: var(--perf) 46px;
+        box-shadow:
+          inset -8px 0 14px -10px rgba(0, 0, 0, 0.9),
+          inset 8px 0 14px -10px rgba(0, 0, 0, 0.9);
+      }
+
+      .perf--l {
+        border-right: 1px solid rgba(236, 226, 201, 0.06);
+      }
+
+      .perf--r {
+        border-left: 1px solid rgba(236, 226, 201, 0.06);
+      }
+
+      .frame__body {
+        padding: clamp(28px, 6vh, 72px) clamp(22px, 5vw, 76px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: clamp(14px, 2.4vh, 26px);
+      }
+
+      /* ---------- piezas comunes ---------- */
+
+      .kicker {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+        font-size: 0.6rem;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--paper-dim);
+      }
+
+      .kicker__n {
+        font-family: "Alfa Slab One", serif;
+        font-size: 0.95rem;
+        letter-spacing: 0.04em;
+        color: var(--red);
+      }
+
+      .kicker__rule {
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(to right, var(--red), transparent);
+      }
+
+      .display {
+        margin: 0;
+        font-family: "Alfa Slab One", serif;
+        font-weight: 400;
+        line-height: 0.96;
+        letter-spacing: 0.01em;
+        font-size: clamp(2.1rem, 5.6vw, 4.4rem);
+        text-wrap: balance;
+      }
+
+      .lead {
+        margin: 0;
+        max-width: 46ch;
+        font-size: clamp(0.82rem, 1.15vw, 1rem);
+        line-height: 1.6;
+        color: var(--paper-dim);
+      }
+
+      .stamp {
+        display: inline-block;
+        align-self: flex-start;
+        padding: 0.28em 0.7em;
+        border: 2px solid var(--red);
+        color: var(--red);
+        font-size: 0.62rem;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        rotate: -2deg;
+      }
+
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        align-self: flex-start;
+        padding: 0.7em 1.2em 0.65em;
+        border: 1px solid var(--paper);
+        color: var(--paper);
+        text-decoration: none;
+        font-size: 0.66rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        transition:
+          background-color 0.2s ease,
+          color 0.2s ease,
+          border-color 0.2s ease;
+      }
+
+      .cta:hover,
+      .cta:focus-visible {
+        background: var(--red);
+        border-color: var(--red);
+        color: var(--paper);
+      }
+
+      .cta:focus-visible {
+        outline: 2px solid var(--paper);
+        outline-offset: 3px;
+      }
+
+      .cta--red {
+        border-color: var(--red);
+        background: var(--red);
+      }
+
+      .cta--red:hover,
+      .cta--red:focus-visible {
+        background: transparent;
+        color: var(--red);
+      }
+
+      .empty {
+        margin: 0;
+        font-size: 0.78rem;
+        letter-spacing: 0.1em;
+        color: rgba(236, 226, 201, 0.45);
+        text-transform: uppercase;
+      }
+
+      /* ============================================================
+         FOTOGRAMA 00 — portada
+         ============================================================ */
+
+      .hero {
+        gap: clamp(18px, 3vh, 30px);
+      }
+
+      .hero .display {
+        font-size: clamp(2.4rem, 7vw, 5.6rem);
+      }
+
+      .hero__ask {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 14px;
+      }
+
+      .hero__ask a {
+        color: var(--paper);
+        text-decoration: none;
+        border-bottom: 2px solid var(--red);
+        padding-bottom: 2px;
+        font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .hero__ask a:hover,
+      .hero__ask a:focus-visible {
+        color: var(--red);
+      }
+
+      .hero__meta {
+        margin: 0;
+        font-size: 0.58rem;
+        letter-spacing: 0.26em;
+        text-transform: uppercase;
+        color: rgba(236, 226, 201, 0.4);
+      }
+
+      /* ============================================================
+         FOTOGRAMA 02 — la película
+         ============================================================ */
+
+      .movie {
+        display: grid;
+        grid-template-columns: minmax(140px, 220px) 1fr;
+        gap: clamp(20px, 3.5vw, 48px);
+        align-items: start;
+      }
+
+      .movie__poster {
+        position: relative;
+        border: 1px solid rgba(236, 226, 201, 0.2);
+        background: #0d0b09;
+        box-shadow: 0 24px 44px -26px rgba(0, 0, 0, 0.9);
+      }
+
+      .movie__poster img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .movie__poster::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(115deg, rgba(255, 255, 255, 0.08), transparent 40%);
+        pointer-events: none;
+      }
+
+      .movie__info {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        min-width: 0;
+        max-width: 68ch;
+      }
+
+      .movie__title {
+        margin: 0;
+        font-family: "Alfa Slab One", serif;
+        font-weight: 400;
+        font-size: clamp(1.4rem, 2.6vw, 2.3rem);
+        line-height: 1.02;
+      }
+
+      .movie__year {
+        margin: 0;
+        font-size: 0.68rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--paper-dim);
+      }
+
+      .expect {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 10px;
+        padding-top: 6px;
+        border-top: 1px solid var(--line);
+      }
+
+      .expect__label {
+        font-size: 0.58rem;
+        letter-spacing: 0.26em;
+        text-transform: uppercase;
+        color: var(--paper-dim);
+      }
+
+      .expect__value {
+        font-family: "Alfa Slab One", serif;
+        font-size: clamp(1rem, 1.7vw, 1.35rem);
+        color: var(--paper);
+      }
+
+      .expect__value--empty {
+        font-family: "Special Elite", cursive;
+        font-size: 0.8rem;
+        color: rgba(236, 226, 201, 0.5);
+      }
+
+      .voices {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .voices li {
+        padding-left: 12px;
+        border-left: 2px solid var(--red);
+        font-size: 0.78rem;
+        line-height: 1.5;
+        color: var(--paper-dim);
+      }
+
+      .voices strong {
+        display: block;
+        color: var(--paper);
+        font-size: 0.62rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+
+      /* ============================================================
+         FOTOGRAMA 03 — críticas
+         ============================================================ */
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: clamp(12px, 1.8vw, 22px);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .card {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        color: var(--paper);
+        text-decoration: none;
+      }
+
+      .card img {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 2 / 3;
+        object-fit: cover;
+        border: 1px solid rgba(236, 226, 201, 0.16);
+        filter: saturate(0.92) contrast(1.02);
+        transition:
+          border-color 0.2s ease,
+          filter 0.2s ease;
+      }
+
+      .card:hover img,
+      .card:focus-visible img {
+        border-color: var(--red);
+        filter: saturate(1.05) contrast(1.05);
+      }
+
+      .card:focus-visible {
+        outline: 2px solid var(--red);
+        outline-offset: 3px;
+      }
+
+      .card__title {
+        font-size: 0.68rem;
+        line-height: 1.3;
+        letter-spacing: 0.06em;
+      }
+
+      .card__meta {
+        font-size: 0.56rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(236, 226, 201, 0.45);
+      }
+
+      /* ============================================================
+         FOTOGRAMA 04 — vibes
+         ============================================================ */
+
+      .vibes {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 0 clamp(16px, 3vw, 44px);
+        border-top: 1px solid var(--line);
+      }
+
+      .vibes a {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        padding: 12px 4px;
+        border-bottom: 1px solid var(--line);
+        color: var(--paper);
+        text-decoration: none;
+        font-size: 0.8rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        transition:
+          color 0.2s ease,
+          padding-left 0.2s ease;
+      }
+
+      .vibes a:hover,
+      .vibes a:focus-visible {
+        color: var(--red);
+        padding-left: 10px;
+      }
+
+      .vibes a:focus-visible {
+        outline: 2px solid var(--red);
+        outline-offset: 2px;
+      }
+
+      .vibes__n {
+        font-family: "Alfa Slab One", serif;
+        font-size: 0.7rem;
+        color: var(--red);
+      }
+
+      /* ============================================================
+         FOTOGRAMA 05 — cartelera
+         ============================================================ */
+
+      .colophon {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px 40px;
+        align-items: baseline;
+        justify-content: space-between;
+        border-top: 1px solid var(--line);
+        padding-top: 16px;
+      }
+
+      .colophon p {
+        margin: 0;
+        font-size: 0.62rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(236, 226, 201, 0.4);
+      }
+
+      .colophon a {
+        color: var(--paper-dim);
+        text-decoration: none;
+      }
+
+      .colophon a:hover,
+      .colophon a:focus-visible {
+        color: var(--red);
+      }
+
+      /* ============================================================
+         BARRA DEL LABORATORIO (no forma parte del diseño)
+         ============================================================ */
+
+      .lab-bar {
+        position: fixed;
+        left: 14px;
+        bottom: 14px;
+        z-index: 60;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 8px 12px;
+        border: 1px solid rgba(236, 226, 201, 0.16);
+        background: rgba(8, 8, 9, 0.86);
+        backdrop-filter: blur(6px);
+        font-family: system-ui, sans-serif;
+        font-size: 11px;
+        color: rgba(236, 226, 201, 0.6);
+      }
+
+      .lab-bar a {
+        color: var(--paper);
+        text-decoration: none;
+        border-bottom: 1px solid var(--red);
+      }
+
+      /* ============================================================
+         MÓVIL: la claqueta pasa a tira superior
+         ============================================================ */
+
+      @media (max-width: 860px) {
+        :root {
+          --perf: 18px;
+        }
+
+        .shell {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto 1fr;
+        }
+
+        .clapper {
+          flex-direction: row;
+          align-items: center;
+          gap: 14px;
+          padding: 10px 12px;
+          border-right: 0;
+          border-bottom: 2px solid var(--red);
+          overflow-x: auto;
+          overflow-y: hidden;
+        }
+
+        .clapper__brand {
+          width: 32px;
+          height: 32px;
+          flex: 0 0 auto;
+          font-size: 0.9rem;
+        }
+
+        .clapper__meta,
+        .clapper__foot {
+          display: none;
+        }
+
+        .clapper__nav {
+          flex-direction: row;
+          flex-wrap: nowrap;
+          gap: 4px;
+          margin: 0;
+        }
+
+        .clapper__link {
+          flex: 0 0 auto;
+          white-space: nowrap;
+          border-left: 0;
+          border-bottom: 2px solid transparent;
+          padding: 6px 8px;
+        }
+
+        .clapper__link[aria-current="true"] {
+          border-bottom-color: var(--red);
+          background: transparent;
+        }
+
+        .frame__body {
+          padding: 26px 18px 40px;
+        }
+
+        .movie {
+          grid-template-columns: minmax(110px, 150px) 1fr;
+        }
+
+        .grid {
+          grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+        }
+
+        .lab-bar {
+          left: 8px;
+          bottom: 8px;
+        }
+
+        .lab-note {
+          display: none;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .reel {
+          scroll-behavior: auto;
+        }
+
+        .frame,
+        .clapper__link,
+        .cta,
+        .card img,
+        .vibes a {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <p class="lab-note">laboratorio · bobina · no es la portada real</p>
+
+    <div class="shell">
+      <aside class="clapper" aria-label="Índice de la bobina">
+        <p class="clapper__brand" aria-hidden="true">ZK</p>
+        <p class="clapper__meta">Bobina 01<br />6 fotogramas<br />35 mm</p>
+
+        <nav class="clapper__nav" aria-label="Fotogramas">
+          {frames.map((frame) => (
+            <a class="clapper__link" href={`#${frame.id}`} data-frame-link={frame.id}>
+              <span class="clapper__n">{frame.n}</span>
+              <span>{frame.title}</span>
+            </a>
+          ))}
+        </nav>
+
+        <p class="clapper__foot">scroll ↓</p>
+      </aside>
+
+      <main class="reel" id="reel">
+        <!-- 00 · portada -->
+        <section class="frame is-active" id="portada" aria-labelledby="t-portada">
+          <div class="perf perf--l" aria-hidden="true"></div>
+          <div class="frame__body hero">
+            <p class="kicker">
+              <span class="kicker__n">00</span>
+              <span>Zinema Kamikaze</span>
+              <span class="kicker__rule" aria-hidden="true"></span>
+            </p>
+            <h1 class="display" id="t-portada">ZINEMA<br />KAMIKAZE!!!</h1>
+            <p class="lead">
+              Críticas de cine escritas sin pedir permiso. Una película, una
+              entrada, una opinión que no se puede devolver.
+            </p>
+            <div class="hero__ask">
+              <a href="/catalog">¿A qué me tengo que enfrentar?</a>
+              <span class="hero__meta">listado completo de películas</span>
+            </div>
+          </div>
+          <div class="perf perf--r" aria-hidden="true"></div>
+        </section>
+
+        <!-- 01 · taquilla -->
+        <section class="frame" id="taquilla" aria-labelledby="t-taquilla">
+          <div class="perf perf--l" aria-hidden="true"></div>
+          <div class="frame__body">
+            <p class="kicker">
+              <span class="kicker__n">01</span>
+              <span>Taquilla</span>
+              <span class="kicker__rule" aria-hidden="true"></span>
+            </p>
+
+            {taquillaOpen ? (
+              <>
+                <span class="stamp">Abierta</span>
+                <h2 class="display" id="t-taquilla">El primero que pulse elige</h2>
+                <p class="lead">
+                  Una entrada, una elección. Cuando alguien entra, la ronda se
+                  cierra y la película pasa a crítica en proceso.
+                </p>
+                <a class="cta cta--red" href="/">Entrar y elegir →</a>
+              </>
+            ) : isViewingPeriod && latestMovie ? (
+              <>
+                <span class="stamp">En proceso</span>
+                <h2 class="display" id="t-taquilla">
+                  {latestMovie.title}
+                </h2>
+                <p class="lead">
+                  La película ya está elegida y la crítica está en camino. Mientras
+                  tanto, abajo tienes lo que espera la gente.
+                </p>
+                <p class="hero__meta">
+                  Elegida por {latestMovie.selected_by || "Anónimo"}
+                  {watchedLabel ? ` · ${watchedLabel}` : ""}
+                </p>
+              </>
+            ) : (
+              <>
+                <span class="stamp">Cerrada</span>
+                <h2 class="display" id="t-taquilla">Sin función por ahora</h2>
+                <p class="lead">
+                  El próximo sorteo se anunciará en redes. Cuando abra, el botón
+                  aparecerá aquí.
+                </p>
+              </>
+            )}
+          </div>
+          <div class="perf perf--r" aria-hidden="true"></div>
+        </section>
+
+        <!-- 02 · la película -->
+        <section class="frame" id="pelicula" aria-labelledby="t-pelicula">
+          <div class="perf perf--l" aria-hidden="true"></div>
+          <div class="frame__body">
+            <p class="kicker">
+              <span class="kicker__n">02</span>
+              <span>La película</span>
+              <span class="kicker__rule" aria-hidden="true"></span>
+            </p>
+
+            {latestMovie ? (
+              <div class="movie">
+                <figure class="movie__poster" style="margin: 0">
+                  <img
+                    src={posterUrl}
+                    alt={`Póster de ${latestMovie.title}`}
+                    width="500"
+                    height="750"
+                  />
+                </figure>
+
+                <div class="movie__info">
+                  <h2 class="movie__title" id="t-pelicula">{latestMovie.title}</h2>
+                  <p class="movie__year">{latestMovie.year}</p>
+
+                  <div class="expect">
+                    <span class="expect__label">Esto espero</span>
+                    {moodInfo ? (
+                      <span class="expect__value">
+                        {moodInfo.emoji} {moodInfo.label}
+                      </span>
+                    ) : (
+                      <span class="expect__value expect__value--empty">
+                        Sin reacción todavía
+                      </span>
+                    )}
+                  </div>
+
+                  {expectationComments.length > 0 ? (
+                    <ul class="voices">
+                      {expectationComments.slice(0, 3).map((comment) => (
+                        <li>
+                          <strong>{comment.author_name}</strong>
+                          {comment.content.length > 150
+                            ? `${comment.content.slice(0, 150)}…`
+                            : comment.content}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p class="empty">Todavía nadie ha dejado su expectativa</p>
+                  )}
+
+                  {expectationComments.length > 3 && (
+                    <p class="hero__meta">
+                      +{expectationComments.length - 3} expectativas más en la portada real
+                    </p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <p class="empty">Sin película en cartel</p>
+            )}
+          </div>
+          <div class="perf perf--r" aria-hidden="true"></div>
+        </section>
+
+        <!-- 03 · críticas -->
+        <section class="frame" id="criticas" aria-labelledby="t-criticas">
+          <div class="perf perf--l" aria-hidden="true"></div>
+          <div class="frame__body">
+            <p class="kicker">
+              <span class="kicker__n">03</span>
+              <span>Críticas</span>
+              <span class="kicker__rule" aria-hidden="true"></span>
+            </p>
+            <h2 class="display" id="t-criticas" style="font-size: clamp(1.6rem, 3.4vw, 2.8rem)">
+              Lo último que ha pasado por aquí
+            </h2>
+
+            {reviewedMovies.length > 0 ? (
+              <ul class="grid">
+                {reviewedMovies.slice(0, 6).map((movie) => (
+                  <li>
+                    <a class="card" href={`/reviews/${movie.id}`}>
+                      <img
+                        src={
+                          movie.poster_url
+                            ? `https://image.tmdb.org/t/p/w342${movie.poster_url}`
+                            : "/images/noImg.png"
+                        }
+                        alt={`Póster de ${movie.title}`}
+                        loading="lazy"
+                        width="342"
+                        height="513"
+                      />
+                      <span class="card__title">{movie.title}</span>
+                      <span class="card__meta">
+                        {movie.year} · {movie.vibe || "sin vibe"}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p class="empty">Todavía no hay críticas publicadas</p>
+            )}
+          </div>
+          <div class="perf perf--r" aria-hidden="true"></div>
+        </section>
+
+        <!-- 04 · vibes -->
+        <section class="frame" id="vibes" aria-labelledby="t-vibes">
+          <div class="perf perf--l" aria-hidden="true"></div>
+          <div class="frame__body">
+            <p class="kicker">
+              <span class="kicker__n">04</span>
+              <span>Vibes</span>
+              <span class="kicker__rule" aria-hidden="true"></span>
+            </p>
+            <h2 class="display" id="t-vibes" style="font-size: clamp(1.6rem, 3.4vw, 2.8rem)">
+              ¿Qué te apetece ver?
+            </h2>
+
+            {vibeList.length > 0 ? (
+              <ul class="vibes">
+                {vibeList.map((vibe, index) => (
+                  <li>
+                    <a href={`/vibe/${vibe}`}>
+                      <span class="vibes__n">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span>{vibe}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p class="empty">Sin vibes todavía</p>
+            )}
+          </div>
+          <div class="perf perf--r" aria-hidden="true"></div>
+        </section>
+
+        <!-- 05 · cartelera -->
+        <section class="frame" id="cartelera" aria-labelledby="t-cartelera">
+          <div class="perf perf--l" aria-hidden="true"></div>
+          <div class="frame__body">
+            <p class="kicker">
+              <span class="kicker__n">05</span>
+              <span>Cartelera</span>
+              <span class="kicker__rule" aria-hidden="true"></span>
+            </p>
+            <h2 class="display" id="t-cartelera" style="font-size: clamp(1.8rem, 4vw, 3.2rem)">
+              ¿A qué me tengo que enfrentar?
+            </h2>
+            <p class="lead">
+              Todas las películas que han pasado por la web, con su nota, su vibe
+              y su crítica. Si buscas algo concreto, también hay buscador.
+            </p>
+            <div class="hero__ask">
+              <a href="/catalog">Abrir el listado</a>
+              <a href="/catalog/search">Buscar una película</a>
+            </div>
+
+            <div class="colophon">
+              <p>Zinema Kamikaze · laboratorio de diseño</p>
+              <p><a href="/">← Portada real</a> · <a href="/lab/cartel">Laboratorio del cartel</a></p>
+            </div>
+          </div>
+          <div class="perf perf--r" aria-hidden="true"></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="lab-bar">
+      <span>Prototipo</span>
+      <a href="/">Portada real →</a>
+    </div>
+
+    <script>
+      const reel = document.getElementById("reel") as HTMLElement | null;
+      const links = new Map<string, HTMLAnchorElement>();
+
+      document.querySelectorAll<HTMLAnchorElement>("[data-frame-link]").forEach((link) => {
+        const id = link.dataset.frameLink;
+        if (id) links.set(id, link);
+      });
+
+      if (reel) {
+        const frames = Array.from(reel.querySelectorAll<HTMLElement>(".frame"));
+
+        const setActive = (id: string) => {
+          frames.forEach((frame) => frame.classList.toggle("is-active", frame.id === id));
+          links.forEach((link, linkId) => {
+            if (linkId === id) link.setAttribute("aria-current", "true");
+            else link.removeAttribute("aria-current");
+          });
+        };
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) setActive((entry.target as HTMLElement).id);
+            }
+          },
+          { root: reel, threshold: 0.55 },
+        );
+
+        frames.forEach((frame) => observer.observe(frame));
+      }
+    </script>
+  </body>
+</html>
