@@ -10,6 +10,7 @@
     "deploy": "rm -rf dist .astro && pnpm run build && pm2 restart zinemakamikaze",
     "migrate": "node scripts/migrate.cjs",
     "migrate:prod": "cross-env NODE_ENV=production node scripts/migrate.cjs",
+    "backup": "node scripts/backup-tidb.mjs",
     "test": "node --experimental-strip-types --test \"tests/**/*.test.mts\"",
     "test:db": "cross-env TEST_DB=1 node --experimental-strip-types --test \"tests/**/*.test.mts\"",
     "smoke": "node scripts/smoke-test.mjs"
