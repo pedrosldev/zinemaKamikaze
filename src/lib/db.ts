@@ -189,8 +189,6 @@ interface ReviewedMovieRow extends RowDataPacket {
   year: number;
   poster_url: string;
   vibe: string;
-  expectation_mood?: string | null;
-  final_mood?: string | null;
 }
 
 interface TokenRow extends RowDataPacket {
@@ -451,7 +449,7 @@ export async function getMoviesWithMultipleReviews() {
 
 export async function getReviewedMovies(): Promise<ReviewedMovieRow[]> {
   const [rows] = await getPool().query<ReviewedMovieRow[]>(
-    `SELECT id, film_id, title, year, poster_url, vibe, expectation_mood, final_mood 
+    `SELECT id, film_id, title, year, poster_url, vibe 
      FROM reviews 
      WHERE review IS NOT NULL AND viewing_period = false
      ORDER BY id DESC`
