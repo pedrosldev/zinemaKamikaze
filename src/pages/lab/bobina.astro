@@ -56,9 +56,10 @@ const frames = [
   { id: "portada", n: "00", title: "Portada" },
   { id: "taquilla", n: "01", title: "Taquilla" },
   { id: "pelicula", n: "02", title: "La película" },
-  { id: "criticas", n: "03", title: "Críticas" },
-  { id: "vibes", n: "04", title: "Vibes" },
-  { id: "cartelera", n: "05", title: "Cartelera" },
+  { id: "reacciones", n: "03", title: "Reacciones" },
+  { id: "criticas", n: "04", title: "Críticas" },
+  { id: "vibes", n: "05", title: "Vibes" },
+  { id: "cartelera", n: "06", title: "Cartelera" },
 ];
 ---
 
@@ -150,6 +151,21 @@ const frames = [
         background: var(--ink-2);
         border-right: 2px solid var(--red);
         overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(236, 226, 201, 0.2) transparent;
+      }
+
+      .clapper::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      .clapper::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .clapper::-webkit-scrollbar-thumb {
+        background: rgba(236, 226, 201, 0.18);
       }
 
       .clapper__brand {
@@ -237,9 +253,23 @@ const frames = [
         overflow-y: auto;
         scroll-snap-type: y proximity;
         scroll-behavior: smooth;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(236, 226, 201, 0.22) transparent;
         background:
           radial-gradient(120% 80% at 50% 0%, rgba(255, 240, 210, 0.04), transparent 60%),
           var(--ink);
+      }
+
+      .reel::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .reel::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .reel::-webkit-scrollbar-thumb {
+        background: rgba(236, 226, 201, 0.18);
       }
 
       .frame {
@@ -541,7 +571,103 @@ const frames = [
       }
 
       /* ============================================================
-         FOTOGRAMA 03 — críticas
+         FOTOGRAMA 03 — reacciones (antes / después)
+         ============================================================ */
+
+      .moods {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 0 clamp(18px, 3vw, 44px);
+        border-top: 1px solid var(--line);
+      }
+
+      .mood-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 14px 2px 12px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .mood-row__film {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0;
+      }
+
+      .mood-row__film a {
+        color: var(--paper);
+        text-decoration: none;
+        font-size: 0.76rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border-bottom: 1px solid transparent;
+      }
+
+      .mood-row__film a:hover,
+      .mood-row__film a:focus-visible {
+        color: var(--red);
+        border-bottom-color: var(--red);
+      }
+
+      .mood-row__film a:focus-visible {
+        outline: 2px solid var(--red);
+        outline-offset: 3px;
+      }
+
+      .mood-row__year {
+        font-size: 0.56rem;
+        letter-spacing: 0.2em;
+        color: rgba(236, 226, 201, 0.42);
+      }
+
+      .mood-row__pair {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0;
+        font-size: 0.76rem;
+      }
+
+      .mood {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 7px;
+      }
+
+      .mood__tag {
+        font-size: 0.5rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(236, 226, 201, 0.38);
+      }
+
+      .mood--expect {
+        color: var(--paper-dim);
+      }
+
+      .mood--final {
+        color: var(--paper);
+      }
+
+      .mood em {
+        color: rgba(236, 226, 201, 0.32);
+        font-style: italic;
+      }
+
+      .mood-row__arrow {
+        color: var(--red);
+        font-family: system-ui, sans-serif;
+      }
+
+      /* ============================================================
+         FOTOGRAMA 04 — críticas
          ============================================================ */
 
       .grid {
@@ -599,7 +725,7 @@ const frames = [
       }
 
       /* ============================================================
-         FOTOGRAMA 04 — vibes
+         FOTOGRAMA 05 — vibes
          ============================================================ */
 
       .vibes {
@@ -646,7 +772,7 @@ const frames = [
       }
 
       /* ============================================================
-         FOTOGRAMA 05 — cartelera
+         FOTOGRAMA 06 — cartelera
          ============================================================ */
 
       .colophon {
@@ -727,6 +853,11 @@ const frames = [
           border-bottom: 2px solid var(--red);
           overflow-x: auto;
           overflow-y: hidden;
+          scrollbar-width: none;
+        }
+
+        .clapper::-webkit-scrollbar {
+          display: none;
         }
 
         .clapper__brand {
@@ -769,6 +900,16 @@ const frames = [
           grid-template-columns: minmax(110px, 150px) 1fr;
         }
 
+        .mood-row__pair {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 4px;
+        }
+
+        .mood-row__arrow {
+          display: none;
+        }
+
         .grid {
           grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
         }
@@ -806,7 +947,7 @@ const frames = [
     <div class="shell">
       <aside class="clapper" aria-label="Índice de la bobina">
         <p class="clapper__brand" aria-hidden="true">ZK</p>
-        <p class="clapper__meta">Bobina 01<br />6 fotogramas<br />35 mm</p>
+        <p class="clapper__meta">Bobina 01<br />7 fotogramas<br />35 mm</p>
 
         <nav class="clapper__nav" aria-label="Fotogramas">
           {frames.map((frame) => (
@@ -836,8 +977,7 @@ const frames = [
               entrada, una opinión que no se puede devolver.
             </p>
             <div class="hero__ask">
-              <a href="/catalog">¿A qué me tengo que enfrentar?</a>
-              <span class="hero__meta">listado completo de películas</span>
+              <a href="#taquilla">Empezar la bobina ↓</a>
             </div>
           </div>
           <div class="perf perf--r" aria-hidden="true"></div>
@@ -959,12 +1099,63 @@ const frames = [
           <div class="perf perf--r" aria-hidden="true"></div>
         </section>
 
-        <!-- 03 · críticas -->
-        <section class="frame" id="criticas" aria-labelledby="t-criticas">
+        <!-- 03 · reacciones -->
+        <section class="frame" id="reacciones" aria-labelledby="t-reacciones">
           <div class="perf perf--l" aria-hidden="true"></div>
           <div class="frame__body">
             <p class="kicker">
               <span class="kicker__n">03</span>
+              <span>Reacciones</span>
+              <span class="kicker__rule" aria-hidden="true"></span>
+            </p>
+            <h2 class="display" id="t-reacciones" style="font-size: clamp(1.6rem, 3.4vw, 2.8rem)">
+              Lo que esperaba y lo que me encontré
+            </h2>
+
+            {reviewedMovies.length > 0 ? (
+              <ul class="moods">
+                {reviewedMovies.slice(0, 8).map((movie) => {
+                  const before = movie.expectation_mood
+                    ? getMoodConfig(movie.expectation_mood, "expectation")
+                    : null;
+                  const after = movie.final_mood
+                    ? getMoodConfig(movie.final_mood, "final")
+                    : null;
+
+                  return (
+                    <li class="mood-row">
+                      <p class="mood-row__film">
+                        <a href={`/reviews/${movie.id}`}>{movie.title}</a>
+                        <span class="mood-row__year">{movie.year}</span>
+                      </p>
+                      <p class="mood-row__pair">
+                        <span class="mood mood--expect">
+                          <span class="mood__tag">esperaba</span>
+                          {before ? `${before.emoji} ${before.label}` : <em>sin registro</em>}
+                        </span>
+                        <span class="mood-row__arrow" aria-hidden="true">→</span>
+                        <span class="mood mood--final">
+                          <span class="mood__tag">me dejó</span>
+                          {after ? `${after.emoji} ${after.label}` : <em>sin registro</em>}
+                        </span>
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p class="empty">Todavía no hay reacciones registradas</p>
+            )}
+          </div>
+          <div class="perf perf--r" aria-hidden="true"></div>
+        </section>
+
+        <!-- 04 · críticas -->
+        <section class="frame" id="criticas" aria-labelledby="t-criticas">
+          <div class="perf perf--l" aria-hidden="true"></div>
+          <div class="frame__body">
+            <p class="kicker">
+              <span class="kicker__n">04</span>
               <span>Críticas</span>
               <span class="kicker__rule" aria-hidden="true"></span>
             </p>
@@ -1008,7 +1199,7 @@ const frames = [
           <div class="perf perf--l" aria-hidden="true"></div>
           <div class="frame__body">
             <p class="kicker">
-              <span class="kicker__n">04</span>
+              <span class="kicker__n">05</span>
               <span>Vibes</span>
               <span class="kicker__rule" aria-hidden="true"></span>
             </p>
@@ -1041,7 +1232,7 @@ const frames = [
           <div class="perf perf--l" aria-hidden="true"></div>
           <div class="frame__body">
             <p class="kicker">
-              <span class="kicker__n">05</span>
+              <span class="kicker__n">06</span>
               <span>Cartelera</span>
               <span class="kicker__rule" aria-hidden="true"></span>
             </p>
