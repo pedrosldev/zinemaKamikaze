@@ -20,7 +20,7 @@ import {
   getReviewedMovies,
   getOpenSelection,
 } from "../../lib/db";
-import { getMoodConfig, EXPECTATION_MOODS } from "../../lib/moodMapper";
+import { getMoodConfig } from "../../lib/moodMapper";
 import { moodSequences, defaultSequence } from "../../config/moodSequences";
 import ExpectationStrip from "../../components/ExpectationStrip.astro";
 
@@ -41,26 +41,11 @@ const taquillaOpen = !isViewingPeriod && (await getOpenSelection()) !== null;
 
 const moodInfo = expectationMood ? getMoodConfig(expectationMood, "expectation") : null;
 
-// Reacciones animadas: las mismas secuencias de caras que usa la portada real.
-const MOOD_ORDER = ["excitement", "fear", "curiosity", "dread", "surprise", "boredom"] as const;
-const moodLayers = [
-  ...MOOD_ORDER.map((key) => ({
-    key,
-    emoji: EXPECTATION_MOODS[key].emoji,
-    label: EXPECTATION_MOODS[key].label,
-    caption: "Esto espero",
-    sequence: moodSequences[key],
-  })),
-  {
-    key: "default",
-    emoji: "🎞️",
-    label: "La secuencia de siempre",
-    caption: "Sin elección",
-    sequence: defaultSequence,
-  },
-];
-const activeMoodKey =
-  expectationMood && moodSequences[expectationMood] ? expectationMood : "default";
+// La reacción de la película en cartel: la misma secuencia que reproduce la portada.
+const currentSequence =
+  expectationMood && moodSequences[expectationMood]
+    ? moodSequences[expectationMood]
+    : defaultSequence;
 
 // watched_date puede llegar como Date (driver) o como "YYYY-MM-DD".
 const watchedLabel = (() => {
@@ -594,33 +579,17 @@ const frames = [
       }
 
       /* ============================================================
-         FOTOGRAMA 03 — reacciones (secuencias animadas)
+         FOTOGRAMA 03 — reacciones (la reacción de la película)
          ============================================================ */
-
-      .reactions {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) clamp(180px, 19vw, 240px);
-        gap: clamp(18px, 2.6vw, 36px);
-        align-items: stretch;
-        min-height: 0;
-      }
 
       .screen {
         position: relative;
-        min-height: clamp(260px, 44vh, 500px);
+        width: 100%;
+        min-height: clamp(300px, 52vh, 560px);
         border: 1px solid rgba(236, 226, 201, 0.16);
         background: #05070c;
         overflow: hidden;
         box-shadow: 0 26px 50px -30px rgba(0, 0, 0, 0.9);
-      }
-
-      .screen__layer {
-        position: absolute;
-        inset: 0;
-      }
-
-      .screen__layer[hidden] {
-        display: none;
       }
 
       .screen__caption {
@@ -632,8 +601,8 @@ const frames = [
         display: flex;
         align-items: baseline;
         flex-wrap: wrap;
-        gap: 12px;
-        padding: 16px 18px;
+        gap: 6px 14px;
+        padding: 18px 20px;
       }
 
       .screen__label {
@@ -650,59 +619,11 @@ const frames = [
         color: var(--paper);
       }
 
-      .mood-picker {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        border-top: 1px solid var(--line);
-      }
-
-      .mood-picker li {
-        display: flex;
-      }
-
-      .mood-picker button {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 8px;
-        border: 0;
-        border-bottom: 1px solid var(--line);
-        background: transparent;
-        color: var(--paper-dim);
-        font-family: inherit;
+      .screen__desc {
+        flex-basis: 100%;
         font-size: 0.68rem;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        text-align: left;
-        cursor: pointer;
-        transition:
-          color 0.2s ease,
-          background-color 0.2s ease,
-          box-shadow 0.2s ease;
-      }
-
-      .mood-picker button:hover {
-        color: var(--paper);
-        background: rgba(236, 226, 201, 0.05);
-      }
-
-      .mood-picker button:focus-visible {
-        outline: 2px solid var(--red);
-        outline-offset: -2px;
-      }
-
-      .mood-picker button[aria-pressed="true"] {
-        color: var(--paper);
-        background: var(--red-soft);
-        box-shadow: inset 3px 0 0 var(--red);
-      }
-
-      .mood-picker__emoji {
-        font-size: 1rem;
+        letter-spacing: 0.04em;
+        color: rgba(236, 226, 201, 0.55);
       }
 
       /* ============================================================
@@ -939,23 +860,8 @@ const frames = [
           grid-template-columns: minmax(110px, 150px) 1fr;
         }
 
-        .reactions {
-          grid-template-columns: 1fr;
-          gap: 14px;
-        }
-
         .screen {
           min-height: clamp(190px, 30vh, 280px);
-        }
-
-        .mood-picker {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          border-top: 0;
-        }
-
-        .mood-picker li:last-child {
-          grid-column: 1 / -1;
         }
 
         .grid {
@@ -1106,16 +1012,7 @@ const frames = [
                   <p class="movie__year">{latestMovie.year}</p>
 
                   <div class="expect">
-                    <span class="expect__label">Esto espero</span>
-                    {moodInfo ? (
-                      <span class="expect__value">
-                        {moodInfo.emoji} {moodInfo.label}
-                      </span>
-                    ) : (
-                      <span class="expect__value expect__value--empty">
-                        Sin reacción todavía
-                      </span>
-                    )}
+                    <span class="expect__label">Lo que espera la gente</span>
                   </div>
 
                   {expectationComments.length > 0 ? (
@@ -1157,53 +1054,36 @@ const frames = [
               <span class="kicker__rule" aria-hidden="true"></span>
             </p>
             <h2 class="display" id="t-reacciones" style="font-size: clamp(1.6rem, 3.4vw, 2.8rem)">
-              Las caras que pongo
+              Lo que me sugiere
             </h2>
             <p class="lead">
-              Las secuencias que se ven en la portada mientras la película está en
-              proceso. Elige una y la bobina la reproduce.
+              {latestMovie
+                ? `"${latestMovie.title}" (${latestMovie.year}) · la reacción que la portada reproduce mientras la crítica está en camino.`
+                : "Cuando haya una película en cartel, aquí se verá la reacción que me sugiere."}
             </p>
 
-            <div class="reactions">
+            {latestMovie ? (
               <div class="screen">
-                {moodLayers.map((layer) => (
-                  <div
-                    class="screen__layer"
-                    data-mood-layer={layer.key}
-                    hidden={layer.key !== activeMoodKey}
-                  >
-                    <ExpectationStrip
-                      sequence={layer.sequence}
-                      mood={layer.key === "default" ? null : layer.key}
-                      variant="frame"
-                    />
-                    <div class="screen__caption">
-                      <span class="screen__label">{layer.caption}</span>
-                      <strong class="screen__mood">
-                        {layer.emoji} {layer.label}
-                      </strong>
-                    </div>
-                  </div>
-                ))}
+                <ExpectationStrip
+                  sequence={currentSequence}
+                  mood={moodInfo ? expectationMood : null}
+                  variant="frame"
+                />
+                <div class="screen__caption">
+                  <span class="screen__label">Esto espero</span>
+                  <strong class="screen__mood">
+                    {moodInfo
+                      ? `${moodInfo.emoji} ${moodInfo.label}`
+                      : "Sin reacción todavía"}
+                  </strong>
+                  {moodInfo?.description && (
+                    <span class="screen__desc">{moodInfo.description}</span>
+                  )}
+                </div>
               </div>
-
-              <ul class="mood-picker" aria-label="Reacciones">
-                {moodLayers.map((layer) => (
-                  <li>
-                    <button
-                      type="button"
-                      data-mood-pick={layer.key}
-                      aria-pressed={layer.key === activeMoodKey ? "true" : "false"}
-                    >
-                      <span class="mood-picker__emoji" aria-hidden="true">
-                        {layer.emoji}
-                      </span>
-                      <span>{layer.label}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            ) : (
+              <p class="empty">Sin película en cartel</p>
+            )}
           </div>
           <div class="perf perf--r" aria-hidden="true"></div>
         </section>
@@ -1352,26 +1232,6 @@ const frames = [
 
         frames.forEach((frame) => observer.observe(frame));
       }
-
-      // Selector de reacciones: cambia la capa visible del fotograma 03.
-      const moodButtons = Array.from(
-        document.querySelectorAll<HTMLButtonElement>("[data-mood-pick]"),
-      );
-      const moodLayers = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-mood-layer]"),
-      );
-
-      moodButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const key = button.dataset.moodPick;
-          moodButtons.forEach((other) => {
-            other.setAttribute("aria-pressed", other === button ? "true" : "false");
-          });
-          moodLayers.forEach((layer) => {
-            layer.hidden = layer.dataset.moodLayer !== key;
-          });
-        });
-      });
     </script>
   </body>
 </html>
